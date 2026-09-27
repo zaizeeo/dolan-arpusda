@@ -1,6 +1,6 @@
-import React from "react";
+const HomePage = (props) => {
+    console.log({ props });
 
-const HomePage = () => {
     return <div>HomePage</div>;
 };
 
