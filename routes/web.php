@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BukuTamuController;
 use App\Http\Controllers\AuthController;
+use Inertia\Inertia;
 
 // --- AREA PUBLIK (Tidak perlu login) ---
 Route::get('/', [BukuTamuController::class, 'create']);
@@ -20,3 +21,7 @@ Route::get('/pengunjung/{id}/edit', [BukuTamuController::class, 'edit'])->name('
 Route::put('/pengunjung/{id}', [BukuTamuController::class, 'update'])->name('buku-tamu.update')->middleware('auth');
 
 Route::delete('/pengunjung/{id}', [BukuTamuController::class, 'destroy'])->name('buku-tamu.destroy')->middleware('auth');
+
+Route::get('/home', function () {
+    return Inertia::render('home-page');
+});
