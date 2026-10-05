@@ -2,15 +2,46 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
+use Inertia\Inertia;
 
 class AuthController extends Controller
 {
     // Menampilkan halaman form login
-    public function showLoginForm()
+    public function showAuthPage()
     {
-        return view('auth.login');
+        return Inertia::render('auth-page');
+    }
+
+    public function createUser(Request $request)
+    {
+        try {
+            $data = $request->validate(
+                [
+                    'name' => ['required', 'min:2', 'max:128'],
+                    'email' => ['required', 'email'],
+                    'password' => ['required', 'min:8', 'max:32'],
+                    'role' => ['required', 'in:magang,staff,admin,superadmin']
+                ],
+                [
+                    'name.min' => 'nama harus diisi minimal 2 karakter',
+                    'name.max' => 'nama maksimal 128 karakter',
+                    'email.required' => 'email harus diisi',
+                    'email.email' => 'mohon isi email yang valid',
+                    'password.required' => 'password harus diisi',
+                    'role.required' => 'pilih role yang tersedia',
+                    'role.in' => 'role harus diantara magang, staff, admin, dan superadmin'
+                ]
+            );
+        } catch (\Throwable $th) {
+            if ($th instanceof ValidationException) {
+                return redirect()->back()->withErrors($th->getMessage(), 'server');
+            }
+            return redirect()->back()->withErrors('Terjadi kesalahan Coba lagi beberapa saat', 'server');
+        }
     }
 
     // Memproses data login yang diinput
