@@ -191,4 +191,16 @@ Use Wayfinder to generate TypeScript functions for Laravel routes. Import from `
 
 - IMPORTANT: Activate `inertia-react-development` when working with Inertia React client-side patterns.
 
+=== frontend rules ===
+
+# Frontend Guidelines (Laravel Inertia + React)
+
+- **Package Manager**: Bun is the main package manager (`bun`). Use `pnpm` if `bun` is not available.
+- **UI Stack**: This project uses Tailwind CSS (v4) and shadcn UI components.
+- **Color System**: Never use raw Tailwind palette colors (e.g. `bg-blue-500`, `text-gray-700`). Always use shadcn UI semantic theme colors instead (e.g. `bg-primary`, `text-primary-foreground`, `bg-muted`, `text-muted-foreground`, `bg-card`, `text-card-foreground`, `border-border`, `text-destructive`).
+- **Sizing & Spacing**: Avoid adding arbitrary explicit sizes with brackets (e.g. avoid `mt-[40px]`, `w-[300px]`). Always use Tailwind's native scale/sizing utilities (e.g. `mt-10`, `w-72`, `max-w-md`).
+- **Form Handling & Validation**: Always validate forms with user input. Use React Hook Form (`useForm`, `Controller`) for form state management and Zod (`zodResolver`) for schema validation.
+- **Localization**: Always use Bahasa Indonesia for all user-facing rendered HTML and UI text (labels, titles, descriptions, placeholders, button actions, validation errors, and toast messages).
+
+
 </laravel-boost-guidelines>
