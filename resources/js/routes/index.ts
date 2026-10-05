@@ -1,75 +1,68 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../wayfinder'
 /**
-* @see \App\Http\Controllers\AuthController::login
-* @see app/Http/Controllers/AuthController.php:11
-* @route '/login'
+* @see routes/web.php:24
+* @route '/'
 */
-export const login = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
-    url: login.url(options),
+export const homePage = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: homePage.url(options),
     method: 'get',
 })
 
-login.definition = {
+homePage.definition = {
     methods: ["get","head"],
-    url: '/login',
+    url: '/',
 } satisfies RouteDefinition<["get","head"]>
 
 /**
-* @see \App\Http\Controllers\AuthController::login
-* @see app/Http/Controllers/AuthController.php:11
-* @route '/login'
+* @see routes/web.php:24
+* @route '/'
 */
-login.url = (options?: RouteQueryOptions) => {
-    return login.definition.url + queryParams(options)
+homePage.url = (options?: RouteQueryOptions) => {
+    return homePage.definition.url + queryParams(options)
 }
 
 /**
-* @see \App\Http\Controllers\AuthController::login
-* @see app/Http/Controllers/AuthController.php:11
-* @route '/login'
+* @see routes/web.php:24
+* @route '/'
 */
-login.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
-    url: login.url(options),
+homePage.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: homePage.url(options),
     method: 'get',
 })
 
 /**
-* @see \App\Http\Controllers\AuthController::login
-* @see app/Http/Controllers/AuthController.php:11
-* @route '/login'
+* @see routes/web.php:24
+* @route '/'
 */
-login.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
-    url: login.url(options),
+homePage.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: homePage.url(options),
     method: 'head',
 })
 
 /**
-* @see \App\Http\Controllers\AuthController::login
-* @see app/Http/Controllers/AuthController.php:11
-* @route '/login'
+* @see routes/web.php:24
+* @route '/'
 */
-const loginForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-    action: login.url(options),
+const homePageForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: homePage.url(options),
     method: 'get',
 })
 
 /**
-* @see \App\Http\Controllers\AuthController::login
-* @see app/Http/Controllers/AuthController.php:11
-* @route '/login'
+* @see routes/web.php:24
+* @route '/'
 */
-loginForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-    action: login.url(options),
+homePageForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: homePage.url(options),
     method: 'get',
 })
 
 /**
-* @see \App\Http\Controllers\AuthController::login
-* @see app/Http/Controllers/AuthController.php:11
-* @route '/login'
+* @see routes/web.php:24
+* @route '/'
 */
-loginForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-    action: login.url({
+homePageForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: homePage.url({
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'HEAD',
             ...(options?.query ?? options?.mergeQuery ?? {}),
@@ -78,60 +71,4 @@ loginForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
     method: 'get',
 })
 
-login.form = loginForm
-
-/**
-* @see \App\Http\Controllers\AuthController::logout
-* @see app/Http/Controllers/AuthController.php:37
-* @route '/logout'
-*/
-export const logout = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
-    url: logout.url(options),
-    method: 'post',
-})
-
-logout.definition = {
-    methods: ["post"],
-    url: '/logout',
-} satisfies RouteDefinition<["post"]>
-
-/**
-* @see \App\Http\Controllers\AuthController::logout
-* @see app/Http/Controllers/AuthController.php:37
-* @route '/logout'
-*/
-logout.url = (options?: RouteQueryOptions) => {
-    return logout.definition.url + queryParams(options)
-}
-
-/**
-* @see \App\Http\Controllers\AuthController::logout
-* @see app/Http/Controllers/AuthController.php:37
-* @route '/logout'
-*/
-logout.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
-    url: logout.url(options),
-    method: 'post',
-})
-
-/**
-* @see \App\Http\Controllers\AuthController::logout
-* @see app/Http/Controllers/AuthController.php:37
-* @route '/logout'
-*/
-const logoutForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-    action: logout.url(options),
-    method: 'post',
-})
-
-/**
-* @see \App\Http\Controllers\AuthController::logout
-* @see app/Http/Controllers/AuthController.php:37
-* @route '/logout'
-*/
-logoutForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-    action: logout.url(options),
-    method: 'post',
-})
-
-logout.form = logoutForm
+homePage.form = homePageForm
