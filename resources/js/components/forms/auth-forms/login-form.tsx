@@ -62,9 +62,9 @@ export function LoginForm({
       return
     }
 
-    toast("You submitted the following values:", {
+    toast("Data yang dikirimkan:", {
       description: (
-        <pre className="mt-2 w-[320px] overflow-x-auto rounded-md bg-muted p-4 text-foreground">
+        <pre className="mt-2 w-80 overflow-x-auto rounded-md bg-muted p-4 text-foreground">
           <code>{JSON.stringify(data, null, 2)}</code>
         </pre>
       ),
