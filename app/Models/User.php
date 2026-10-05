@@ -6,6 +6,7 @@ namespace App\Models;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -15,7 +16,7 @@ use Illuminate\Notifications\Notifiable;
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, HasUuids, Notifiable;
 
     /**
      * Get the attributes that should be cast.
@@ -32,10 +33,10 @@ class User extends Authenticatable
 
     public function hasAdminsAuthority(): bool
     {
-        return in_array($this->role, ['admin', 'superadmin']);
+        return in_array(strtolower($this->role), ['admin', 'superadmin']);
     }
     public function hasSuperAdminAuthority(): bool
     {
-        return in_array($this->role, ['superadmin']);
+        return in_array(strtolower($this->role), ['superadmin']);
     }
 }
