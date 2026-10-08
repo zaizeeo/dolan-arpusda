@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\AuthMiddleware;
 use App\Http\Middleware\GuestMiddleware;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Foundation\Application;
@@ -20,7 +21,8 @@ return Application::configure(basePath: dirname(__DIR__))
             AddLinkHeadersForPreloadedAssets::class,
         ]);
         $middleware->alias([
-            'guest.middleware' => GuestMiddleware::class
+            'guest.middleware' => GuestMiddleware::class,
+            'auth.middleware' => AuthMiddleware::class
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
