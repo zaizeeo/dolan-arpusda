@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
@@ -27,13 +26,15 @@ class AuthController extends Controller
                     'role' => ['required', 'in:magang,staff,admin,superadmin']
                 ],
                 [
-                    'name.min' => 'nama harus diisi minimal 2 karakter',
-                    'name.max' => 'nama maksimal 128 karakter',
-                    'email.required' => 'email harus diisi',
-                    'email.email' => 'mohon isi email yang valid',
+                    'name.min' => 'Nama harus diisi minimal 2 karakter',
+                    'name.max' => 'Nama maksimal 128 karakter',
+                    'email.required' => 'Email harus diisi',
+                    'email.email' => 'Mohon isi email yang valid',
                     'password.required' => 'password harus diisi',
-                    'role.required' => 'pilih role yang tersedia',
-                    'role.in' => 'role harus diantara magang, staff, admin, dan superadmin'
+                    'password.min' => 'Password minimal 8 karakter',
+                    'password.max' => 'Password maksimal 32 karakter',
+                    'role.required' => 'Pilih role yang tersedia',
+                    'role.in' => 'Role harus diantara magang, staff, admin, dan superadmin'
                 ]
             );
         } catch (\Throwable $th) {
@@ -47,21 +48,35 @@ class AuthController extends Controller
     // Memproses data login yang diinput
     public function login(Request $request)
     {
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
-        ]);
+        try {
+            $data = $request->validate(
+                [
+                    'email' => ['required', 'email'],
+                    'password' => ['required', 'min:8', 'max:32'],
+                ],
+                [
+                    'email.required' => 'Email harus diisi',
+                    'email.email' => 'Mohon isi email yang valid',
+                    'password.required' => 'Password harus diisi',
+                    'password.min' => 'Password minimal 8 karakter',
+                    'password.max' => 'Password maksimal 32 karakte r',
+                ]
+            );
+            // Mengecek apakah email dan password cocok di database
+            if (Auth::attempt($data)) {
+                $request->session()->regenerate();
+                return redirect()->route('dashboard.index'); // Arahkan ke tabel jika berhasil
+            }
 
-        // Mengecek apakah email dan password cocok di database
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-            return redirect()->intended('/pengunjung'); // Arahkan ke tabel jika berhasil
+
+            // Jika salah, kembalikan ke halaman login dengan pesan error
+            return back()->withErrors('Email atau password tidak valid!', 'server');
+        } catch (\Throwable $th) {
+            if ($th instanceof ValidationException) {
+                return redirect()->back()->withErrors($th->getMessage(), 'server');
+            }
+            return redirect()->back()->withErrors('Terjadi kesalahan Coba lagi beberapa saat', 'server');
         }
-
-        // Jika salah, kembalikan ke halaman login dengan pesan error
-        return back()->withErrors([
-            'email' => 'Email atau password yang Anda masukkan salah.',
-        ]);
     }
 
     // Memproses proses keluar (logout)

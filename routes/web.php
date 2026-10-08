@@ -25,4 +25,16 @@ Route::get('/', function () {
     return Inertia::render('home-page');
 })->name('home-page');
 
-Route::get('/auth', [AuthController::class, 'showAuthPage'])->middleware('guest.middleware');
+Route::get('/auth', [AuthController::class, 'showAuthPage'])->middleware('guest.middleware')->name('login');
+
+Route::prefix('/api')->group(function () {
+    Route::prefix('/auth')->group(function () {
+        Route::post('/login', [AuthController::class, 'login'])->name('login')->middleware(['guest.middleware']);
+    });
+});
+
+Route::prefix('/dashboard')->middleware(['auth.middleware'])->group(function () {
+    Route::get('/', function () {
+        return Inertia::render('dashboard/index');
+    })->name('dashboard.index');
+});
