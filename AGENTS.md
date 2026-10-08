@@ -200,7 +200,26 @@ Use Wayfinder to generate TypeScript functions for Laravel routes. Import from `
 - **Color System**: Never use raw Tailwind palette colors (e.g. `bg-blue-500`, `text-gray-700`). Always use shadcn UI semantic theme colors instead (e.g. `bg-primary`, `text-primary-foreground`, `bg-muted`, `text-muted-foreground`, `bg-card`, `text-card-foreground`, `border-border`, `text-destructive`).
 - **Sizing & Spacing**: Avoid adding arbitrary explicit sizes with brackets (e.g. avoid `mt-[40px]`, `w-[300px]`). Always use Tailwind's native scale/sizing utilities (e.g. `mt-10`, `w-72`, `max-w-md`).
 - **Form Handling & Validation**: Always validate forms with user input. Use React Hook Form (`useForm`, `Controller`) for form state management and Zod (`zodResolver`) for schema validation.
+- **Form Building Standards**:
+  - **Component Composition**: Form components must be self-contained `<form>` units without embedded outer `<Card>` wrappers (avoid `withCard` props). Compose Card, Dialog, or Drawer containers externally at the page level.
+  - **Form Structure**: Use `<form id="form-[name]" onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">`.
+  - **Form-Level Error Display**: Render top-level server errors above `<FieldGroup>` using `{formErrorMessage && <FieldError errors={[{ message: formErrorMessage }]} />}` with local state `const [formErrorMessage, setFormErrorMessage] = useState("")`.
+  - **Field Construction**: Group fields within `<FieldGroup>`. Wrap each field in `<Controller>` with `<Field data-invalid={fieldState.invalid}>`:
+    - `<FieldLabel htmlFor="field-id">`
+    - `<Input id="field-id" aria-invalid={fieldState.invalid} {...field} />` (or `<InputGroup>` for password toggles/adornments)
+    - `{fieldState.invalid && <FieldError errors={[fieldState.error]} />}`
+  - **Action Buttons**: Primary action is the submit button (`<Button disabled={isLoading} type="submit">[Label]</Button>`). Reset buttons (`<Button type="button" variant="outline" onClick={() => form.reset()}>Reset</Button>`) should NOT be included by default on all forms—use them conditionally only when explicitly necessary. When multiple action buttons are needed, wrap and align them using `<Field orientation="horizontal" className="w-full justify-end gap-2 pt-2">`.
+  - **Submission & State Lifecycle**:
+    - Manage submission loading with `isLoading` (`useState(false)`).
+    - Handle requests with Inertia (`router.post`, etc.) and `requestOptions satisfies VisitHelperOptions`.
+    - `onStart`: `setIsLoading(true)`
+    - `onFinish`: `setIsLoading(false)`
+    - `onSuccess`: display `toast.success("Berhasil", { description: "..." })`
+    - `onError`: resolve error string (e.g. `const errMessage = error?.server[0] || "Coba lagi beberapa saat"`), set `setFormErrorMessage(errMessage)`, and show `toast.error("Terjadi Kesalahan!", { description: errMessage })` (pass `errMessage` directly, never stale state).
+- **Toast Notifications Standard**:
+  - Use plain strings for toast descriptions (`{ description: "..." }`). Do not wrap descriptions in manual `<span className="...">` tags.
+  - The global Toaster configures descriptions using the shadcn semantic token `text-muted-foreground` for consistent and accessible contrast across themes.
+  - Never style descriptions with `primary-foreground` (which is meant for text on `primary` backgrounds and creates illegible white-on-white text on popover/card surfaces).
 - **Localization**: Always use Bahasa Indonesia for all user-facing rendered HTML and UI text (labels, titles, descriptions, placeholders, button actions, validation errors, and toast messages).
-
 
 </laravel-boost-guidelines>
