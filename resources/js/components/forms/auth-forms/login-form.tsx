@@ -15,6 +15,7 @@ import { toast } from "sonner";
 export function LoginForm() {
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [formErrorMessage, setFormErrorMessage] = useState("");
 
     const form = useForm<LoginSchemaType>({
         resolver: zodResolver(loginSchema),
@@ -34,8 +35,9 @@ export function LoginForm() {
                 });
             },
             onError: (error) => {
-                const description = error?.server[0] || "Coba lagi beberapa saat";
-                toast.error("Terjadi Kesalahan!", { description });
+                const errMessage = error?.server[0] || "Coba lagi beberapa saat";
+                setFormErrorMessage(errMessage);
+                toast.error("Terjadi Kesalahan!", { description: formErrorMessage });
             },
         } satisfies VisitHelperOptions;
 
@@ -44,6 +46,7 @@ export function LoginForm() {
 
     return (
         <form id="form-login" onSubmit={form.handleSubmit(onSubmit)} className={"space-y-6"}>
+            {formErrorMessage && <FieldError errors={[{ message: formErrorMessage }]} />}
             <FieldGroup>
                 <Controller
                     name="email"
