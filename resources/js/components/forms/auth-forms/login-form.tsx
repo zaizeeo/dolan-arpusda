@@ -31,13 +31,15 @@ export function LoginForm() {
             onFinish: () => setIsLoading(false),
             onSuccess: () => {
                 toast.success("Berhasil", {
-                    description: <span className="text-foreground/50">Anda akan diarahkan ke halaman Dashboard!</span>,
+                    description: "Anda akan diarahkan ke halaman Dashboard!",
                 });
             },
             onError: (error) => {
                 const errMessage = error?.server[0] || "Coba lagi beberapa saat";
                 setFormErrorMessage(errMessage);
-                toast.error("Terjadi Kesalahan!", { description: formErrorMessage });
+                toast.error("Terjadi Kesalahan!", {
+                    description: errMessage,
+                });
             },
         } satisfies VisitHelperOptions;
 
@@ -97,15 +99,10 @@ export function LoginForm() {
                         </Field>
                     )}
                 />
-            </FieldGroup>
-            <Field orientation="horizontal" className="w-full justify-end gap-2 pt-2">
-                <Button type="button" variant="outline" onClick={() => form.reset()}>
-                    Reset
-                </Button>
                 <Button disabled={isLoading} type="submit">
                     Masuk
                 </Button>
-            </Field>
+            </FieldGroup>
         </form>
     );
 }
