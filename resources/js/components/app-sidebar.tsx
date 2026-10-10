@@ -121,9 +121,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         },
         {
             title: "Buku Tamu",
-            url: "/dashboard/guest-book",
+            url: "/dashboard/management/guest-book",
             icon: BookOpen,
-            isActive: url.startsWith("/dashboard/reports"),
+            isActive: url.startsWith("/dashboard/management/guest-book"),
         },
     ];
 
