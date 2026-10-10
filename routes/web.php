@@ -33,6 +33,8 @@ Route::prefix('/api')->group(function () {
     });
 });
 
+Route::post('/logout', [AuthController::class, 'logout'])->middleware(['auth.middleware'])->name('logout');
+
 Route::prefix('/dashboard')->middleware(['auth.middleware'])->group(function () {
     Route::get('/', function () {
         return Inertia::render('dashboard/index');
