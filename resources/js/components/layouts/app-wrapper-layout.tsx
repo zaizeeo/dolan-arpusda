@@ -4,11 +4,12 @@ import { Toaster } from "../ui/sonner";
 
 interface Props {
     children: ReactNode;
+    className?: string;
 }
 
-const AppWrapperLayout = ({ children }: Props) => {
+const AppWrapperLayout = ({ children, className }: Props) => {
     return (
-        <div>
+        <div className={className}>
             <TooltipProvider>
                 {children}
                 <Toaster />

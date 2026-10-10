@@ -1,5 +1,7 @@
+import DashboardLayout from "@/components/layouts/dashboard-layout";
+
 const DashboardIndexPage = () => {
-    return <div>DashboardIndexPage</div>;
+    return <DashboardLayout>DashboardIndexPage</DashboardLayout>;
 };
 
 export default DashboardIndexPage;
