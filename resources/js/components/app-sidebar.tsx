@@ -72,7 +72,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         .toUpperCase();
 
     const handleLogout = () => {
-        router.post("/logout");
+        router.post("/_api/authlogout");
     };
 
     const navMain = [
@@ -186,12 +186,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         <SidebarMenu>
                             {navMain.map((item) =>
                                 item.items ? (
-                                    <Collapsible
-                                        key={item.title}
-                                        asChild
-                                        defaultOpen={item.isActive}
-                                        className="group/collapsible"
-                                    >
+                                    <Collapsible key={item.title} asChild defaultOpen={item.isActive} className="group/collapsible">
                                         <SidebarMenuItem>
                                             <CollapsibleTrigger asChild>
                                                 <SidebarMenuButton tooltip={item.title} isActive={item.isActive}>
@@ -224,7 +219,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                             </Link>
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>
-                                )
+                                ),
                             )}
                         </SidebarMenu>
                     </SidebarGroupContent>

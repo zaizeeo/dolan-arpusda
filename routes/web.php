@@ -27,13 +27,13 @@ Route::get('/', function () {
 
 Route::get('/auth', [AuthController::class, 'showAuthPage'])->middleware('guest.middleware')->name('login');
 
-Route::prefix('/api')->group(function () {
+Route::prefix('/_api')->group(function () {
     Route::prefix('/auth')->group(function () {
         Route::post('/login', [AuthController::class, 'login'])->name('login')->middleware(['guest.middleware']);
+        Route::post('/logout', [AuthController::class, 'logout'])->middleware(['auth.middleware'])->name('logout');
     });
 });
 
-Route::post('/logout', [AuthController::class, 'logout'])->middleware(['auth.middleware'])->name('logout');
 
 Route::prefix('/dashboard')->middleware(['auth.middleware'])->group(function () {
     Route::get('/', function () {
