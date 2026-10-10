@@ -43,7 +43,7 @@ export function LoginForm() {
             },
         } satisfies VisitHelperOptions;
 
-        router.post("/api/auth/login", data, requestOptions);
+        router.post("/_api/auth/login", data, requestOptions);
     }
 
     return (
