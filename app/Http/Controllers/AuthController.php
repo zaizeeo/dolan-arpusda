@@ -2,90 +2,55 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Auth\CreateUserAction;
+use App\Http\Requests\Auth\CreateUserRequest;
+use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
 class AuthController extends Controller
 {
-    // Menampilkan halaman form login
+    /**
+     * Menampilkan halaman login/otentikasi.
+     */
     public function showAuthPage()
     {
         return Inertia::render('auth-page');
     }
 
-    public function createUser(Request $request)
+    /**
+     * Membuat akun user baru.
+     */
+    public function createUser(CreateUserRequest $request, CreateUserAction $createUserAction)
     {
-        try {
-            $data = $request->validate(
-                [
-                    'name' => ['required', 'min:2', 'max:128'],
-                    'email' => ['required', 'email'],
-                    'password' => ['required', 'min:8', 'max:32'],
-                    'role' => ['required', 'in:magang,staff,admin,superadmin']
-                ],
-                [
-                    'name.min' => 'Nama harus diisi minimal 2 karakter',
-                    'name.max' => 'Nama maksimal 128 karakter',
-                    'email.required' => 'Email harus diisi',
-                    'email.email' => 'Mohon isi email yang valid',
-                    'password.required' => 'password harus diisi',
-                    'password.min' => 'Password minimal 8 karakter',
-                    'password.max' => 'Password maksimal 32 karakter',
-                    'role.required' => 'Pilih role yang tersedia',
-                    'role.in' => 'Role harus diantara magang, staff, admin, dan superadmin'
-                ]
-            );
-        } catch (\Throwable $th) {
-            if ($th instanceof ValidationException) {
-                return redirect()->back()->withErrors($th->getMessage(), 'server');
-            }
-            return redirect()->back()->withErrors('Terjadi kesalahan Coba lagi beberapa saat', 'server');
-        }
+        $createUserAction->execute($request->validated());
+
+        return redirect()->back()->with('success', 'User berhasil dibuat');
     }
 
-    // Memproses data login yang diinput
-    public function login(Request $request)
+    /**
+     * Memproses data login dengan validasi dan rate limiting.
+     */
+    public function login(LoginRequest $request)
     {
-        try {
-            $data = $request->validate(
-                [
-                    'email' => ['required', 'email'],
-                    'password' => ['required', 'min:8', 'max:32'],
-                ],
-                [
-                    'email.required' => 'Email harus diisi',
-                    'email.email' => 'Mohon isi email yang valid',
-                    'password.required' => 'Password harus diisi',
-                    'password.min' => 'Password minimal 8 karakter',
-                    'password.max' => 'Password maksimal 32 karakte r',
-                ]
-            );
-            // Mengecek apakah email dan password cocok di database
-            if (Auth::attempt($data)) {
-                $request->session()->regenerate();
-                return redirect()->route('dashboard.index'); // Arahkan ke tabel jika berhasil
-            }
+        $request->authenticate();
 
+        $request->session()->regenerate();
 
-            // Jika salah, kembalikan ke halaman login dengan pesan error
-            return back()->withErrors('Email atau password tidak valid!', 'server');
-        } catch (\Throwable $th) {
-            if ($th instanceof ValidationException) {
-                return redirect()->back()->withErrors($th->getMessage(), 'server');
-            }
-            return redirect()->back()->withErrors('Terjadi kesalahan Coba lagi beberapa saat', 'server');
-        }
+        return redirect()->route('dashboard.index');
     }
 
-    // Memproses proses keluar (logout)
+    /**
+     * Memproses proses keluar (logout).
+     */
     public function logout(Request $request)
     {
         Auth::logout();
+
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/'); // Arahkan kembali ke form buku tamu tamu
+        return redirect('/');
     }
 }

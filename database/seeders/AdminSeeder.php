@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class AdminSeeder extends Seeder
@@ -15,14 +14,14 @@ class AdminSeeder extends Seeder
     {
         User::factory()->count(3)->sequence(
             [
-                "role" => "superadmin",
-                "name" => "Superadmin",
-                "email" => "superadmin@superadmin.com",
+                'role' => 'superadmin',
+                'name' => 'Superadmin',
+                'email' => 'superadmin@superadmin.com',
             ],
             [
-                "role" => "admin",
-                "name" => "Admin",
-                "email" => "admin@admin.com",
+                'role' => 'admin',
+                'name' => 'Admin',
+                'email' => 'admin@admin.com',
             ],
         )->create();
     }

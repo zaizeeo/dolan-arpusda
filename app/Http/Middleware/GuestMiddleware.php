@@ -16,8 +16,9 @@ class GuestMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         if ($request->user() != null) {
-            return redirect()->route("home-page");
+            return redirect()->route('home-page');
         }
+
         return $next($request);
     }
 }

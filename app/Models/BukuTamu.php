@@ -17,6 +17,6 @@ class BukuTamu extends Model
         'pendidikan_terakhir',
         'pekerjaan',
         'alamat',
-        'keperluan_layanan'
+        'keperluan_layanan',
     ];
 }

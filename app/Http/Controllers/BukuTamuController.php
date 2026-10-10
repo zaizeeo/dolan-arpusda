@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\BukuTamu;
+use Illuminate\Http\Request;
 
 class BukuTamuController extends Controller
 {
@@ -36,7 +36,8 @@ class BukuTamuController extends Controller
 
         return back()->with('success', 'Terima kasih, data kunjungan Anda berhasil disimpan!');
     }
-// Fungsi untuk menghapus data pengunjung
+
+    // Fungsi untuk menghapus data pengunjung
     public function destroy($id)
     {
         $bukuTamu = BukuTamu::findOrFail($id);
@@ -44,14 +45,16 @@ class BukuTamuController extends Controller
 
         return back()->with('success', 'Data pengunjung berhasil dihapus!');
     }
-// Menampilkan halaman form edit
+
+    // Menampilkan halaman form edit
     public function edit($id)
     {
         $bukuTamu = BukuTamu::findOrFail($id);
+
         return view('buku-tamu.edit', compact('bukuTamu'));
     }
 
-// Memproses penyimpanan data yang diedit
+    // Memproses penyimpanan data yang diedit
     public function update(Request $request, $id)
     {
         $request->validate([
