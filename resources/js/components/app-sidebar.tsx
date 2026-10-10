@@ -104,28 +104,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 },
             ],
         },
-        {
-            title: "Layanan Kearsipan",
-            icon: Archive,
-            isActive: url.startsWith("/dashboard/arsip"),
-            items: [
-                {
-                    title: "Peminjaman Arsip",
-                    url: "/dashboard/arsip/peminjaman",
-                    isActive: url === "/dashboard/arsip/peminjaman",
-                },
-                {
-                    title: "Penelusuran Arsip",
-                    url: "/dashboard/arsip/penelusuran",
-                    isActive: url === "/dashboard/arsip/penelusuran",
-                },
-                {
-                    title: "Wisata Arsip",
-                    url: "/dashboard/arsip/wisata",
-                    isActive: url === "/dashboard/arsip/wisata",
-                },
-            ],
-        },
     ];
 
     const navManagement = [
@@ -137,9 +115,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         },
         {
             title: "Laporan & Rekap",
-            url: "/dashboard/laporan",
+            url: "/dashboard/reports",
             icon: BarChart3,
-            isActive: url.startsWith("/dashboard/laporan"),
+            isActive: url.startsWith("/dashboard/reports"),
+        },
+        {
+            title: "Buku Tamu",
+            url: "/dashboard/guest-book",
+            icon: BookOpen,
+            isActive: url.startsWith("/dashboard/reports"),
         },
     ];
 
