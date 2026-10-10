@@ -27,3 +27,4 @@ Homestead.yaml
 Thumbs.db
 
 resources/js/actions/
+resources/js/routes/
