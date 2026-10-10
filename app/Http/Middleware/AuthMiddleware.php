@@ -16,8 +16,9 @@ class AuthMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         if ($request->user() == null) {
-            return redirect()->route("login");
+            return redirect()->route('login');
         }
+
         return $next($request);
     }
 }

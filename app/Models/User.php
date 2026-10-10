@@ -35,6 +35,7 @@ class User extends Authenticatable
     {
         return in_array(strtolower($this->role), ['admin', 'superadmin']);
     }
+
     public function hasSuperAdminAuthority(): bool
     {
         return in_array(strtolower($this->role), ['superadmin']);
