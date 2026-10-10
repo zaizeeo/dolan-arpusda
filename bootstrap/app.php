@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Middleware\AdminsMiddleware;
 use App\Http\Middleware\AuthMiddleware;
 use App\Http\Middleware\GuestMiddleware;
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\SuperadminMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -23,6 +25,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'guest.middleware' => GuestMiddleware::class,
             'auth.middleware' => AuthMiddleware::class,
+            'admins.middleware' => AdminsMiddleware::class,
+            'super-admin.middleware' => SuperadminMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
