@@ -72,7 +72,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         .toUpperCase();
 
     const handleLogout = () => {
-        router.post("/_api/authlogout");
+        router.post("/_api/auth/logout");
     };
 
     const navMain = [
