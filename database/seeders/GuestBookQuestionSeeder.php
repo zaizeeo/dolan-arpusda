@@ -59,13 +59,14 @@ class GuestBookQuestionSeeder extends Seeder
             'description' => 'Isi Pekerjaan',
         ]);
 
-        $rawData = ['PNS', 'TNI/POLRI', 'Guru', 'Karyawan Swasta', 'BUMN/BUMD', 'Pensiunan', 'Pelajar', 'Mahasiswa', 'Ibu Rumah Tangga', 'Lainnya'];
+        $rawData = ['PNS', 'TNI/POLRI', 'Guru', 'Karyawan Swasta', 'BUMN/BUMD', 'Pensiunan', 'Pelajar', 'Mahasiswa', 'Ibu Rumah Tangga', 'Dosen', 'Lainnya'];
 
         $data = array_map(function ($item) use ($job) {
             return [
                 'id' => (string) Str::orderedUuid(),
                 'guest_book_question_id' => $job->id,
                 'label' => $item,
+                'is_active' => $item !== 'Dosen',
                 'is_allow_custom_text' => $item === 'Lainnya',
             ];
         }, $rawData);
