@@ -35,11 +35,13 @@ const GuestBookQuestionManagement = (props: Props) => {
                 {props.questions.map((question) => (
                     <Card key={question.id}>
                         <CardHeader>
-                            <CardTitle>{question.label}</CardTitle>
-                            <CardDescription>{question.label}</CardDescription>
+                            <CardTitle>
+                                {question.label} <Badge>{question.is_active ? "Aktif" : "Tidak Aktif"}</Badge>
+                            </CardTitle>
+                            <CardDescription>{String(question.description ?? "")}</CardDescription>
                         </CardHeader>
                         <CardContent>
-                            {question.options.length > 0 && (
+                            {question.options.length > 0 ? (
                                 <div>
                                     <h1>Pilihan yang aktif</h1>
                                     {question.options.map((option) => (
@@ -53,6 +55,8 @@ const GuestBookQuestionManagement = (props: Props) => {
                                         </ul>
                                     ))}
                                 </div>
+                            ) : (
+                                <span>Tidak ada pilihan, gunakan text</span>
                             )}
                         </CardContent>
                     </Card>
