@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('guest_book_question_options', function (Blueprint $table) {
             $table->string('id')->primary();
             $table->foreignUuid('guest_book_question_id');
-            $table->string('label');
+            $table->string('label')->index();
             $table->string('description')->nullable();
             $table->boolean('is_active')->default(true);
             $table->softDeletes();
