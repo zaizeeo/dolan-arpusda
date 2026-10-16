@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[Fillable(['guest_book_id', 'guest_book_question_id', 'guest_book_question_option_id'])]
+#[Fillable(['guest_book_id', 'guest_book_question_id', 'custom_text', 'guest_book_question_option_id'])]
 class GuestBookAnswer extends Model
 {
     /** @use HasFactory<GuestBookAnswerFactory> */

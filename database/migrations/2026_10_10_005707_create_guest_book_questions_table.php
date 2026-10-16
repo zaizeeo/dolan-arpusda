@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('guest_book_questions', function (Blueprint $table) {
             $table->string('id')->primary();
-            $table->string('label');
+            $table->string('label')->index();
             $table->string('description')->nullable();
             $table->boolean('is_active')->default(true);
             $table->softDeletes();

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\GuestBookController;
+use App\Http\Controllers\GuestBookQuestionController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -40,5 +41,6 @@ Route::prefix('/dashboard')->middleware(['auth.middleware'])->group(function () 
     Route::get('/', function () {
         return Inertia::render('dashboard/index');
     })->name('dashboard.index');
-    Route::get('/management/guest-book', [GuestBookController::class,'index'])->name('dashboard.management.guest-book.index')->middleware(['admins.middleware']);
+    Route::get('/management/guest-book', [GuestBookController::class, 'index'])->name('dashboard.management.guest-book.index')->middleware(['admins.middleware']);
+    Route::get('/management/guest-book-question', [GuestBookQuestionController::class, 'index'])->name('dashboard.management.guest-book-question.index')->middleware(['admins.middleware']);
 });
