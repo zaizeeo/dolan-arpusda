@@ -2,13 +2,7 @@ import DashboardLayout from "@/components/layouts/dashboard-layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -38,6 +32,7 @@ interface Option extends Partial<TimeStamps> {
     description: string | null;
     guest_book_question_id: string;
     is_allow_custom_text: boolean | number;
+    sequence_number?: number;
     is_active: boolean;
 }
 
@@ -46,6 +41,7 @@ interface Question extends Partial<TimeStamps> {
     label: string;
     description: string | null;
     is_active: boolean;
+    sequence_number?: number;
     options: Array<Option>;
 }
 
@@ -54,6 +50,8 @@ interface Props extends PageProps {
 }
 
 export default function GuestBookQuestionManagement({ questions = [] }: Props) {
+    console.log({ questions });
+
     const totalQuestions = questions.length;
     const activeQuestions = questions.filter((q) => q.is_active).length;
     const totalOptions = questions.reduce((acc, q) => acc + (q.options?.length || 0), 0);
@@ -65,9 +63,7 @@ export default function GuestBookQuestionManagement({ questions = [] }: Props) {
                     {/* Header Page & Summary */}
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                         <div>
-                            <h1 className="text-2xl font-bold tracking-tight text-foreground">
-                                Daftar Pertanyaan Buku Tamu
-                            </h1>
+                            <h1 className="text-2xl font-bold tracking-tight text-foreground">Daftar Pertanyaan Buku Tamu</h1>
                             <p className="text-sm text-muted-foreground">
                                 Kelola pertanyaan kuisioner dan opsi jawaban untuk formulir buku tamu digital.
                             </p>
@@ -138,7 +134,7 @@ export default function GuestBookQuestionManagement({ questions = [] }: Props) {
                         </Card>
                     ) : (
                         <div className="flex flex-col gap-4">
-                            {questions.map((question, index) => {
+                            {questions.map((question) => {
                                 const hasOptions = question.options && question.options.length > 0;
                                 const activeOptionsCount = question.options?.filter((o) => o.is_active).length || 0;
 
@@ -148,17 +144,12 @@ export default function GuestBookQuestionManagement({ questions = [] }: Props) {
                                             <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                                                 <div className="flex items-start gap-3">
                                                     <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-muted text-xs font-semibold text-muted-foreground">
-                                                        #{index + 1}
+                                                        #{question.sequence_number}
                                                     </span>
                                                     <div className="space-y-1">
                                                         <div className="flex flex-wrap items-center gap-2">
-                                                            <CardTitle className="text-base font-semibold leading-none">
-                                                                {question.label}
-                                                            </CardTitle>
-                                                            <Badge
-                                                                variant={question.is_active ? "default" : "secondary"}
-                                                                className="text-[11px]"
-                                                            >
+                                                            <CardTitle className="text-base leading-none font-semibold">{question.label}</CardTitle>
+                                                            <Badge variant={question.is_active ? "default" : "secondary"} className="text-[11px]">
                                                                 {question.is_active ? "Aktif" : "Tidak Aktif"}
                                                             </Badge>
                                                             <Badge variant="outline" className="text-[11px]">
@@ -167,9 +158,7 @@ export default function GuestBookQuestionManagement({ questions = [] }: Props) {
                                                         </div>
                                                         <CardDescription className="text-sm">
                                                             {question.description || (
-                                                                <span className="italic text-muted-foreground/70">
-                                                                    Tidak ada deskripsi tambahan
-                                                                </span>
+                                                                <span className="text-muted-foreground/70 italic">Tidak ada deskripsi tambahan</span>
                                                             )}
                                                         </CardDescription>
                                                     </div>
@@ -177,54 +166,36 @@ export default function GuestBookQuestionManagement({ questions = [] }: Props) {
 
                                                 {/* Question Actions */}
                                                 <div className="flex items-center gap-1.5 self-end sm:self-start">
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        className="h-8 gap-1.5 text-xs"
-                                                    >
+                                                    <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs">
                                                         <ListPlus className="size-3.5" />
                                                         <span>Tambah Opsi</span>
                                                     </Button>
 
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon-sm"
-                                                        className="size-8"
-                                                        title="Edit Pertanyaan"
-                                                    >
+                                                    <Button variant="ghost" size="icon-sm" className="size-8" title="Edit Pertanyaan">
                                                         <Pencil className="size-3.5" />
                                                     </Button>
 
                                                     <DropdownMenu>
                                                         <DropdownMenuTrigger asChild>
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="icon-sm"
-                                                                className="size-8"
-                                                                aria-label="Menu Aksi"
-                                                            >
+                                                            <Button variant="ghost" size="icon-sm" className="size-8" aria-label="Menu Aksi">
                                                                 <MoreVertical className="size-3.5" />
                                                             </Button>
                                                         </DropdownMenuTrigger>
                                                         <DropdownMenuContent align="end" className="w-48">
-                                                            <DropdownMenuItem className="gap-2 cursor-pointer">
+                                                            <DropdownMenuItem className="cursor-pointer gap-2">
                                                                 <Pencil className="size-4" />
                                                                 <span>Edit Pertanyaan</span>
                                                             </DropdownMenuItem>
-                                                            <DropdownMenuItem className="gap-2 cursor-pointer">
+                                                            <DropdownMenuItem className="cursor-pointer gap-2">
                                                                 <ListPlus className="size-4" />
                                                                 <span>Tambah Pilihan Opsi</span>
                                                             </DropdownMenuItem>
-                                                            <DropdownMenuItem className="gap-2 cursor-pointer">
+                                                            <DropdownMenuItem className="cursor-pointer gap-2">
                                                                 <Power className="size-4" />
-                                                                <span>
-                                                                    {question.is_active
-                                                                        ? "Nonaktifkan Pertanyaan"
-                                                                        : "Aktifkan Pertanyaan"}
-                                                                </span>
+                                                                <span>{question.is_active ? "Nonaktifkan Pertanyaan" : "Aktifkan Pertanyaan"}</span>
                                                             </DropdownMenuItem>
                                                             <DropdownMenuSeparator />
-                                                            <DropdownMenuItem className="gap-2 text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer">
+                                                            <DropdownMenuItem className="cursor-pointer gap-2 text-destructive focus:bg-destructive/10 focus:text-destructive">
                                                                 <Trash2 className="size-4" />
                                                                 <span>Hapus Pertanyaan</span>
                                                             </DropdownMenuItem>
@@ -238,7 +209,7 @@ export default function GuestBookQuestionManagement({ questions = [] }: Props) {
                                             <div className="rounded-lg border border-border/60 bg-muted/30 p-3.5">
                                                 <div className="mb-2.5 flex items-center justify-between">
                                                     <div className="flex items-center gap-2">
-                                                        <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                                        <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
                                                             Pilihan Jawaban
                                                         </span>
                                                         {hasOptions && (
@@ -270,9 +241,7 @@ export default function GuestBookQuestionManagement({ questions = [] }: Props) {
                                                                 <div className="flex items-center gap-2.5">
                                                                     <CircleDot className="size-3.5 shrink-0 text-muted-foreground" />
                                                                     <div className="flex flex-wrap items-center gap-2">
-                                                                        <span className="text-sm font-medium text-foreground">
-                                                                            {option.label}
-                                                                        </span>
+                                                                        <span className="text-sm font-medium text-foreground">{option.label}</span>
                                                                         <Badge
                                                                             variant={option.is_active ? "default" : "secondary"}
                                                                             className="text-[10px]"
@@ -352,18 +321,13 @@ export default function GuestBookQuestionManagement({ questions = [] }: Props) {
                                                     <div className="flex flex-col items-center justify-center gap-2 rounded-md border border-dashed border-border py-4 text-center">
                                                         <Type className="size-5 text-muted-foreground" />
                                                         <div className="space-y-0.5">
-                                                            <p className="text-xs font-medium text-foreground">
-                                                                Tipe Isian Teks Bebas
-                                                            </p>
+                                                            <p className="text-xs font-medium text-foreground">Tipe Isian Teks Bebas</p>
                                                             <p className="text-[11px] text-muted-foreground">
-                                                                Pertanyaan ini tidak memerlukan pilihan ganda. Pengunjung akan mengetik langsung jawaban mereka.
+                                                                Pertanyaan ini tidak memerlukan pilihan ganda. Pengunjung akan mengetik langsung
+                                                                jawaban mereka.
                                                             </p>
                                                         </div>
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            className="mt-1 h-7 gap-1 text-xs"
-                                                        >
+                                                        <Button variant="outline" size="sm" className="mt-1 h-7 gap-1 text-xs">
                                                             <Plus className="size-3" />
                                                             <span>Ubah Jadi Pilihan Ganda (Tambah Opsi)</span>
                                                         </Button>
