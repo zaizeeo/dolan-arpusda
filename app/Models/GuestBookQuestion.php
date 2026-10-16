@@ -9,12 +9,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[Fillable(['label', 'text', 'is_active'])]
+#[Fillable(['label', 'description', 'is_active'])]
 class GuestBookQuestion extends Model
 {
     /** @use HasFactory<GuestBookQuestionFactory> */
-    use HasFactory, HasUuids;
+    use HasFactory, HasUuids, SoftDeletes;
 
     /**
      * Get the attributes that should be cast.
@@ -36,6 +37,11 @@ class GuestBookQuestion extends Model
     public function answers(): HasMany
     {
         return $this->hasMany(GuestBookAnswer::class);
+    }
+
+    public function options(): HasMany
+    {
+        return $this->hasMany(GuestBookQuestionOption::class);
     }
 
     /**

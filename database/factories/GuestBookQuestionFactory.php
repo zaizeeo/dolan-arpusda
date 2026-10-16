@@ -19,7 +19,7 @@ class GuestBookQuestionFactory extends Factory
     {
         return [
             'label' => fake()->word(),
-            'text' => fake()->sentence(),
+            'description' => fake()->sentence(),
             'is_active' => true,
         ];
     }
