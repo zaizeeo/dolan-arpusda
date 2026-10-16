@@ -62,16 +62,12 @@ class GuestBookQuestionSeeder extends Seeder
         $rawData = ['PNS', 'TNI/POLRI', 'Guru', 'Karyawan Swasta', 'BUMN/BUMD', 'Pensiunan', 'Pelajar', 'Mahasiswa', 'Ibu Rumah Tangga', 'Lainnya'];
 
         $data = array_map(function ($item) use ($job) {
-            $returnItem = [
+            return [
                 'id' => (string) Str::orderedUuid(),
                 'guest_book_question_id' => $job->id,
                 'label' => $item,
+                'is_allow_custom_text' => $item === 'Lainnya',
             ];
-            if ($item == "Lainnya") {
-                $returnItem['is_allow_custom_text'] = true;
-            }
-
-            return $returnItem;
         }, $rawData);
 
         GuestBookQuestionOption::insert($data);
@@ -87,16 +83,12 @@ class GuestBookQuestionSeeder extends Seeder
         $rawData = ['Bimbingan/Konsultasi', 'Peminjaman Arsip', 'Penelusuran Arsip', 'Kunjungan/ Wisata Arsip', 'Penyerahan Arsip', 'Lainnya'];
 
         $data = array_map(function ($item) use ($needs) {
-            $returnItem = [
+            return [
                 'id' => (string) Str::orderedUuid(),
                 'guest_book_question_id' => $needs->id,
                 'label' => $item,
+                'is_allow_custom_text' => $item === 'Lainnya',
             ];
-            if ($item == "Lainnya") {
-                $returnItem['is_allow_custom_text'] = true;
-            }
-
-            return $returnItem;
         }, $rawData);
 
         GuestBookQuestionOption::insert($data);
