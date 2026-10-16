@@ -30,7 +30,8 @@ class CreateQuestionRequest extends FormRequest
             'description' => ['string', 'nullable'],
             'options' => ['array', 'nullable'],
             'options.*.label' => ['string', 'min:2'],
-            'options.*.description' => ['string', 'nullable']
+            'options.*.description' => ['string', 'nullable'],
+            'options.*.is_allow_custom_text' => ['string', 'nullable']
         ];
     }
 
@@ -48,6 +49,7 @@ class CreateQuestionRequest extends FormRequest
             'options.*.label.required' => 'Label Harus diisi',
             'options.*.label.string' => 'Label hanya bisa diisi dengan text',
             'options.*.description.string' => 'Deskripsi hanya bisa diisi dengan text',
+            'options.*.is_allow_custom_text.boolean' => 'Opsi ini hanya bisa true atau false',
         ];
     }
 
