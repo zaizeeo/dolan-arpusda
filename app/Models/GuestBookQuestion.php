@@ -38,6 +38,11 @@ class GuestBookQuestion extends Model
         return $this->hasMany(GuestBookAnswer::class);
     }
 
+    public function options(): HasMany
+    {
+        return $this->hasMany(GuestBookQuestionOption::class);
+    }
+
     /**
      * Get the guest books that answered this question.
      *

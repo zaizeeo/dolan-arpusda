@@ -15,6 +15,7 @@ return new class extends Migration
             $table->string('id')->primary();
             $table->foreignUuid('guest_book_id');
             $table->foreignUuid('guest_book_question_id');
+            $table->softDeletes();
             $table->timestamps();
         });
     }
