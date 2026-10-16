@@ -8,8 +8,9 @@ use Inertia\Inertia;
 
 class GuestBookController extends Controller
 {
-    public function index(){
-        $guestBooks = GuestBook::with('answers.question')->get();
-        return Inertia::render("dashboard/management/guest-book/index",compact("guestBooks"));
+    public function index()
+    {
+        $guestBooks = GuestBook::with(['questions', 'options'])->get();
+        return Inertia::render("dashboard/management/guest-book/index", compact("guestBooks"));
     }
 }
