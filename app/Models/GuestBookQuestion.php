@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[Fillable(['label', 'description', 'is_active'])]
+#[Fillable(['label', 'description', 'is_active', 'sequence_number'])]
 class GuestBookQuestion extends Model
 {
     /** @use HasFactory<GuestBookQuestionFactory> */

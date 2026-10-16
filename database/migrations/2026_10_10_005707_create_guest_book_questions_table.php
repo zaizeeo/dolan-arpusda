@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('label')->index();
             $table->string('description')->nullable();
             $table->boolean('is_active')->default(true);
+            $table->integer('sequence_number')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
