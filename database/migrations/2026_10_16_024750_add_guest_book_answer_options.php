@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table("guest_book_answers", function (Blueprint $table) {
+        Schema::table('guest_book_answers', function (Blueprint $table) {
             $table->foreignUuid('guest_book_question_option_id')->nullable();
         });
     }
