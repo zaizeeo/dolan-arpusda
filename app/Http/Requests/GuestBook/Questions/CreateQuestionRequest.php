@@ -1,12 +1,13 @@
 <?php
 
+namespace App\Http\Requests\GuestBook\Questions;
+
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Validation\ValidationException;
 
-
-class CreateUserRequest extends FormRequest
+class CreateQuestionRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -61,4 +62,6 @@ class CreateUserRequest extends FormRequest
         throw ValidationException::withMessages($messages)
             ->redirectTo($this->getRedirectUrl());
     }
+
+    public function createQuestion() {}
 }
