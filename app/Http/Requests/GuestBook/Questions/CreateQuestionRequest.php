@@ -45,7 +45,6 @@ class CreateQuestionRequest extends FormRequest
         return [
             'label.required' => 'Label Harus diisi',
             'label.string' => 'Label hanya bisa diisi dengan text',
-            'text.string' => 'Label hanya bisa diisi dengan text',
             'options.*.label.required' => 'Label Harus diisi',
             'options.*.label.string' => 'Label hanya bisa diisi dengan text',
             'options.*.description.string' => 'Deskripsi hanya bisa diisi dengan text',
