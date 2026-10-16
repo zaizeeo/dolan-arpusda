@@ -42,5 +42,7 @@ Route::prefix('/dashboard')->middleware(['auth.middleware'])->group(function () 
         return Inertia::render('dashboard/index');
     })->name('dashboard.index');
     Route::get('/management/guest-book', [GuestBookController::class, 'index'])->name('dashboard.management.guest-book.index')->middleware(['admins.middleware']);
-    Route::get('/management/guest-book-question', [GuestBookQuestionController::class, 'index'])->name('dashboard.management.guest-book-question.index')->middleware(['admins.middleware']);
+    Route::prefix('/management/guest-book-question')->group(function () {
+        Route::get('/', [GuestBookQuestionController::class, 'index'])->name('dashboard.management.guest-book-question.index')->middleware(['admins.middleware']);
+    });
 });
