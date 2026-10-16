@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[Fillable(['label', 'description', 'is_active', 'guest_book_question_id'])]
+#[Fillable(['label', 'description', 'is_active', 'is_allow_custom_text', 'guest_book_question_id'])]
 class GuestBookQuestionOption extends Model
 {
     /** @use HasFactory<GuestBookQuestionOptionFactory> */

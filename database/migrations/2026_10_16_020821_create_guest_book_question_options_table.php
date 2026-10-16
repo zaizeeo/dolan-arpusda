@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('label')->index();
             $table->string('description')->nullable();
             $table->boolean('is_active')->default(true);
+            $table->boolean('is_allow_custom_text')->default(false);
             $table->softDeletes();
             $table->timestamps();
         });
