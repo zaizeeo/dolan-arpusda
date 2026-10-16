@@ -13,4 +13,6 @@ class GuestBookController extends Controller
         $guestBooks = GuestBook::with(['questions', 'options'])->get();
         return Inertia::render("dashboard/management/guest-book/index", compact("guestBooks"));
     }
+
+    public function create() {}
 }

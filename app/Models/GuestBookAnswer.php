@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['guest_book_id', 'guest_book_question_id'])]
+#[Fillable(['guest_book_id', 'guest_book_question_id', 'guest_book_question_option_id', 'guest_book_question_option_id'])]
 class GuestBookAnswer extends Model
 {
     /** @use HasFactory<GuestBookAnswerFactory> */
@@ -33,5 +33,15 @@ class GuestBookAnswer extends Model
     public function question(): BelongsTo
     {
         return $this->belongsTo(GuestBookQuestion::class, 'guest_book_question_id');
+    }
+
+    /**
+     * Get the option selected for this answer, when the question provides options.
+     *
+     * @return BelongsTo<GuestBookQuestionOption, $this>
+     */
+    public function option(): BelongsTo
+    {
+        return $this->belongsTo(GuestBookQuestionOption::class, 'guest_book_question_option_id');
     }
 }

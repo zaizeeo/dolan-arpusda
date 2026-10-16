@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['label', 'text', 'is_active'])]
+#[Fillable(['label', 'description', 'is_active'])]
 class GuestBookQuestion extends Model
 {
     /** @use HasFactory<GuestBookQuestionFactory> */
