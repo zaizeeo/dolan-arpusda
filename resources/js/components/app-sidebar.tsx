@@ -1,6 +1,6 @@
 import { Link, router, usePage } from "@inertiajs/react";
 import {
-    Archive,
+    BadgeQuestionMark,
     BarChart3,
     BookOpen,
     ChevronRight,
@@ -124,6 +124,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             url: "/dashboard/management/guest-book",
             icon: BookOpen,
             isActive: url.startsWith("/dashboard/management/guest-book"),
+        },
+        {
+            title: "Pertanyaan Buku Tamu",
+            url: "/dashboard/management/guest-book-question",
+            icon: BadgeQuestionMark,
+            isActive: url.startsWith("/dashboard/management/guest-book-question"),
         },
     ];
 
