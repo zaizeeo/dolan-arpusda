@@ -69,11 +69,15 @@ const CreateGuestBookQuestion = ({ children, closeButton = null }: Props) => {
             onStart: () => setIsLoading(true),
             onFinish: () => setIsLoading(false),
             onSuccess: () => {
+                form.reset();
+                setOpen(false);
                 toast.success("Berhasil", {
                     description: "Pertanyaan baru berhasil dibuat!",
                 });
             },
             onError: (error) => {
+                console.log({ error });
+
                 const errMessage = error?.server[0] || "Coba lagi beberapa saat";
                 setFormErrorMessage(errMessage);
                 toast.error("Terjadi Kesalahan!", {
@@ -82,7 +86,7 @@ const CreateGuestBookQuestion = ({ children, closeButton = null }: Props) => {
             },
         } satisfies VisitHelperOptions;
 
-        router.post("/_api/dashboard/management/guest-book-question", data, requestOptions);
+        router.post("/_api/dashboard/management/guest-book-question", payload, requestOptions);
     };
 
     return (

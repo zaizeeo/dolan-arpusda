@@ -31,7 +31,7 @@ class CreateQuestionRequest extends FormRequest
             'options' => ['array', 'nullable'],
             'options.*.label' => ['string', 'min:2'],
             'options.*.description' => ['string', 'nullable'],
-            'options.*.is_allow_custom_text' => ['string', 'nullable']
+            'options.*.is_allow_custom_text' => ['boolean', 'nullable']
         ];
     }
 

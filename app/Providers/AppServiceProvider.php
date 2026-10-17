@@ -21,6 +21,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Inertia::handleExceptionsUsing(new ErrorHandler);
+        // Inertia::handleExceptionsUsing(new ErrorHandler);
     }
 }
