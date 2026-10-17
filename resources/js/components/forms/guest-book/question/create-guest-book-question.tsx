@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
@@ -264,16 +265,19 @@ const CreateGuestBookQuestion = ({ children, closeButton = null }: Props) => {
                                             name={`options.${index}.is_allow_custom_text`}
                                             control={form.control}
                                             render={({ field }) => (
-                                                <label className="flex cursor-pointer items-center gap-2 pt-1 text-xs text-muted-foreground select-none hover:text-foreground">
-                                                    <input
-                                                        type="checkbox"
+                                                <Field orientation="horizontal" className="items-center gap-2 pt-1">
+                                                    <Checkbox
+                                                        id={`option-custom-text-${index}`}
                                                         checked={Boolean(field.value)}
-                                                        onChange={(e) => field.onChange(e.target.checked)}
-                                                        className="size-4 cursor-pointer rounded border-border text-primary accent-primary focus:ring-ring"
-                                                        autoComplete="off"
+                                                        onCheckedChange={(checked) => field.onChange(checked === true)}
                                                     />
-                                                    <span>Izinkan pengunjung mengisi teks khusus untuk opsi ini</span>
-                                                </label>
+                                                    <FieldLabel
+                                                        htmlFor={`option-custom-text-${index}`}
+                                                        className="cursor-pointer text-xs font-normal text-muted-foreground select-none hover:text-foreground"
+                                                    >
+                                                        Izinkan pengunjung mengisi teks khusus untuk opsi ini
+                                                    </FieldLabel>
+                                                </Field>
                                             )}
                                         />
                                     </div>
