@@ -20,9 +20,9 @@ class AdminsMiddleware
             return redirect()->route("login");
         }
         if (!$request->user()->hasAdminsAuthority()) {
-            if (str_starts_with($request->path, "/_api") || str_starts_with($request->path, "/api")) {
-                return redirect()->back()->withErrors("Forbidden", "server");
-            }
+            // if (str_starts_with($request->path, "/_api") || str_starts_with($request->path, "/api")) {
+            //     return redirect()->back()->withErrors("Forbidden", "server");
+            // }
             return redirect()->route("dashboard.index");
         }
         return $next($request);
