@@ -197,6 +197,7 @@ Use Wayfinder to generate TypeScript functions for Laravel routes. Import from `
 
 - **Package Manager**: Bun is the main package manager (`bun`). Use `pnpm` if `bun` is not available.
 - **UI Stack**: This project uses Tailwind CSS (v4) and shadcn UI components.
+- **Component Priority & Consistency**: Always prioritize using shadcn UI components over native HTML elements or raw React primitives (e.g. use shadcn `<Checkbox>`, `<FieldLabel>`, `<Select>`, `<Button>`, `<Input>` instead of native `<input type="checkbox">`, `<label>`, `<select>`, `<button>`, etc.) to maintain UI consistency. If a required shadcn component is not yet installed in the project, install it using `bunx shadcn@latest add <component-name>`. This rule can only be bypassed if shadcn does not provide the desired component.
 - **Color System**: Never use raw Tailwind palette colors (e.g. `bg-blue-500`, `text-gray-700`). Always use shadcn UI semantic theme colors instead (e.g. `bg-primary`, `text-primary-foreground`, `bg-muted`, `text-muted-foreground`, `bg-card`, `text-card-foreground`, `border-border`, `text-destructive`).
 - **Sizing & Spacing**: Avoid adding arbitrary explicit sizes with brackets (e.g. avoid `mt-[40px]`, `w-[300px]`). Always use Tailwind's native scale/sizing utilities (e.g. `mt-10`, `w-72`, `max-w-md`).
 - **Form Handling & Validation**: Always validate forms with user input. Use React Hook Form (`useForm`, `Controller`) for form state management and Zod (`zodResolver`) for schema validation.
