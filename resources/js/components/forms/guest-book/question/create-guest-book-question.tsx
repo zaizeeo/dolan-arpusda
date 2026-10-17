@@ -225,6 +225,7 @@ const CreateGuestBookQuestion = ({ children, closeButton = null }: Props) => {
                                                         placeholder="Contoh: Laki-laki / Sangat Puas"
                                                         aria-invalid={fieldState.invalid}
                                                         className="h-8 text-sm"
+                                                        autoComplete="off"
                                                     />
                                                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                                                 </Field>
@@ -251,6 +252,7 @@ const CreateGuestBookQuestion = ({ children, closeButton = null }: Props) => {
                                                         placeholder="Keterangan singkat jika diperlukan"
                                                         aria-invalid={fieldState.invalid}
                                                         className="h-8 text-sm"
+                                                        autoComplete="off"
                                                     />
                                                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                                                 </Field>
@@ -268,6 +270,7 @@ const CreateGuestBookQuestion = ({ children, closeButton = null }: Props) => {
                                                         checked={Boolean(field.value)}
                                                         onChange={(e) => field.onChange(e.target.checked)}
                                                         className="size-4 cursor-pointer rounded border-border text-primary accent-primary focus:ring-ring"
+                                                        autoComplete="off"
                                                     />
                                                     <span>Izinkan pengunjung mengisi teks khusus untuk opsi ini</span>
                                                 </label>
