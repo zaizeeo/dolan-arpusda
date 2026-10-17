@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Actions\GuestBook\Questions\CreateQuestionAction;
 use App\Models\GuestBookQuestion;
-use CreateQuestionRequest;
+use App\Http\Requests\GuestBook\Questions\CreateQuestionRequest;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class GuestBookQuestionController extends Controller
@@ -17,8 +18,9 @@ class GuestBookQuestionController extends Controller
 
     public function create(CreateQuestionRequest $request, CreateQuestionAction $action)
     {
-        $action->execute($request->validated());
-
+        $data = $request->validated();
+        $action->execute($data);
+        // Log::info($data);
         return redirect()->back();
     }
 }

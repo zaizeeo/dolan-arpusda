@@ -1,3 +1,4 @@
+import CreateGuestBookQuestion from "@/components/forms/guest-book/question/create-guest-book-question";
 import DashboardLayout from "@/components/layouts/dashboard-layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -50,8 +51,6 @@ interface Props extends PageProps {
 }
 
 export default function GuestBookQuestionManagement({ questions = [] }: Props) {
-    console.log({ questions });
-
     const totalQuestions = questions.length;
     const activeQuestions = questions.filter((q) => q.is_active).length;
     const totalOptions = questions.reduce((acc, q) => acc + (q.options?.length || 0), 0);
@@ -69,10 +68,13 @@ export default function GuestBookQuestionManagement({ questions = [] }: Props) {
                             </p>
                         </div>
                         <div className="flex items-center gap-2">
-                            <Button className="gap-2 shadow-sm">
-                                <Plus className="size-4" />
-                                <span>Tambah Pertanyaan</span>
-                            </Button>
+                            <CreateGuestBookQuestion>
+                                <Button className="gap-2 shadow-sm">
+                                    <Plus className="size-4" />
+                                    <span>Tambah Pertanyaan</span>
+                                </Button>
+                            </CreateGuestBookQuestion>
+                            ?
                         </div>
                     </div>
 
