@@ -23,9 +23,7 @@ use Inertia\Inertia;
 
 // Route::delete('/pengunjung/{id}', [BukuTamuController::class, 'destroy'])->name('buku-tamu.destroy')->middleware('auth');
 
-Route::get('/', function () {
-    return Inertia::render('home-page');
-})->name('home-page');
+Route::get('/', [GuestBookController::class, 'showGuestBookForm'])->name('home-page');
 
 Route::get('/auth', [AuthController::class, 'showAuthPage'])->middleware('guest.middleware')->name('login');
 
@@ -40,6 +38,10 @@ Route::prefix('/_api')->group(function () {
                 Route::post('/', [GuestBookQuestionController::class, 'create'])->name('create-guest-book-question');
             });
         });
+    });
+
+    Route::prefix('guest-book')->group(function () {
+        Route::post('/', [GuestBookController::class, 'create'])->name('create-guest-book');
     });
 });
 

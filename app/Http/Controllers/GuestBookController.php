@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\GuestBook\Questions\CreateGuestBookAction;
+use App\Http\Requests\GuestBook\CreateGuestBookRequest;
 use App\Models\GuestBook;
+use App\Models\GuestBookQuestion;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -11,8 +14,19 @@ class GuestBookController extends Controller
     public function index()
     {
         $guestBooks = GuestBook::with(['questions.options', 'answers.option'])->get();
-        return Inertia::render("dashboard/management/guest-book/index", compact("guestBooks"));
+        return Inertia::render("dashboard/management/guest-book/index", compact("guestBooks", "activeQuestionCount"));
     }
 
-    public function create() {}
+    public function showGuestBookForm()
+    {
+        $activeQuestions = GuestBookQuestion::where('is_active', true)->orderBy('sequence_number', 'asc')->with(['options' => fn($query) => $query->where('is_active', true)->orderBy('sequence_number', 'asc')])->get();
+        return Inertia::render('home-page', compact('activeQuestions'));
+    }
+
+    public function create(CreateGuestBookRequest $request, CreateGuestBookAction $action)
+    {
+        $action->execute($request->validated());
+
+        return redirect()->back();
+    }
 }
