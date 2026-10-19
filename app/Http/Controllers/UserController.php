@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Auth\CreateUserAction;
+use App\Actions\Auth\DeleteUserAction;
 use App\Http\Requests\Auth\CreateUserRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -25,5 +26,10 @@ class UserController extends Controller
         return redirect()->back()->with('success', 'User berhasil dibuat');
     }
 
-    public function deleteUser() {}
+    public function deleteUser(Request $request, string $id, DeleteUserAction $action)
+    {
+        $action->execute($id, $request->user());
+
+        return redirect()->back();
+    }
 }

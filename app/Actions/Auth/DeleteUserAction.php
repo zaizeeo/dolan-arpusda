@@ -1,15 +1,16 @@
 <?php
 
+namespace App\Actions\Auth;
+
 use App\Models\User;
 use Illuminate\Validation\ValidationException;
 
 class DeleteUserAction
 {
 
-    //  * @param  array<string, mixed>  $data
-    public function execute(array $data, User $currentUser): void
+    public function execute(string $userId, User $currentUser): void
     {
-        $user = User::find($data["id"]);
+        $user = User::find($userId);
 
         if ($user === null) {
             throw ValidationException::withMessages([
@@ -17,7 +18,7 @@ class DeleteUserAction
             ]);
         }
 
-        if ($currentUser->id === $data['id']) {
+        if ($currentUser->id === $userId) {
             throw ValidationException::withMessages([
                 'server' => 'Anda tidak bisa menghapus akun anda sendiri!',
             ]);
@@ -34,13 +35,8 @@ class DeleteUserAction
     }
 
 
-    /**
-     * Invokable alias for execute.
-     *
-     * @param  array<string, mixed>  $data
-     */
-    public function __invoke(array $data, User $currentUser): void
+    public function __invoke(string $userId, User $currentUser): void
     {
-        return $this->execute($data, $currentUser);
+        return $this->execute($userId, $currentUser);
     }
 }

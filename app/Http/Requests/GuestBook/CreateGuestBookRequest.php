@@ -4,7 +4,9 @@ namespace App\Http\Requests\GuestBook;
 
 use App\Models\GuestBookQuestion;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\ValidationException;
 
 class CreateGuestBookRequest extends FormRequest
 {
@@ -47,5 +49,14 @@ class CreateGuestBookRequest extends FormRequest
             'answers.max' => 'Jumlah jawaban tidak sesuai dengan pertanyaan yang tersedia.',
             'answers.*.guest_book_question_id.required' => 'Pertanyaan wajib dipilih.',
         ];
+    }
+
+    protected function failedValidation(Validator $validator)
+    {
+        $messages = $validator->errors()->toArray();
+        $messages['server'] = [$validator->errors()->first()];
+
+        throw ValidationException::withMessages($messages)
+            ->redirectTo($this->getRedirectUrl());
     }
 }
