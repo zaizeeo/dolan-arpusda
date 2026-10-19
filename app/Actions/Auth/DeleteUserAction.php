@@ -37,6 +37,6 @@ class DeleteUserAction
 
     public function __invoke(string $userId, User $currentUser): void
     {
-        return $this->execute($userId, $currentUser);
+        $this->execute($userId, $currentUser);
     }
 }
