@@ -24,7 +24,9 @@ export const editUserSchema = z.object({
 
             return z.email().safeParse(v).success;
         }, "Email tidak valid"),
-    name: z.string("Nama harus diisi text").min(3, "Nama harus diisi minimal 3 karakter").nullable(),
-    role: z.enum(allowedUserRole).nullable(),
-    password: z.string("Password minimal 8 karakter").min(8).max(32, "Password maksimal 32 karakter").nullable(),
+    name: z.string("Nama harus diisi text").optional(),
+    role: z.enum(allowedUserRole).optional(),
+    password: z.string("Password minimal 8 karakter").optional(),
 });
+
+export type EditUserSchemaType = z.infer<typeof editUserSchema>;

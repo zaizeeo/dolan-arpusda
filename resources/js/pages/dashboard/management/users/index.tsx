@@ -1,9 +1,11 @@
 import CreateUserForm from "@/components/forms/user-management/create-user-form";
 import DeleteUserForm from "@/components/forms/user-management/delete-user-form";
+import EditUserForm from "@/components/forms/user-management/edit-user-form";
 import DashboardLayout from "@/components/layouts/dashboard-layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useUserRole } from "@/lib/hooks/use-user-role";
 import { User } from "@/types";
 import { PageProps } from "@/types/page-props";
 
@@ -12,9 +14,8 @@ interface Props extends PageProps {
 }
 
 const UserManagementDashboardIndex = (props: Props) => {
-    console.log({ props });
-
     const currentUser = props.auth as User;
+    const { hasAdminsAuthority, hasSuperAdminAuthority } = useUserRole(props.auth as User);
 
     return (
         <DashboardLayout title="User Management" className="flex flex-col gap-3">
@@ -36,8 +37,6 @@ const UserManagementDashboardIndex = (props: Props) => {
                     <TableBody>
                         {props.users.map((user, index) => {
                             const isCurrentUser = currentUser.id === user.id;
-                            const isSuperadmin = currentUser?.role === "superadmin";
-                            const isAdmin = currentUser?.role === "admin" || currentUser?.role === "superadmin";
                             const targetIsSuperadmin = user.role === "superadmin";
                             const targetIsAdmin = user.role === "admin" && !targetIsSuperadmin;
 
@@ -51,15 +50,11 @@ const UserManagementDashboardIndex = (props: Props) => {
                                     </TableCell>
                                     <TableCell>
                                         {/* Edit button - only for admins */}
-                                        {isAdmin && (
-                                            <Button onClick={() => {}} className="btn btn-sm btn-outline-primary me-1">
-                                                Edit
-                                            </Button>
-                                        )}
+                                        {hasAdminsAuthority && user.id !== currentUser.id && <EditUserForm user={user} />}
                                         {/* Delete Button - only for superadmin and not current user */}
-                                        {isSuperadmin && !isCurrentUser && <DeleteUserForm user={user} />}
+                                        {hasSuperAdminAuthority && !isCurrentUser && <DeleteUserForm user={user} />}
                                         {/* Promote to Superadmin Button - only for superadmin and target is admin and not current user */}
-                                        {isSuperadmin && !isCurrentUser && targetIsAdmin && (
+                                        {hasSuperAdminAuthority && !isCurrentUser && targetIsAdmin && (
                                             <Button onClick={() => {}} className="btn btn-sm btn-outline-success">
                                                 Promosikan ke Superadmin
                                             </Button>

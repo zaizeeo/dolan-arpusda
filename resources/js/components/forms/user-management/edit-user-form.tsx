@@ -1,36 +1,42 @@
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Controller, useForm } from "react-hook-form";
-import { createUserSchema, allowedUserRole, type AllowedUserRoleType, CreateUserSchemaType } from "@/lib/validations/user-management";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { capitalizeText } from "@/lib";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { router } from "@inertiajs/react";
-import { VisitHelperOptions } from "@inertiajs/core";
-import { toast } from "sonner";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
+import { capitalizeText } from "@/lib";
+import { allowedUserRole, type AllowedUserRoleType, editUserSchema, EditUserSchemaType } from "@/lib/validations/user-management";
+import { User } from "@/types";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { VisitHelperOptions } from "@inertiajs/core";
+import { router } from "@inertiajs/react";
+import { Eye, Pencil } from "lucide-react";
+import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
 
-const CreateUserForm = () => {
+interface Props {
+    user: User;
+}
+
+const EditUserForm = ({ user }: Props) => {
     const [isOpen, setIsOpen] = useState(false);
     const [formErrorMessage, setFormErrorMessage] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState({ password: false, password_confirmation: false });
     const form = useForm({
-        resolver: zodResolver(createUserSchema),
+        resolver: zodResolver(editUserSchema),
         defaultValues: {
-            name: "",
-            email: "",
+            name: user.name,
+            email: user.email,
             password: "",
-            password_confirmation: "",
-            role: "staff" as AllowedUserRoleType[number],
+            role: user.role as AllowedUserRoleType[number],
         },
     });
 
-    function onSubmit(data: CreateUserSchemaType) {
+    function onSubmit(data: EditUserSchemaType) {
         const requestOptions = {
             onStart: () => setIsLoading(true),
             onFinish: () => setIsLoading(false),
@@ -50,13 +56,15 @@ const CreateUserForm = () => {
             },
         } satisfies VisitHelperOptions;
 
-        router.post("/_api/dashboard/management/users", data, requestOptions);
+        router.patch(`/_api/dashboard/management/users/${user.id}`, data, requestOptions);
     }
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-                <Button>+ Buat Pengguna Baru</Button>
+                <Button>
+                    <Pencil /> Edit
+                </Button>
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
@@ -131,45 +139,37 @@ const CreateUserForm = () => {
                                 render={({ field, fieldState }) => (
                                     <Field data-invalid={fieldState.invalid}>
                                         <FieldLabel htmlFor={field.name}>Password</FieldLabel>
-                                        <Input
-                                            {...field}
-                                            id={field.name}
-                                            aria-invalid={fieldState.invalid}
-                                            placeholder="********"
-                                            autoComplete="off"
-                                            type={showPassword.password ? "text" : "password"}
-                                        />
+                                        <InputGroup>
+                                            <InputGroupInput
+                                                {...field}
+                                                id={field.name}
+                                                aria-invalid={fieldState.invalid}
+                                                placeholder="********"
+                                                autoComplete="off"
+                                                type={showPassword.password ? "text" : "password"}
+                                            />
+                                            <InputGroupAddon
+                                                className="cursor-pointer"
+                                                onClick={() => setShowPassword((prev) => ({ ...prev, password: !prev.password }))}
+                                                align={"inline-end"}
+                                            >
+                                                <Eye />
+                                            </InputGroupAddon>
+                                        </InputGroup>
                                         {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                                     </Field>
                                 )}
                             />
-                            <Controller
-                                name="password_confirmation"
-                                control={form.control}
-                                render={({ field, fieldState }) => (
-                                    <Field data-invalid={fieldState.invalid}>
-                                        <FieldLabel htmlFor={field.name}>Konfirmasi Password</FieldLabel>
-                                        <Input
-                                            {...field}
-                                            id={field.name}
-                                            aria-invalid={fieldState.invalid}
-                                            placeholder="********"
-                                            autoComplete="off"
-                                            type={showPassword.password ? "text" : "password"}
-                                        />
-                                        {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                                    </Field>
-                                )}
-                            />
-                            <Button disabled={isLoading}>{isLoading ? <Spinner /> : <>Buat Pengguna</>}</Button>
+
+                            <Button disabled={isLoading}>{isLoading ? <Spinner /> : "Edit Pengguna"}</Button>
                         </FieldGroup>
                     </form>
                 </ScrollArea>
 
-                <DialogFooter>Formulir Membuat Pengguna Baru</DialogFooter>
+                <DialogFooter>Formulir Edit Pengguna</DialogFooter>
             </DialogContent>
         </Dialog>
     );
 };
 
-export default CreateUserForm;
+export default EditUserForm;

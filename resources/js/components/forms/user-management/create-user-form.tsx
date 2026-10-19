@@ -33,6 +33,10 @@ const CreateUserForm = () => {
     });
 
     function onSubmit(data: CreateUserSchemaType) {
+        if (data.password !== data.password_confirmation) {
+            return form.setError("password_confirmation", { message: "Konfirmasi password tidak sesuai" });
+        }
+
         const requestOptions = {
             onStart: () => setIsLoading(true),
             onFinish: () => setIsLoading(false),
