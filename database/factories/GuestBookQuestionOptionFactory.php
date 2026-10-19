@@ -20,7 +20,7 @@ class GuestBookQuestionOptionFactory extends Factory
     {
         return [
             'guest_book_question_id' => GuestBookQuestion::factory(),
-            'title' => fake()->words(3, true),
+            'label' => fake()->words(3, true),
             'description' => fake()->sentence(),
             'is_active' => true,
         ];

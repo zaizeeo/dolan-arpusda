@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Actions\GuestBook\Questions\CreateGuestBookAction;
+use App\Actions\GuestBook\CreateGuestBookAction;
 use App\Http\Requests\GuestBook\CreateGuestBookRequest;
 use App\Models\GuestBook;
 use App\Models\GuestBookQuestion;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class GuestBookController extends Controller

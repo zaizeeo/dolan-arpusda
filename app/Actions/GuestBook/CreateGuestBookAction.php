@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Actions\GuestBook\Questions;
+namespace App\Actions\GuestBook;
 
 use App\Models\GuestBook;
 use App\Models\GuestBookAnswer;
@@ -17,13 +17,16 @@ class CreateGuestBookAction
     {
         $guestBook = GuestBook::create();
 
-        $answers = array_map(function ($answer) use ($guestBook) {
+        $now = now();
+        $answers = array_map(function ($answer) use ($guestBook, $now) {
             return [
                 'id' => (string) Str::orderedUuid(),
                 'guest_book_id' => $guestBook->id,
                 'guest_book_question_id' => $answer['guest_book_question_id'],
-                'custom_text' => $answer['custom_text'],
-                'guest_book_question_option_id' => $answer['guest_book_question_option_id'],
+                'custom_text' => (isset($answer['custom_text']) && $answer['custom_text'] !== '') ? $answer['custom_text'] : null,
+                'guest_book_question_option_id' => ! empty($answer['guest_book_question_option_id']) ? $answer['guest_book_question_option_id'] : null,
+                'created_at' => $now,
+                'updated_at' => $now,
             ];
         }, $data['answers']);
 

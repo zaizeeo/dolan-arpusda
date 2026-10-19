@@ -32,4 +32,20 @@ class CreateGuestBookRequest extends FormRequest
             'answers.*.guest_book_question_option_id' => ['string', 'nullable'],
         ];
     }
+
+    /**
+     * Get the error messages for the defined validation rules.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'answers.required' => 'Jawaban buku tamu wajib diisi.',
+            'answers.array' => 'Format data jawaban tidak valid.',
+            'answers.min' => 'Mohon lengkapi seluruh pertanyaan buku tamu.',
+            'answers.max' => 'Jumlah jawaban tidak sesuai dengan pertanyaan yang tersedia.',
+            'answers.*.guest_book_question_id.required' => 'Pertanyaan wajib dipilih.',
+        ];
+    }
 }
