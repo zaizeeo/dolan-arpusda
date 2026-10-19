@@ -36,9 +36,10 @@ const UserManagementDashboardIndex = (props: Props) => {
                     </TableHeader>
                     <TableBody>
                         {props.users.map((user, index) => {
+                            const target = useUserRole(user);
                             const isCurrentUser = currentUser.id === user.id;
-                            const targetIsSuperadmin = user.role === "superadmin";
-                            const targetIsAdmin = user.role === "admin" && !targetIsSuperadmin;
+                            const targetIsSuperadmin = target.hasSuperAdminAuthority;
+                            const targetIsAdmin = target.hasAdminsAuthority && !targetIsSuperadmin;
 
                             return (
                                 <TableRow key={user.id}>

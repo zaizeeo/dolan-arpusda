@@ -48,6 +48,8 @@ const EditUserForm = ({ user }: Props) => {
                 setIsOpen(false);
             },
             onError: (error) => {
+                console.log({ error });
+
                 const errMessage = error?.server || "Coba lagi beberapa saat";
                 setFormErrorMessage(errMessage);
                 toast.error("Terjadi Kesalahan!", {
