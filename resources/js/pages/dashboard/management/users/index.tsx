@@ -1,12 +1,11 @@
+import CreateUserForm from "@/components/forms/user-management/create-user-form";
+import DeleteUserForm from "@/components/forms/user-management/delete-user-form";
 import DashboardLayout from "@/components/layouts/dashboard-layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import CreateUserForm from "@/components/user-management/create-user-form";
-import DeleteUserForm from "@/components/user-management/delete-user-form";
 import { User } from "@/types";
 import { PageProps } from "@/types/page-props";
-import { router } from "@inertiajs/react";
 
 interface Props extends PageProps {
     users: Array<User>;
