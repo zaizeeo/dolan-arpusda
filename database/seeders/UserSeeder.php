@@ -29,9 +29,9 @@ class UserSeeder extends Seeder
                 'email' => 'staff@staff.com',
             ],
             [
-                'role' => 'magang',
-                'name' => 'Magang',
-                'email' => 'magang@magang.com',
+                'role' => 'intern',
+                'name' => 'Intern',
+                'email' => 'intern@intern.com',
             ],
         )->create();
     }

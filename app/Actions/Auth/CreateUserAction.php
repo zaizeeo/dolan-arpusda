@@ -17,7 +17,7 @@ class CreateUserAction
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => $data['password'],
-            'role' => $data['role'] ?? 'staff',
+            'role' => $data['role'],
         ]);
     }
 

@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GuestBookController;
 use App\Http\Controllers\GuestBookQuestionController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 // --- AREA PUBLIK (Tidak perlu login) ---
@@ -53,5 +54,7 @@ Route::prefix('/dashboard')->middleware(['auth.middleware'])->group(function () 
         Route::prefix('/guest-book-question')->group(function () {
             Route::get('/', [GuestBookQuestionController::class, 'index'])->name('dashboard.management.guest-book-question.index')->middleware(['admins.middleware']);
         });
+
+        Route::get('/users', [UserController::class, 'index'])->name('user-controller-index')->middleware(['admins.middleware']);
     });
 });
