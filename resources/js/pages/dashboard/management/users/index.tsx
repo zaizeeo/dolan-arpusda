@@ -1,6 +1,7 @@
 import CreateUserForm from "@/components/forms/user-management/create-user-form";
 import DeleteUserForm from "@/components/forms/user-management/delete-user-form";
 import EditUserForm from "@/components/forms/user-management/edit-user-form";
+import PromoteToSuperadminForm from "@/components/forms/user-management/promote-to-superadmin-form";
 import DashboardLayout from "@/components/layouts/dashboard-layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -55,11 +56,7 @@ const UserManagementDashboardIndex = (props: Props) => {
                                         {/* Delete Button - only for superadmin and not current user */}
                                         {hasSuperAdminAuthority && !isCurrentUser && <DeleteUserForm user={user} />}
                                         {/* Promote to Superadmin Button - only for superadmin and target is admin and not current user */}
-                                        {hasSuperAdminAuthority && !isCurrentUser && targetIsAdmin && (
-                                            <Button onClick={() => {}} className="btn btn-sm btn-outline-success">
-                                                Promosikan ke Superadmin
-                                            </Button>
-                                        )}
+                                        {hasSuperAdminAuthority && !isCurrentUser && targetIsAdmin && <PromoteToSuperadminForm user={user} />}
                                     </TableCell>
                                 </TableRow>
                             );

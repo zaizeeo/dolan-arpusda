@@ -42,7 +42,7 @@ const EditUserForm = ({ user }: Props) => {
             onFinish: () => setIsLoading(false),
             onSuccess: () => {
                 toast.success("Berhasil", {
-                    description: "Pengguna baru berhasil dibuat!",
+                    description: "Data pengguna telah diedit!",
                 });
                 form.reset();
                 setIsOpen(false);
