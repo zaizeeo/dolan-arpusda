@@ -10,9 +10,9 @@ class DeleteUserAction
 
     public function execute(string $userId, User $currentUser): void
     {
-        $user = User::find($userId);
+        $existingUser = User::find($userId);
 
-        if ($user === null) {
+        if ($existingUser === null) {
             throw ValidationException::withMessages([
                 'server' => 'Pengguna tidak ditemukan!',
             ]);
@@ -25,13 +25,13 @@ class DeleteUserAction
         }
 
 
-        if ($user->role === "admin" && $currentUser->role !== "superadmin") {
+        if ($existingUser->role === "admin" && !$currentUser->hasSuperAdminAuthority()) {
             throw ValidationException::withMessages([
                 'server' => 'Hanya Superadmin yang bisa menghapus seorang admin!',
             ]);
         }
 
-        $user->delete();
+        $existingUser->delete();
     }
 
 

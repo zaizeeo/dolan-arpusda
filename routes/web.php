@@ -38,6 +38,11 @@ Route::prefix('/_api')->group(function () {
             Route::prefix('/guest-book-question')->group(function () {
                 Route::post('/', [GuestBookQuestionController::class, 'create'])->name('create-guest-book-question');
             });
+            Route::prefix('/users')->group(function () {
+                Route::post('/', [UserController::class, 'createUser'])->name('user-controller-index')->middleware(['admins.middleware']);
+                Route::patch('/{id}', [UserController::class, 'editUser'])->name('user-controller-index')->middleware(['admins.middleware']);
+                Route::delete('/{id}', [UserController::class, 'deleteUser'])->name('user-controller-index')->middleware(['admins.middleware']);
+            });
         });
     });
 
