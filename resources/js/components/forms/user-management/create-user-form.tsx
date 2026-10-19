@@ -13,6 +13,8 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
+import { Eye } from "lucide-react";
 
 const CreateUserForm = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -131,14 +133,23 @@ const CreateUserForm = () => {
                                 render={({ field, fieldState }) => (
                                     <Field data-invalid={fieldState.invalid}>
                                         <FieldLabel htmlFor={field.name}>Password</FieldLabel>
-                                        <Input
-                                            {...field}
-                                            id={field.name}
-                                            aria-invalid={fieldState.invalid}
-                                            placeholder="********"
-                                            autoComplete="off"
-                                            type={showPassword.password ? "text" : "password"}
-                                        />
+                                        <InputGroup>
+                                            <InputGroupInput
+                                                {...field}
+                                                id={field.name}
+                                                aria-invalid={fieldState.invalid}
+                                                placeholder="********"
+                                                autoComplete="off"
+                                                type={showPassword.password ? "text" : "password"}
+                                            />
+                                            <InputGroupAddon
+                                                className="cursor-pointer"
+                                                onClick={() => setShowPassword((prev) => ({ ...prev, password: !prev.password }))}
+                                                align={"inline-end"}
+                                            >
+                                                <Eye />
+                                            </InputGroupAddon>
+                                        </InputGroup>
                                         {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                                     </Field>
                                 )}
@@ -149,14 +160,25 @@ const CreateUserForm = () => {
                                 render={({ field, fieldState }) => (
                                     <Field data-invalid={fieldState.invalid}>
                                         <FieldLabel htmlFor={field.name}>Konfirmasi Password</FieldLabel>
-                                        <Input
-                                            {...field}
-                                            id={field.name}
-                                            aria-invalid={fieldState.invalid}
-                                            placeholder="********"
-                                            autoComplete="off"
-                                            type={showPassword.password ? "text" : "password"}
-                                        />
+                                        <InputGroup>
+                                            <InputGroupInput
+                                                {...field}
+                                                id={field.name}
+                                                aria-invalid={fieldState.invalid}
+                                                placeholder="********"
+                                                autoComplete="off"
+                                                type={showPassword.password_confirmation ? "text" : "password"}
+                                            />
+                                            <InputGroupAddon
+                                                className="cursor-pointer"
+                                                onClick={() =>
+                                                    setShowPassword((prev) => ({ ...prev, password_confirmation: !prev.password_confirmation }))
+                                                }
+                                                align={"inline-end"}
+                                            >
+                                                <Eye />
+                                            </InputGroupAddon>
+                                        </InputGroup>
                                         {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                                     </Field>
                                 )}
