@@ -83,11 +83,7 @@ export function CreateGuestBookForm({ questions, onSuccessSubmit }: Props) {
                 onSuccessSubmit?.();
             },
             onError: (error) => {
-                const errMessage =
-                    error?.server?.[0] ||
-                    error?.answers?.[0] ||
-                    (typeof error === "object" && Object.values(error)?.[0]) ||
-                    "Coba lagi beberapa saat";
+                const errMessage = error?.server || "Coba lagi beberapa saat";
 
                 const messageStr = typeof errMessage === "string" ? errMessage : "Terjadi kesalahan saat menyimpan data buku tamu.";
 
