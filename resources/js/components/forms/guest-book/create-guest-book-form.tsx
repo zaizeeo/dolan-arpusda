@@ -2,10 +2,8 @@ import { Button } from "@/components/ui/button";
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import {
-    CreateGuestBookSchemaType,
-    getCreateGuestBookSchema,
-} from "@/lib/validations/guest-book";
+import { getCreateGuestBookSchema } from "@/lib/validations/guest-book";
+import { z } from "zod";
 import { createGuestBook } from "@/routes";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { router, type VisitHelperOptions } from "@inertiajs/core";
@@ -43,8 +41,9 @@ export function CreateGuestBookForm({ questions, onSuccessSubmit }: Props) {
     const [formErrorMessage, setFormErrorMessage] = useState("");
 
     const validationSchema = useMemo(() => getCreateGuestBookSchema(questions), [questions]);
+    type FormSchema = z.infer<typeof validationSchema>;
 
-    const form = useForm<CreateGuestBookSchemaType>({
+    const form = useForm<FormSchema>({
         resolver: zodResolver(validationSchema),
         defaultValues: {
             answers: questions.map((question) => ({
@@ -55,17 +54,14 @@ export function CreateGuestBookForm({ questions, onSuccessSubmit }: Props) {
         },
     });
 
-    const onSubmit = (data: CreateGuestBookSchemaType) => {
+    const onSubmit = (data: FormSchema) => {
         setIsLoading(true);
         setFormErrorMessage("");
 
         const payload = {
             answers: data.answers.map((answer) => ({
                 guest_book_question_id: answer.guest_book_question_id,
-                guest_book_question_option_id:
-                    answer.guest_book_question_option_id?.trim() !== ""
-                        ? answer.guest_book_question_option_id
-                        : null,
+                guest_book_question_option_id: answer.guest_book_question_option_id?.trim() !== "" ? answer.guest_book_question_option_id : null,
                 custom_text: answer.custom_text?.trim() !== "" ? answer.custom_text : null,
             })),
         };
@@ -93,10 +89,7 @@ export function CreateGuestBookForm({ questions, onSuccessSubmit }: Props) {
                     (typeof error === "object" && Object.values(error)?.[0]) ||
                     "Coba lagi beberapa saat";
 
-                const messageStr =
-                    typeof errMessage === "string"
-                        ? errMessage
-                        : "Terjadi kesalahan saat menyimpan data buku tamu.";
+                const messageStr = typeof errMessage === "string" ? errMessage : "Terjadi kesalahan saat menyimpan data buku tamu.";
 
                 setFormErrorMessage(messageStr);
                 toast.error("Terjadi Kesalahan!", {
@@ -109,11 +102,7 @@ export function CreateGuestBookForm({ questions, onSuccessSubmit }: Props) {
     };
 
     return (
-        <form
-            id="form-create-guest-book"
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-6"
-        >
+        <form id="form-create-guest-book" onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {formErrorMessage && <FieldError errors={[{ message: formErrorMessage }]} />}
 
             <FieldGroup className="space-y-6">
@@ -121,10 +110,7 @@ export function CreateGuestBookForm({ questions, onSuccessSubmit }: Props) {
                     const hasOptions = Array.isArray(question.options) && question.options.length > 0;
 
                     return (
-                        <div
-                            key={question.id}
-                            className="rounded-xl border border-border bg-card p-5 shadow-xs transition-shadow hover:shadow-sm"
-                        >
+                        <div key={question.id} className="rounded-xl border border-border bg-card p-5 shadow-xs transition-shadow hover:shadow-sm">
                             <div className="mb-4">
                                 <div className="flex items-start gap-3">
                                     <span className="inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
@@ -132,20 +118,14 @@ export function CreateGuestBookForm({ questions, onSuccessSubmit }: Props) {
                                     </span>
                                     <div className="flex flex-col gap-1">
                                         <FieldLabel
-                                            htmlFor={
-                                                hasOptions
-                                                    ? `label-question-${question.id}`
-                                                    : `question-input-${question.id}`
-                                            }
-                                            className="text-base font-semibold leading-normal text-card-foreground"
+                                            htmlFor={hasOptions ? `label-question-${question.id}` : `question-input-${question.id}`}
+                                            className="text-base leading-normal font-semibold text-card-foreground"
                                         >
                                             {question.label}
                                             <span className="ml-1 text-destructive">*</span>
                                         </FieldLabel>
                                         {question.description && (
-                                            <FieldDescription className="text-sm text-muted-foreground">
-                                                {question.description}
-                                            </FieldDescription>
+                                            <FieldDescription className="text-sm text-muted-foreground">{question.description}</FieldDescription>
                                         )}
                                     </div>
                                 </div>
@@ -162,14 +142,9 @@ export function CreateGuestBookForm({ questions, onSuccessSubmit }: Props) {
                                                     value={field.value}
                                                     onValueChange={(val) => {
                                                         field.onChange(val);
-                                                        const opt = question.options.find(
-                                                            (o) => o.id === val,
-                                                        );
+                                                        const opt = question.options.find((o) => o.id === val);
                                                         if (!opt?.is_allow_custom_text) {
-                                                            form.setValue(
-                                                                `answers.${index}.custom_text`,
-                                                                "",
-                                                            );
+                                                            form.setValue(`answers.${index}.custom_text`, "");
                                                         }
                                                     }}
                                                     className="gap-2.5"
@@ -189,10 +164,7 @@ export function CreateGuestBookForm({ questions, onSuccessSubmit }: Props) {
                                                                 )}
                                                             >
                                                                 <div className="flex items-center gap-3">
-                                                                    <RadioGroupItem
-                                                                        value={option.id}
-                                                                        id={`option-${option.id}`}
-                                                                    />
+                                                                    <RadioGroupItem value={option.id} id={`option-${option.id}`} />
                                                                     <div className="flex flex-1 flex-col">
                                                                         <FieldLabel
                                                                             htmlFor={`option-${option.id}`}
@@ -208,60 +180,42 @@ export function CreateGuestBookForm({ questions, onSuccessSubmit }: Props) {
                                                                     </div>
                                                                 </div>
 
-                                                                {option.is_allow_custom_text &&
-                                                                    isSelected && (
-                                                                        <div className="mt-3 pl-7">
-                                                                            <Controller
-                                                                                name={`answers.${index}.custom_text`}
-                                                                                control={form.control}
-                                                                                render={({
-                                                                                    field: customField,
-                                                                                    fieldState:
-                                                                                        customFieldState,
-                                                                                }) => (
-                                                                                    <Field
-                                                                                        data-invalid={Boolean(
-                                                                                            customFieldState.invalid,
-                                                                                        )}
-                                                                                        className="gap-1.5"
+                                                                {option.is_allow_custom_text && isSelected && (
+                                                                    <div className="mt-3 pl-7">
+                                                                        <Controller
+                                                                            name={`answers.${index}.custom_text`}
+                                                                            control={form.control}
+                                                                            render={({ field: customField, fieldState: customFieldState }) => (
+                                                                                <Field
+                                                                                    data-invalid={Boolean(customFieldState.invalid)}
+                                                                                    className="gap-1.5"
+                                                                                >
+                                                                                    <FieldLabel
+                                                                                        htmlFor={`custom-text-${option.id}`}
+                                                                                        className="text-xs font-medium text-muted-foreground"
                                                                                     >
-                                                                                        <FieldLabel
-                                                                                            htmlFor={`custom-text-${option.id}`}
-                                                                                            className="text-xs font-medium text-muted-foreground"
-                                                                                        >
-                                                                                            Keterangan
-                                                                                            Tambahan{" "}
-                                                                                            <span className="text-destructive">
-                                                                                                *
-                                                                                            </span>
-                                                                                        </FieldLabel>
-                                                                                        <Input
-                                                                                            id={`custom-text-${option.id}`}
-                                                                                            placeholder="Tuliskan keterangan detail..."
-                                                                                            aria-invalid={Boolean(
-                                                                                                customFieldState.invalid,
-                                                                                            )}
-                                                                                            {...customField}
-                                                                                        />
-                                                                                        {customFieldState.invalid && (
-                                                                                            <FieldError
-                                                                                                errors={[
-                                                                                                    customFieldState.error,
-                                                                                                ]}
-                                                                                            />
-                                                                                        )}
-                                                                                    </Field>
-                                                                                )}
-                                                                            />
-                                                                        </div>
-                                                                    )}
+                                                                                        Keterangan Tambahan{" "}
+                                                                                        <span className="text-destructive">*</span>
+                                                                                    </FieldLabel>
+                                                                                    <Input
+                                                                                        id={`custom-text-${option.id}`}
+                                                                                        placeholder="Tuliskan keterangan detail..."
+                                                                                        aria-invalid={Boolean(customFieldState.invalid)}
+                                                                                        {...customField}
+                                                                                    />
+                                                                                    {customFieldState.invalid && (
+                                                                                        <FieldError errors={[customFieldState.error]} />
+                                                                                    )}
+                                                                                </Field>
+                                                                            )}
+                                                                        />
+                                                                    </div>
+                                                                )}
                                                             </div>
                                                         );
                                                     })}
                                                 </RadioGroup>
-                                                {fieldState.invalid && (
-                                                    <FieldError errors={[fieldState.error]} />
-                                                )}
+                                                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                                             </Field>
                                         )}
                                     />
@@ -277,9 +231,7 @@ export function CreateGuestBookForm({ questions, onSuccessSubmit }: Props) {
                                                     aria-invalid={Boolean(fieldState.invalid)}
                                                     {...field}
                                                 />
-                                                {fieldState.invalid && (
-                                                    <FieldError errors={[fieldState.error]} />
-                                                )}
+                                                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                                             </Field>
                                         )}
                                     />
@@ -290,12 +242,7 @@ export function CreateGuestBookForm({ questions, onSuccessSubmit }: Props) {
                 })}
 
                 <div className="pt-2">
-                    <Button
-                        disabled={isLoading}
-                        type="submit"
-                        size="lg"
-                        className="w-full font-semibold"
-                    >
+                    <Button disabled={isLoading} type="submit" size="lg" className="w-full font-semibold">
                         {isLoading ? (
                             <>
                                 <Loader2 className="mr-2 size-4 animate-spin" />
