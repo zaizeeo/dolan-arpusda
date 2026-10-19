@@ -20,16 +20,6 @@ class AuthController extends Controller
     }
 
     /**
-     * Membuat akun user baru.
-     */
-    public function createUser(CreateUserRequest $request, CreateUserAction $createUserAction)
-    {
-        $createUserAction->execute($request->validated());
-
-        return redirect()->back()->with('success', 'User berhasil dibuat');
-    }
-
-    /**
      * Memproses data login dengan validasi dan rate limiting.
      */
     public function login(LoginRequest $request)

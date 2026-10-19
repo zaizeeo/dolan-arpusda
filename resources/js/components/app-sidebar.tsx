@@ -109,7 +109,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const navManagement = [
         {
             title: "Data Pengguna",
-            url: "/dashboard/users",
+            url: "/dashboard/management/users",
             icon: Users,
             isActive: url.startsWith("/dashboard/users"),
         },

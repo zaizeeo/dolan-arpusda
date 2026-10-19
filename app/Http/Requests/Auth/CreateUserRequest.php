@@ -28,7 +28,7 @@ class CreateUserRequest extends FormRequest
             'name' => ['required', 'string', 'min:2', 'max:128'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'max:32'],
-            'role' => ['required', 'string', 'in:magang,staff,admin,superadmin'],
+            'role' => ['required', 'string', 'in:intern,staff,admin,superadmin'],
         ];
     }
 

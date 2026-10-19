@@ -4,24 +4,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GuestBookController;
 use App\Http\Controllers\GuestBookQuestionController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
-
-// --- AREA PUBLIK (Tidak perlu login) ---
-// Route::get('/', [BukuTamuController::class, 'create']);
-// Route::post('/simpan', [BukuTamuController::class, 'store'])->name('buku-tamu.store');
-
-// // --- AREA LOGIN ---
-// Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-// Route::post('/login', [AuthController::class, 'login']);
-// Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-
-// // --- AREA ADMIN (Dikunci dengan middleware 'auth') ---
-// Route::get('/pengunjung', [BukuTamuController::class, 'index'])->name('buku-tamu.index')->middleware('auth');
-
-// Route::get('/pengunjung/{id}/edit', [BukuTamuController::class, 'edit'])->name('buku-tamu.edit')->middleware('auth');
-// Route::put('/pengunjung/{id}', [BukuTamuController::class, 'update'])->name('buku-tamu.update')->middleware('auth');
-
-// Route::delete('/pengunjung/{id}', [BukuTamuController::class, 'destroy'])->name('buku-tamu.destroy')->middleware('auth');
 
 Route::get('/', [GuestBookController::class, 'showGuestBookForm'])->name('home-page');
 
@@ -36,6 +20,12 @@ Route::prefix('/_api')->group(function () {
         Route::prefix('/management')->group(function () {
             Route::prefix('/guest-book-question')->group(function () {
                 Route::post('/', [GuestBookQuestionController::class, 'create'])->name('create-guest-book-question');
+            });
+            Route::prefix('/users')->group(function () {
+                Route::post('/', [UserController::class, 'createUser'])->name('user-controller-create')->middleware(['admins.middleware']);
+                Route::patch('/{id}', [UserController::class, 'editUser'])->name('user-controller-edit')->middleware(['admins.middleware']);
+                Route::delete('/{id}', [UserController::class, 'deleteUser'])->name('user-controller-delete')->middleware(['admins.middleware']);
+                Route::post('/{id}/promote-to-superadmin', [UserController::class, 'promoteToSuperadmin'])->name('user-controller-promote-to-superadmin')->middleware(['admins.middleware']);
             });
         });
     });
@@ -53,5 +43,7 @@ Route::prefix('/dashboard')->middleware(['auth.middleware'])->group(function () 
         Route::prefix('/guest-book-question')->group(function () {
             Route::get('/', [GuestBookQuestionController::class, 'index'])->name('dashboard.management.guest-book-question.index')->middleware(['admins.middleware']);
         });
+
+        Route::get('/users', [UserController::class, 'index'])->name('user-controller-index')->middleware(['admins.middleware']);
     });
 });

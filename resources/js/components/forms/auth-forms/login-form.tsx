@@ -35,7 +35,7 @@ export function LoginForm() {
                 });
             },
             onError: (error) => {
-                const errMessage = error?.server[0] || "Coba lagi beberapa saat";
+                const errMessage = error?.server || "Coba lagi beberapa saat";
                 setFormErrorMessage(errMessage);
                 toast.error("Terjadi Kesalahan!", {
                     description: errMessage,
