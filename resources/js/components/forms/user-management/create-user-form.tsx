@@ -1,18 +1,18 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "../ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Controller, useForm } from "react-hook-form";
 import { createUserSchema, allowedUserRole, type AllowedUserRoleType, CreateUserSchemaType } from "@/lib/validations/user-management";
-import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field";
-import { Input } from "../ui/input";
 import { useState } from "react";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "../ui/select";
 import { capitalizeText } from "@/lib";
-import { ScrollArea } from "../ui/scroll-area";
 import { router } from "@inertiajs/react";
 import { VisitHelperOptions } from "@inertiajs/core";
 import { toast } from "sonner";
-import { Spinner } from "../ui/spinner";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Spinner } from "@/components/ui/spinner";
 
 const CreateUserForm = () => {
     const [isOpen, setIsOpen] = useState(false);

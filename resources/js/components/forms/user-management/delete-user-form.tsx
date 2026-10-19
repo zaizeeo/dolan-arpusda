@@ -1,13 +1,22 @@
 import { Trash } from "lucide-react";
-import { Button } from "../ui/button";
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
+import { Button } from "@/components/ui/button";
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
 import { User } from "@/types";
 import { useState } from "react";
 import { toast } from "sonner";
 import { router } from "@inertiajs/react";
 import { VisitHelperOptions } from "@inertiajs/core";
-import { Spinner } from "../ui/spinner";
-import { FieldError } from "../ui/field";
+import { Spinner } from "@/components/ui/spinner";
+import { FieldError } from "@/components/ui/field";
 
 interface Props {
     user: User;
