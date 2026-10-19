@@ -38,7 +38,7 @@ export const getCreateGuestBookSchema = (questions: QuestionValidationContext[])
                 if (!hasOptions) {
                     if (!ans.custom_text || ans.custom_text.trim() === "") {
                         ctx.addIssue({
-                            code: z.ZodIssueCode.custom,
+                            code: "custom",
                             message: "Pertanyaan ini wajib diisi.",
                             path: [index, "custom_text"],
                         });
@@ -46,7 +46,7 @@ export const getCreateGuestBookSchema = (questions: QuestionValidationContext[])
                 } else {
                     if (!ans.guest_book_question_option_id || ans.guest_book_question_option_id.trim() === "") {
                         ctx.addIssue({
-                            code: z.ZodIssueCode.custom,
+                            code: "custom",
                             message: "Silakan pilih salah satu opsi jawaban.",
                             path: [index, "guest_book_question_option_id"],
                         });
@@ -54,7 +54,7 @@ export const getCreateGuestBookSchema = (questions: QuestionValidationContext[])
                         const selectedOption = question.options?.find((opt) => opt.id === ans.guest_book_question_option_id);
                         if (selectedOption?.is_allow_custom_text && (!ans.custom_text || ans.custom_text.trim() === "")) {
                             ctx.addIssue({
-                                code: z.ZodIssueCode.custom,
+                                code: "custom",
                                 message: "Keterangan tambahan wajib diisi untuk pilihan ini.",
                                 path: [index, "custom_text"],
                             });
