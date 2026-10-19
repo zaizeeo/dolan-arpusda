@@ -1,7 +1,7 @@
 import z from "zod";
 
 export const allowedUserRole = ["intern", "staff", "admin", "superadmin"] as const;
-export const AllowedUserRoleType = typeof allowedUserRole;
+export type AllowedUserRoleType = typeof allowedUserRole;
 
 export const createUserSchema = z.object({
     email: z.email(),

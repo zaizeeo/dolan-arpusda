@@ -7,11 +7,12 @@ import AppWrapperLayout from "./app-wrapper-layout";
 interface Props {
     children: ReactNode;
     title?: string;
+    className?: string;
 }
 
-const DashboardLayout = ({ children, title = "Dashboard" }: Props) => {
+const DashboardLayout = ({ children, title = "Dashboard", className }: Props) => {
     return (
-        <AppWrapperLayout>
+        <AppWrapperLayout className={className}>
             <SidebarProvider defaultOpen={true}>
                 <AppSidebar />
                 <SidebarInset>
@@ -22,9 +23,7 @@ const DashboardLayout = ({ children, title = "Dashboard" }: Props) => {
                             <span className="text-sm font-medium text-foreground">{title}</span>
                         </div>
                     </header>
-                    <main className="flex flex-1 flex-col gap-4 p-4 md:p-6">
-                        {children}
-                    </main>
+                    <main className="flex flex-1 flex-col gap-4 p-4 md:p-6">{children}</main>
                 </SidebarInset>
             </SidebarProvider>
         </AppWrapperLayout>
