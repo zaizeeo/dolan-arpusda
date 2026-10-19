@@ -1,7 +1,7 @@
 import z from "zod";
 
 export const loginSchema = z.object({
-    email: z.email("Mohon masukkan alamat email yang valid"),
+    email: z.email("Mohon masukkan alamat email yang valid").trim(),
     password: z.string().min(8, "Password minimal 8 karakter").max(32, "Password maksimal 32 karakter"),
 });
 
