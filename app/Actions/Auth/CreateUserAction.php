@@ -15,6 +15,12 @@ class CreateUserAction
     public function execute(array $data): User
     {
 
+        $emailCount = User::where("email", $data["email"])->count();
+
+        if ($emailCount > 0) {
+            throw ValidationException::withMessages(["server" => "Email sudah digunakan oleh pengguna lain"]);
+        }
+
         $superadminCount = User::where("role", "superadmin")->count();
 
         $isSuperAdminAlreadyExist = $superadminCount > 0;
