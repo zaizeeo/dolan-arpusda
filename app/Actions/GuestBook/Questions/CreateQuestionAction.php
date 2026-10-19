@@ -2,10 +2,8 @@
 
 namespace App\Actions\GuestBook\Questions;
 
-use App\Http\Requests\GuestBook\Questions\CreateQuestionRequest;
 use App\Models\GuestBookQuestion;
 use App\Models\GuestBookQuestionOption;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class CreateQuestionAction

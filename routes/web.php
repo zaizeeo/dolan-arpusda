@@ -1,10 +1,10 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GuestBookController;
 use App\Http\Controllers\GuestBookQuestionController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 // --- AREA PUBLIK (Tidak perlu login) ---
 // Route::get('/', [BukuTamuController::class, 'create']);
@@ -23,15 +23,13 @@ use Inertia\Inertia;
 
 // Route::delete('/pengunjung/{id}', [BukuTamuController::class, 'destroy'])->name('buku-tamu.destroy')->middleware('auth');
 
-Route::get('/', function () {
-    return Inertia::render('home-page');
-})->name('home-page');
+Route::get('/', [GuestBookController::class, 'showGuestBookForm'])->name('home-page');
 
 Route::get('/auth', [AuthController::class, 'showAuthPage'])->middleware('guest.middleware')->name('login');
 
 Route::prefix('/_api')->group(function () {
     Route::prefix('/auth')->group(function () {
-        Route::post('/login', [AuthController::class, 'login'])->name('login')->middleware(['guest.middleware']);
+        Route::post('/login', [AuthController::class, 'login'])->name('login.submit')->middleware(['guest.middleware']);
         Route::post('/logout', [AuthController::class, 'logout'])->middleware(['auth.middleware'])->name('logout');
     });
     Route::prefix('/dashboard')->group(function () {
@@ -41,13 +39,15 @@ Route::prefix('/_api')->group(function () {
             });
         });
     });
+
+    Route::prefix('guest-book')->group(function () {
+        Route::post('/', [GuestBookController::class, 'create'])->name('create-guest-book');
+        Route::delete('/{guestBook}', [GuestBookController::class, 'destroy'])->name('delete-guest-book')->middleware(['admins.middleware']);
+    });
 });
 
-
 Route::prefix('/dashboard')->middleware(['auth.middleware'])->group(function () {
-    Route::get('/', function () {
-        return Inertia::render('dashboard/index');
-    })->name('dashboard.index');
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard.index');
     Route::prefix('/management')->group(function () {
         Route::get('/guest-book', [GuestBookController::class, 'index'])->name('dashboard.management.guest-book.index')->middleware(['admins.middleware']);
         Route::prefix('/guest-book-question')->group(function () {

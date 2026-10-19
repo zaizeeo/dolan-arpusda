@@ -41,6 +41,7 @@ class GuestBookQuestionOption extends Model
     {
         return [
             'is_active' => 'boolean',
+            'is_allow_custom_text' => 'boolean',
         ];
     }
 }
