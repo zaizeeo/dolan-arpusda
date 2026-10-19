@@ -1,4 +1,4 @@
-import { usePage } from '@inertiajs/react';
-import { User } from '.';
+import { usePage } from "@inertiajs/react";
+import { User } from ".";
 
-export type PageProps = ReturnType<typeof usePage>['props'] & { auth: { user: User | null }; sidebar_state?: 'true' | 'false' };
+export type PageProps = ReturnType<typeof usePage>["props"] & { auth: User | null; sidebar_state?: "true" | "false" };
