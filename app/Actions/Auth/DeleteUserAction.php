@@ -24,6 +24,11 @@ class DeleteUserAction
             ]);
         }
 
+        if ($existingUser->hasSuperAdminAuthority()) {
+            throw ValidationException::withMessages([
+                'server' => 'Tidak bisa menghapus data Superadmin!',
+            ]);
+        }
 
         if ($existingUser->role === "admin" && !$currentUser->hasSuperAdminAuthority()) {
             throw ValidationException::withMessages([

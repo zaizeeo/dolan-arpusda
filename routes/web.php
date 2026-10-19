@@ -25,6 +25,7 @@ Route::prefix('/_api')->group(function () {
                 Route::post('/', [UserController::class, 'createUser'])->name('user-controller-create')->middleware(['admins.middleware']);
                 Route::patch('/{id}', [UserController::class, 'editUser'])->name('user-controller-edit')->middleware(['admins.middleware']);
                 Route::delete('/{id}', [UserController::class, 'deleteUser'])->name('user-controller-delete')->middleware(['admins.middleware']);
+                Route::post('/{id}/promote-to-superadmin', [UserController::class, 'promoteToSuperadmin'])->name('user-controller-promote-to-superadmin')->middleware(['admins.middleware']);
             });
         });
     });
