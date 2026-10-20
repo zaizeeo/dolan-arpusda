@@ -29,7 +29,7 @@ class CreateGuestBookRequest extends FormRequest
 
         return [
             'answers' => ['array', "min:$activeQuestionsCount", "max:$activeQuestionsCount"],
-            'answers.*.guest_book_question_id' => ['string', 'required'],
+            'answers.*.guest_book_question_id' => ['string', 'required', 'distinct'],
             'answers.*.custom_text' => ['string', 'nullable'],
             'answers.*.guest_book_question_option_id' => ['string', 'nullable'],
         ];
@@ -48,6 +48,7 @@ class CreateGuestBookRequest extends FormRequest
             'answers.min' => 'Mohon lengkapi seluruh pertanyaan buku tamu.',
             'answers.max' => 'Jumlah jawaban tidak sesuai dengan pertanyaan yang tersedia.',
             'answers.*.guest_book_question_id.required' => 'Pertanyaan wajib dipilih.',
+            'answers.*.guest_book_question_id.distinct' => 'Setiap pertanyaan hanya boleh dijawab satu kali.',
         ];
     }
 
