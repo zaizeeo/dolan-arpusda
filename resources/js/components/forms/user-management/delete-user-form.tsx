@@ -1,44 +1,47 @@
-import { Trash } from "lucide-react";
+import UserRoleBadge from "@/components/user-role-badge";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
-import { User } from "@/types";
-import { useState } from "react";
-import { toast } from "sonner";
-import { router } from "@inertiajs/react";
-import { VisitHelperOptions } from "@inertiajs/core";
-import { Spinner } from "@/components/ui/spinner";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { FieldError } from "@/components/ui/field";
+import { Spinner } from "@/components/ui/spinner";
+import { getInitials } from "@/lib";
+import { resolveInertiaErrorMessage } from "@/lib/inertia-errors";
+import { User } from "@/types";
+import { VisitHelperOptions } from "@inertiajs/core";
+import { router } from "@inertiajs/react";
+import { Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 interface Props {
-    user: User;
+    user: User | null;
+    onClose: () => void;
 }
 
-const DeleteUserForm = ({ user }: Props) => {
-    const [isOpen, setIsOpen] = useState(false);
+const DeleteUserForm = ({ user, onClose }: Props) => {
     const [isLoading, setIsLoading] = useState(false);
     const [formErrorMessage, setFormErrorMessage] = useState("");
 
+    useEffect(() => {
+        setFormErrorMessage("");
+    }, [user?.id]);
+
     function handleDeleteUser() {
+        if (!user) {
+            return;
+        }
+
         const requestOptions = {
             onStart: () => setIsLoading(true),
             onFinish: () => setIsLoading(false),
             onSuccess: () => {
                 toast.success("Berhasil", {
-                    description: "Pengguna baru berhasil dibuat!",
+                    description: `Pengguna ${user.name} berhasil dihapus.`,
                 });
-                setIsOpen(false);
+                onClose();
             },
             onError: (error) => {
-                const errMessage = error?.server || "Coba lagi beberapa saat";
+                const errMessage = resolveInertiaErrorMessage(error as Record<string, unknown>);
                 setFormErrorMessage(errMessage);
                 toast.error("Terjadi Kesalahan!", {
                     description: errMessage,
@@ -50,33 +53,47 @@ const DeleteUserForm = ({ user }: Props) => {
     }
 
     return (
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogTrigger asChild>
-                <Button variant={"destructive"}>
-                    <Trash /> Hapus
-                </Button>
-            </DialogTrigger>
-            <DialogContent>
+        <Dialog
+            open={user !== null}
+            onOpenChange={(open) => {
+                if (!open) {
+                    onClose();
+                }
+            }}
+        >
+            <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                    <DialogTitle>Apakah anda yakin?</DialogTitle>
-                    <DialogDescription className="text-destructive">Tindakan ini tidak bisa dipulihkan</DialogDescription>
-                </DialogHeader>
-                <div className="flex flex-col gap-1">
-                    <h1 className="font-semibold">Menghapus Pengguna:</h1>
-                    {formErrorMessage && <FieldError errors={[{ message: formErrorMessage }]} />}
-
-                    <div className="flex flex-col gap-1 pl-1">
-                        <span>Nama: {user.name}</span>
-                        <span>Email: {user.email}</span>
-                        <span>Role: {user.role}</span>
+                    <div className="flex size-10 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+                        <Trash2 className="size-5" />
                     </div>
-                </div>
+                    <DialogTitle>Hapus Pengguna</DialogTitle>
+                    <DialogDescription>Tindakan ini permanen dan tidak dapat dibatalkan.</DialogDescription>
+                </DialogHeader>
+
+                {user && (
+                    <div className="flex items-center gap-3 rounded-lg border border-border bg-muted/40 p-3">
+                        <Avatar>
+                            <AvatarFallback className="bg-primary/10 text-xs font-semibold text-primary">{getInitials(user.name)}</AvatarFallback>
+                        </Avatar>
+                        <div className="flex min-w-0 flex-col">
+                            <span className="truncate text-sm font-medium text-foreground">{user.name}</span>
+                            <span className="truncate text-xs text-muted-foreground">{user.email}</span>
+                        </div>
+                        <UserRoleBadge role={user.role} className="ml-auto" />
+                    </div>
+                )}
+
+                {formErrorMessage && <FieldError errors={[{ message: formErrorMessage }]} />}
+
                 <DialogFooter>
                     <DialogClose asChild>
-                        <Button>Batal</Button>
+                        <Button variant="outline" disabled={isLoading}>
+                            Batal
+                        </Button>
                     </DialogClose>
-                    <Button onClick={handleDeleteUser} variant={"destructive"}>
-                        {isLoading ? <Spinner /> : "Hapus Pengguna"}
+                    <Button variant="destructive" onClick={handleDeleteUser} disabled={isLoading}>
+                        {isLoading ? <Spinner /> : <Trash2 />}
+                        Hapus Pengguna
                     </Button>
                 </DialogFooter>
             </DialogContent>

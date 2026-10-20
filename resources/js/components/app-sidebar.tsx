@@ -111,7 +111,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             title: "Data Pengguna",
             url: "/dashboard/management/users",
             icon: Users,
-            isActive: url.startsWith("/dashboard/users"),
+            isActive: url.startsWith("/dashboard/management/users"),
         },
         {
             title: "Laporan & Rekap",
