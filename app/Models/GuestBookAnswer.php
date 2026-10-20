@@ -33,7 +33,7 @@ class GuestBookAnswer extends Model
      */
     public function question(): BelongsTo
     {
-        return $this->belongsTo(GuestBookQuestion::class, 'guest_book_question_id');
+        return $this->belongsTo(GuestBookQuestion::class, 'guest_book_question_id')->withTrashed();
     }
 
     /**
@@ -43,6 +43,6 @@ class GuestBookAnswer extends Model
      */
     public function option(): BelongsTo
     {
-        return $this->belongsTo(GuestBookQuestionOption::class, 'guest_book_question_option_id');
+        return $this->belongsTo(GuestBookQuestionOption::class, 'guest_book_question_option_id')->withTrashed();
     }
 }

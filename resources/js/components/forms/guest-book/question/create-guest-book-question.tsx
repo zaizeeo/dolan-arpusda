@@ -6,9 +6,12 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
+import { createGuestBookQuestion } from "@/routes";
+import { resolveInertiaErrorMessage } from "@/lib/inertia-errors";
 import { createGuestBookQuestionSchema, CreateGuestBookQuestionSchemaType } from "@/lib/validations/guest-book/question";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { router, VisitHelperOptions } from "@inertiajs/core";
+import { VisitHelperOptions } from "@inertiajs/core";
+import { router } from "@inertiajs/react";
 import { ListPlus, Plus, Trash2, Type } from "lucide-react";
 import { ReactNode, useState } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
@@ -59,7 +62,7 @@ const CreateGuestBookQuestion = ({ children, closeButton = null }: Props) => {
     };
 
     const onSubmit = (data: CreateGuestBookQuestionSchemaType) => {
-        setIsLoading(true);
+        setFormErrorMessage("");
 
         const payload: CreateGuestBookQuestionSchemaType = {
             ...data,
@@ -77,9 +80,7 @@ const CreateGuestBookQuestion = ({ children, closeButton = null }: Props) => {
                 });
             },
             onError: (error) => {
-                console.log({ error });
-
-                const errMessage = error?.server || "Coba lagi beberapa saat";
+                const errMessage = resolveInertiaErrorMessage(error as Record<string, unknown>);
                 setFormErrorMessage(errMessage);
                 toast.error("Terjadi Kesalahan!", {
                     description: errMessage,
@@ -87,7 +88,7 @@ const CreateGuestBookQuestion = ({ children, closeButton = null }: Props) => {
             },
         } satisfies VisitHelperOptions;
 
-        router.post("/_api/dashboard/management/guest-book-question", payload, requestOptions);
+        router.post(createGuestBookQuestion.url(), payload, requestOptions);
     };
 
     return (
