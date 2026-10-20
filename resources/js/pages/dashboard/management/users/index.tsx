@@ -71,7 +71,7 @@ const formatJoinDate = (value?: Date | string | null): string => {
 };
 
 const UserManagementDashboardIndex = ({ auth, users = [] }: Props) => {
-    const currentUser = auth as User;
+    const currentUser = auth.user as User;
     const { hasAdminsAuthority, hasSuperAdminAuthority } = useUserRole(currentUser);
 
     const [searchQuery, setSearchQuery] = useState("");

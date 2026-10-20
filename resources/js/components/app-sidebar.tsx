@@ -43,24 +43,13 @@ import {
     SidebarRail,
     useSidebar,
 } from "@/components/ui/sidebar";
-
-interface PageProps {
-    auth?: {
-        user?: {
-            id?: string;
-            name?: string;
-            email?: string;
-            role?: string;
-        };
-    };
-    [key: string]: unknown;
-}
+import { PageProps } from "@/types/page-props";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const { isMobile } = useSidebar();
     const { url, props: pageProps } = usePage<PageProps>();
 
-    const user = pageProps.auth?.user;
+    const user = pageProps.auth.user;
     const userName = user?.name || "Staff Arpusda";
     const userEmail = user?.email || "staff@arpusda.go.id";
     const userRole = user?.role ? user.role.toUpperCase() : "STAFF";
