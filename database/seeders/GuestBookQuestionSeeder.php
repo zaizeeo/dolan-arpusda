@@ -3,9 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\GuestBookQuestion;
-use App\Models\GuestBookQuestionOption;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class GuestBookQuestionSeeder extends Seeder
 {
@@ -14,94 +13,74 @@ class GuestBookQuestionSeeder extends Seeder
      */
     public function run(): void
     {
+        DB::transaction(function () {
+            $this->createQuestion(1, 'Nama', 'Isi Namamu');
 
-        GuestBookQuestion::create([
-            'label' => 'Nama',
-            'description' => 'Isi Namamu',
-            'sequence_number' => 1,
-        ]);
+            $this->createQuestion(2, 'Jenis Kelamin', 'Isi Jenis Kelamin', [
+                ['label' => 'Laki-Laki'],
+                ['label' => 'Perempuan'],
+            ]);
 
-        $gender = GuestBookQuestion::create([
-            'label' => 'Jenis Kelamin',
-            'description' => 'Isi Jenis Kelamin',
-            'sequence_number' => 2,
-        ]);
+            $this->createQuestion(3, 'Pendidikan Terakhir', 'Isi Pendidikan Terakhir', [
+                ['label' => 'TK'],
+                ['label' => 'SD'],
+                ['label' => 'SMP'],
+                ['label' => 'SMA/SLTA/SMK'],
+                ['label' => 'D3'],
+                ['label' => 'S1'],
+                ['label' => 'S2'],
+                ['label' => 'S3'],
+            ]);
 
-        $rawData = ['Laki-Laki', 'Perempuan'];
+            $this->createQuestion(4, 'Pekerjaan', 'Isi Pekerjaan', [
+                ['label' => 'PNS'],
+                ['label' => 'TNI/POLRI'],
+                ['label' => 'Guru'],
+                ['label' => 'Karyawan Swasta'],
+                ['label' => 'BUMN/BUMD'],
+                ['label' => 'Pensiunan'],
+                ['label' => 'Pelajar'],
+                ['label' => 'Mahasiswa'],
+                ['label' => 'Ibu Rumah Tangga'],
+                ['label' => 'Dosen', 'is_active' => false],
+                ['label' => 'Lainnya', 'is_allow_custom_text' => true],
+            ]);
 
-        $data = array_map(function ($item, $index) use ($gender) {
-            return [
-                'id' => (string) Str::orderedUuid(),
-                'guest_book_question_id' => $gender->id,
-                'label' => $item,
-                'sequence_number' => $index + 1,
-            ];
-        }, $rawData, array_keys($rawData));
+            $this->createQuestion(5, 'Alamat');
 
-        GuestBookQuestionOption::insert($data);
+            $this->createQuestion(6, 'Keperluan Layanan', null, [
+                ['label' => 'Bimbingan/Konsultasi'],
+                ['label' => 'Peminjaman Arsip'],
+                ['label' => 'Penelusuran Arsip'],
+                ['label' => 'Kunjungan/Wisata Arsip'],
+                ['label' => 'Penyerahan Arsip'],
+                ['label' => 'Lainnya', 'is_allow_custom_text' => true],
+            ]);
+        });
+    }
 
-        $educationHistory = GuestBookQuestion::create([
-            'label' => 'Pendidikan Terakhir',
-            'description' => 'Isi Pendidikan Terakhir',
-            'sequence_number' => 3,
-        ]);
+    /**
+     * Create a guest book question together with its options.
+     *
+     * @param  array<int, array{label: string, description?: string|null, is_active?: bool, is_allow_custom_text?: bool}>  $options
+     */
+    private function createQuestion(int $sequenceNumber, string $label, ?string $description = null, array $options = []): void
+    {
+        $question = GuestBookQuestion::firstOrCreate(
+            ['sequence_number' => $sequenceNumber],
+            ['label' => $label, 'description' => $description]
+        );
 
-        $rawData = ['TK', 'SD', 'SMP', 'SMA/SLTA/SMK', 'D3', 'S1', 'S2', 'S3'];
-
-        $data = array_map(function ($item, $index) use ($educationHistory) {
-            return [
-                'id' => (string) Str::orderedUuid(),
-                'guest_book_question_id' => $educationHistory->id,
-                'label' => $item,
-                'sequence_number' => $index + 1,
-            ];
-        }, $rawData, array_keys($rawData));
-
-        GuestBookQuestionOption::insert($data);
-
-        $job = GuestBookQuestion::create([
-            'label' => 'Pekerjaan',
-            'description' => 'Isi Pekerjaan',
-            'sequence_number' => 4,
-        ]);
-
-        $rawData = ['PNS', 'TNI/POLRI', 'Guru', 'Karyawan Swasta', 'BUMN/BUMD', 'Pensiunan', 'Pelajar', 'Mahasiswa', 'Ibu Rumah Tangga', 'Dosen', 'Lainnya'];
-
-        $data = array_map(function ($item, $index) use ($job) {
-            return [
-                'id' => (string) Str::orderedUuid(),
-                'guest_book_question_id' => $job->id,
-                'label' => $item,
-                'sequence_number' => $index + 1,
-                'is_active' => $item !== 'Dosen',
-                'is_allow_custom_text' => $item === 'Lainnya',
-            ];
-        }, $rawData, array_keys($rawData));
-
-        GuestBookQuestionOption::insert($data);
-
-        GuestBookQuestion::create([
-            'label' => 'Alamat',
-            'sequence_number' => 5,
-        ]);
-
-        $needs = GuestBookQuestion::create([
-            'label' => 'Keperluan Layanan',
-            'sequence_number' => 6,
-        ]);
-
-        $rawData = ['Bimbingan/Konsultasi', 'Peminjaman Arsip', 'Penelusuran Arsip', 'Kunjungan/ Wisata Arsip', 'Penyerahan Arsip', 'Lainnya'];
-
-        $data = array_map(function ($item, $index) use ($needs) {
-            return [
-                'id' => (string) Str::orderedUuid(),
-                'guest_book_question_id' => $needs->id,
-                'label' => $item,
-                'sequence_number' => $index + 1,
-                'is_allow_custom_text' => $item === 'Lainnya',
-            ];
-        }, $rawData, array_keys($rawData));
-
-        GuestBookQuestionOption::insert($data);
+        foreach ($options as $index => $option) {
+            $question->options()->firstOrCreate(
+                ['label' => $option['label']],
+                [
+                    'description' => $option['description'] ?? null,
+                    'is_active' => $option['is_active'] ?? true,
+                    'is_allow_custom_text' => $option['is_allow_custom_text'] ?? false,
+                    'sequence_number' => $index + 1,
+                ]
+            );
+        }
     }
 }

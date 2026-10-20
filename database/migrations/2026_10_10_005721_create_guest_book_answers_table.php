@@ -18,6 +18,7 @@ return new class extends Migration
             $table->text('custom_text')->nullable();
             $table->softDeletes();
             $table->timestamps();
+            $table->unique(['guest_book_id', 'guest_book_question_id']);
         });
     }
 
