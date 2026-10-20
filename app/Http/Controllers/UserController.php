@@ -10,18 +10,15 @@ use App\Http\Requests\Auth\CreateUserRequest;
 use App\Http\Requests\Auth\EditUserRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class UserController extends Controller
 {
-
     public function index()
     {
         $users = User::get();
-        $auth = Auth::user();
 
-        return Inertia::render('dashboard/management/users/index', compact('users', 'auth'));
+        return Inertia::render('dashboard/management/users/index', compact('users'));
     }
 
     public function createUser(CreateUserRequest $request, CreateUserAction $createUserAction)
