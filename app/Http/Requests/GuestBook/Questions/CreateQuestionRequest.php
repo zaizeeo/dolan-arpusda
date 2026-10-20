@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests\GuestBook\Questions;
 
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\ValidationException;
 
 class CreateQuestionRequest extends FormRequest
@@ -17,7 +17,6 @@ class CreateQuestionRequest extends FormRequest
         return true;
     }
 
-
     /**
      * Get the validation rules that apply to the request.
      *
@@ -26,12 +25,12 @@ class CreateQuestionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'label' => ['string', 'required'],
-            'description' => ['string', 'nullable'],
+            'label' => ['required', 'string', 'min:2', 'max:255'],
+            'description' => ['nullable', 'string', 'max:255'],
             'options' => ['array', 'nullable'],
-            'options.*.label' => ['string', 'min:2'],
-            'options.*.description' => ['string', 'nullable'],
-            'options.*.is_allow_custom_text' => ['boolean', 'nullable']
+            'options.*.label' => ['required', 'string', 'min:2', 'max:255'],
+            'options.*.description' => ['nullable', 'string', 'max:255'],
+            'options.*.is_allow_custom_text' => ['nullable', 'boolean'],
         ];
     }
 
@@ -43,12 +42,18 @@ class CreateQuestionRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'label.required' => 'Label Harus diisi',
+            'label.required' => 'Label harus diisi',
             'label.string' => 'Label hanya bisa diisi dengan text',
-            'description.string' => 'Label hanya bisa diisi dengan text',
-            'options.*.label.required' => 'Label Harus diisi',
-            'options.*.label.string' => 'Label hanya bisa diisi dengan text',
+            'label.min' => 'Label minimal 2 karakter',
+            'label.max' => 'Label maksimal 255 karakter',
+            'description.string' => 'Deskripsi hanya bisa diisi dengan text',
+            'description.max' => 'Deskripsi maksimal 255 karakter',
+            'options.*.label.required' => 'Label pilihan harus diisi',
+            'options.*.label.string' => 'Label pilihan hanya bisa diisi dengan text',
+            'options.*.label.min' => 'Label pilihan minimal 2 karakter',
+            'options.*.label.max' => 'Label pilihan maksimal 255 karakter',
             'options.*.description.string' => 'Deskripsi hanya bisa diisi dengan text',
+            'options.*.description.max' => 'Deskripsi maksimal 255 karakter',
             'options.*.is_allow_custom_text.boolean' => 'Opsi ini hanya bisa true atau false',
         ];
     }
@@ -64,6 +69,4 @@ class CreateQuestionRequest extends FormRequest
         throw ValidationException::withMessages($messages)
             ->redirectTo($this->getRedirectUrl());
     }
-
-    public function createQuestion() {}
 }

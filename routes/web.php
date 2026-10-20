@@ -18,8 +18,17 @@ Route::prefix('/_api')->group(function () {
     });
     Route::prefix('/dashboard')->group(function () {
         Route::prefix('/management')->group(function () {
-            Route::prefix('/guest-book-question')->group(function () {
+            Route::prefix('/guest-book-question')->middleware(['admins.middleware'])->group(function () {
                 Route::post('/', [GuestBookQuestionController::class, 'create'])->name('create-guest-book-question');
+                Route::patch('/{guestBookQuestion}', [GuestBookQuestionController::class, 'update'])->name('update-guest-book-question');
+                Route::delete('/{guestBookQuestion}', [GuestBookQuestionController::class, 'destroy'])->name('delete-guest-book-question');
+                Route::patch('/{guestBookQuestion}/toggle-active', [GuestBookQuestionController::class, 'toggleActive'])->name('toggle-guest-book-question-active');
+                Route::post('/{guestBookQuestion}/options', [GuestBookQuestionController::class, 'createOption'])->name('create-guest-book-question-option');
+            });
+            Route::prefix('/guest-book-question-option')->middleware(['admins.middleware'])->group(function () {
+                Route::patch('/{guestBookQuestionOption}', [GuestBookQuestionController::class, 'updateOption'])->name('update-guest-book-question-option');
+                Route::delete('/{guestBookQuestionOption}', [GuestBookQuestionController::class, 'destroyOption'])->name('delete-guest-book-question-option');
+                Route::patch('/{guestBookQuestionOption}/toggle-active', [GuestBookQuestionController::class, 'toggleOptionActive'])->name('toggle-guest-book-question-option-active');
             });
             Route::prefix('/users')->group(function () {
                 Route::post('/', [UserController::class, 'createUser'])->name('user-controller-create')->middleware(['admins.middleware']);
