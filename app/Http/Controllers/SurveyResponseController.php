@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Survey;
+use App\Models\SurveyQuestionOption;
 use App\Models\SurveyResponse;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
@@ -34,29 +35,7 @@ class SurveyResponseController extends Controller
             ])
             ->latest()
             ->get()
-            ->map(fn ($response) => [
-                'id' => $response->id,
-                'created_at' => $response->created_at?->toISOString(),
-                'created_at_human' => $response->created_at?->diffForHumans(),
-                'answers' => $response->answers->map(fn ($answer) => [
-                    'id' => $answer->id,
-                    'survey_question_id' => $answer->survey_question_id,
-                    'survey_question_option_id' => $answer->survey_question_option_id,
-                    'custom_text' => $answer->custom_text,
-                    'question' => $answer->question ? [
-                        'id' => $answer->question->id,
-                        'label' => $answer->question->label,
-                        'description' => $answer->question->description,
-                        'sequence_number' => $answer->question->sequence_number,
-                    ] : null,
-                    'option' => $answer->option ? [
-                        'id' => $answer->option->id,
-                        'label' => $answer->option->label,
-                        'description' => $answer->option->description,
-                        'is_allow_custom_text' => $answer->option->is_allow_custom_text,
-                    ] : null,
-                ]),
-            ]);
+            ->map(fn ($response) => $this->formatResponse($response));
 
         return Inertia::render('dashboard/management/survey/index', [
             'survey' => [
@@ -85,6 +64,8 @@ class SurveyResponseController extends Controller
             ] : null,
             'stats' => $this->stats($survey),
             'trend' => $this->weeklyTrend($survey),
+            'popularOptions' => $this->popularOptions($survey),
+            'recentResponses' => $this->recentResponses($survey),
         ]);
     }
 
@@ -147,6 +128,114 @@ class SurveyResponseController extends Controller
                     'count' => (int) ($counts[$date->toDateString()] ?? 0),
                 ];
             })
+            ->all();
+    }
+
+    /**
+     * Format a survey response and its answers for the frontend.
+     *
+     * @return array{
+     *     id: string,
+     *     created_at: string|null,
+     *     created_at_human: string|null,
+     *     answers: array<int, array{
+     *         id: string,
+     *         survey_question_id: string,
+     *         survey_question_option_id: string|null,
+     *         custom_text: string|null,
+     *         question: array{id: string, label: string, description: string|null, sequence_number: int|null}|null,
+     *         option: array{id: string, label: string, description: string|null, is_allow_custom_text: bool}|null
+     *     }>
+     * }
+     */
+    private function formatResponse(SurveyResponse $response): array
+    {
+        return [
+            'id' => $response->id,
+            'created_at' => $response->created_at?->toISOString(),
+            'created_at_human' => $response->created_at?->diffForHumans(),
+            'answers' => $response->answers->map(fn ($answer) => [
+                'id' => $answer->id,
+                'survey_question_id' => $answer->survey_question_id,
+                'survey_question_option_id' => $answer->survey_question_option_id,
+                'custom_text' => $answer->custom_text,
+                'question' => $answer->question ? [
+                    'id' => $answer->question->id,
+                    'label' => $answer->question->label,
+                    'description' => $answer->question->description,
+                    'sequence_number' => $answer->question->sequence_number,
+                ] : null,
+                'option' => $answer->option ? [
+                    'id' => $answer->option->id,
+                    'label' => $answer->option->label,
+                    'description' => $answer->option->description,
+                    'is_allow_custom_text' => $answer->option->is_allow_custom_text,
+                ] : null,
+            ]),
+        ];
+    }
+
+    /**
+     * Build the most selected question options for the active survey.
+     *
+     * @return array<int, array{id: string, label: string, question_label: string|null, count: int}>
+     */
+    private function popularOptions(?Survey $survey): array
+    {
+        if (! $survey) {
+            return [];
+        }
+
+        return SurveyQuestionOption::query()
+            ->with('question:id,label')
+            ->withCount('answers')
+            ->whereHas('question', fn ($query) => $query->where('survey_id', $survey->id))
+            ->whereHas('answers')
+            ->orderByDesc('answers_count')
+            ->limit(5)
+            ->get()
+            ->map(fn ($option) => [
+                'id' => $option->id,
+                'label' => $option->label,
+                'question_label' => $option->question?->label,
+                'count' => (int) $option->answers_count,
+            ])
+            ->all();
+    }
+
+    /**
+     * Build the latest six survey responses for the active survey.
+     *
+     * @return array<int, array{
+     *     id: string,
+     *     created_at: string|null,
+     *     created_at_human: string|null,
+     *     answers: array<int, array{
+     *         id: string,
+     *         survey_question_id: string,
+     *         survey_question_option_id: string|null,
+     *         custom_text: string|null,
+     *         question: array{id: string, label: string, description: string|null, sequence_number: int|null}|null,
+     *         option: array{id: string, label: string, description: string|null, is_allow_custom_text: bool}|null
+     *     }>
+     * }>
+     */
+    private function recentResponses(?Survey $survey): array
+    {
+        if (! $survey) {
+            return [];
+        }
+
+        return SurveyResponse::where('survey_id', $survey->id)
+            ->with([
+                'answers' => fn ($query) => $query->orderBy('created_at', 'asc'),
+                'answers.question:id,label,description,sequence_number',
+                'answers.option:id,label,description,is_allow_custom_text',
+            ])
+            ->latest()
+            ->limit(6)
+            ->get()
+            ->map(fn ($response) => $this->formatResponse($response))
             ->all();
     }
 

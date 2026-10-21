@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart";
+import { cn } from "@/lib/utils";
 import { ChartNoAxesColumnIncreasing } from "lucide-react";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
@@ -13,6 +14,7 @@ export interface SurveyTrendItem {
 
 interface Props {
     trend: SurveyTrendItem[];
+    className?: string;
 }
 
 const surveyTrendChartConfig = {
@@ -22,11 +24,11 @@ const surveyTrendChartConfig = {
     },
 } satisfies ChartConfig;
 
-export function SurveyResponseTrendChart({ trend }: Props) {
+export function SurveyResponseTrendChart({ trend, className }: Props) {
     const totalWeeklyResponses = trend.reduce((total, item) => total + item.count, 0);
 
     return (
-        <Card className="border-border bg-card shadow-xs">
+        <Card className={cn("border-border bg-card shadow-xs", className)}>
             <CardHeader className="flex flex-row items-start justify-between gap-3 pb-2">
                 <div>
                     <div className="flex items-center gap-2">
