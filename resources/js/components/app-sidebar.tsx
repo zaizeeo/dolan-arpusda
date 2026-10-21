@@ -298,7 +298,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
-                                        <Link href="/dashboard/profile" className="cursor-pointer">
+                                        <Link href="/dashboard/profile/edit" className="cursor-pointer">
                                             <Settings className="size-4" />
                                             Update Profil
                                         </Link>

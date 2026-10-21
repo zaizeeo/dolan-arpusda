@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GuestBookController;
 use App\Http\Controllers\GuestBookQuestionController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,6 +18,11 @@ Route::prefix('/_api')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout'])->middleware(['auth.middleware'])->name('logout');
     });
     Route::prefix('/dashboard')->group(function () {
+        Route::prefix('/profile')->middleware(['auth.middleware'])->group(function () {
+            Route::post('/', [ProfileController::class, 'update'])->name('profile.update');
+            Route::patch('/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
+        });
+
         Route::prefix('/management')->group(function () {
             Route::prefix('/guest-book-question')->middleware(['admins.middleware'])->group(function () {
                 Route::post('/', [GuestBookQuestionController::class, 'create'])->name('create-guest-book-question');
@@ -47,6 +53,9 @@ Route::prefix('/_api')->group(function () {
 
 Route::prefix('/dashboard')->middleware(['auth.middleware'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard.index');
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::get('/settings', [ProfileController::class, 'settings'])->name('settings');
     Route::prefix('/management')->group(function () {
         Route::get('/guest-book', [GuestBookController::class, 'index'])->name('dashboard.management.guest-book.index')->middleware(['admins.middleware']);
         Route::prefix('/guest-book-question')->group(function () {

@@ -116,15 +116,15 @@ const getRootError = (
                 const acceptedTypes = Object.values(limits.accept ?? {})
                     .flat()
                     .join(", ");
-                return `only ${acceptedTypes} are allowed`;
+                return `hanya format ${acceptedTypes} yang diperbolehkan`;
             case "file-too-large":
-                const maxMb = limits.maxSize ? (limits.maxSize / (1024 * 1024)).toFixed(2) : "infinite?";
-                return `max size is ${maxMb}MB`;
+                const maxMb = limits.maxSize ? (limits.maxSize / (1024 * 1024)).toFixed(2) : "tidak terbatas";
+                return `ukuran maksimal ${maxMb}MB`;
             case "file-too-small":
-                const roundedMinSize = limits.minSize ? (limits.minSize / (1024 * 1024)).toFixed(2) : "negative?";
-                return `min size is ${roundedMinSize}MB`;
+                const roundedMinSize = limits.minSize ? (limits.minSize / (1024 * 1024)).toFixed(2) : "tidak terbatas";
+                return `ukuran minimal ${roundedMinSize}MB`;
             case "too-many-files":
-                return `max ${limits.maxFiles} files`;
+                return `maksimal ${limits.maxFiles} file`;
         }
     });
     const joinedErrors = errors.join(", ");
