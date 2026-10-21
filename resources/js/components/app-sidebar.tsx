@@ -60,6 +60,7 @@ import {
 import guestBook from "@/routes/dashboard/management/guest-book";
 import guestBookQuestion from "@/routes/dashboard/management/guest-book-question";
 import Profile from "@/routes/profile";
+import { useUserRole } from "@/lib/hooks/use-user-role";
 import { User } from "@/types";
 import { PageProps } from "@/types/page-props";
 
@@ -82,7 +83,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const { isMobile } = useSidebar();
     const { url, props: pageProps } = usePage<PageProps>();
 
-    const { name: userName, role: userRole, email: userEmail, avatar } = pageProps.auth.user as User;
+    const currentUser = pageProps.auth.user as User;
+    const { name: userName, role: userRole, email: userEmail, avatar } = currentUser;
+    const { hasAdminsAuthority, canReadManagement } = useUserRole(currentUser);
     const userInitials = userName
         .split(" ")
         .map((n) => n[0])
@@ -109,52 +112,54 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         },
     ];
 
-    const navManagement: NavItem[] = [
-        {
-            title: "Data Pengguna",
-            url: userControllerIndex.url(),
-            icon: UsersRound,
-            isActive: url.startsWith(userControllerIndex.url()),
-        },
-        {
-            title: "Buku Tamu",
-            icon: BookUser,
-            isActive: url === guestBook.index.url() || url.startsWith(guestBookQuestion.index.url()),
-            items: [
-                {
-                    title: "Daftar Buku Tamu",
-                    url: guestBook.index.url(),
-                    icon: BookOpenCheck,
-                    isActive: url === guestBook.index.url(),
-                },
-                {
-                    title: "Pertanyaan Buku Tamu",
-                    url: guestBookQuestion.index.url(),
-                    icon: MessageCircleQuestionMark,
-                    isActive: url.startsWith(guestBookQuestion.index.url()),
-                },
-            ],
-        },
-        {
-            title: "Survei",
-            icon: ClipboardList,
-            isActive: url === surveyResponseIndex.url() || url.startsWith(surveyQuestionIndex.url()),
-            items: [
-                {
-                    title: "Respon Survei",
-                    url: surveyResponseIndex.url(),
-                    icon: MessagesSquare,
-                    isActive: url === surveyResponseIndex.url(),
-                },
-                {
-                    title: "Pertanyaan Survei",
-                    url: surveyQuestionIndex.url(),
-                    icon: FileQuestionMark,
-                    isActive: url.startsWith(surveyQuestionIndex.url()),
-                },
-            ],
-        },
-    ];
+    const userManagementItem: NavItem = {
+        title: "Data Pengguna",
+        url: userControllerIndex.url(),
+        icon: UsersRound,
+        isActive: url.startsWith(userControllerIndex.url()),
+    };
+
+    const guestBookItem: NavItem = {
+        title: "Buku Tamu",
+        icon: BookUser,
+        isActive: url === guestBook.index.url() || url.startsWith(guestBookQuestion.index.url()),
+        items: [
+            {
+                title: "Daftar Buku Tamu",
+                url: guestBook.index.url(),
+                icon: BookOpenCheck,
+                isActive: url === guestBook.index.url(),
+            },
+            {
+                title: "Pertanyaan Buku Tamu",
+                url: guestBookQuestion.index.url(),
+                icon: MessageCircleQuestionMark,
+                isActive: url.startsWith(guestBookQuestion.index.url()),
+            },
+        ],
+    };
+
+    const surveyItem: NavItem = {
+        title: "Survei",
+        icon: ClipboardList,
+        isActive: url === surveyResponseIndex.url() || url.startsWith(surveyQuestionIndex.url()),
+        items: [
+            {
+                title: "Respon Survei",
+                url: surveyResponseIndex.url(),
+                icon: MessagesSquare,
+                isActive: url === surveyResponseIndex.url(),
+            },
+            {
+                title: "Pertanyaan Survei",
+                url: surveyQuestionIndex.url(),
+                icon: FileQuestionMark,
+                isActive: url.startsWith(surveyQuestionIndex.url()),
+            },
+        ],
+    };
+
+    const navManagement: NavItem[] = [...(hasAdminsAuthority ? [userManagementItem] : []), ...(canReadManagement ? [guestBookItem, surveyItem] : [])];
 
     const renderSidebarItem = (item: NavItem) => {
         if (item.items) {
@@ -231,12 +236,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     </SidebarGroupContent>
                 </SidebarGroup>
 
-                <SidebarGroup>
-                    <SidebarGroupLabel>Manajemen</SidebarGroupLabel>
-                    <SidebarGroupContent>
-                        <SidebarMenu>{navManagement.map(renderSidebarItem)}</SidebarMenu>
-                    </SidebarGroupContent>
-                </SidebarGroup>
+                {navManagement.length > 0 && (
+                    <SidebarGroup>
+                        <SidebarGroupLabel>Manajemen</SidebarGroupLabel>
+                        <SidebarGroupContent>
+                            <SidebarMenu>{navManagement.map(renderSidebarItem)}</SidebarMenu>
+                        </SidebarGroupContent>
+                    </SidebarGroup>
+                )}
             </SidebarContent>
 
             <SidebarFooter>

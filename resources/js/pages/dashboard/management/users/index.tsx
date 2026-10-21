@@ -26,7 +26,6 @@ import { useUserRole } from "@/lib/hooks/use-user-role";
 import { allowedUserRole, getUserRoleLabel, type AllowedUserRoleType } from "@/lib/validations/user-management";
 import { User } from "@/types";
 import { PageProps } from "@/types/page-props";
-import { router } from "@inertiajs/react";
 import {
     ArrowUpCircle,
     CalendarDays,
@@ -35,7 +34,6 @@ import {
     GraduationCap,
     Pencil,
     Plus,
-    RefreshCw,
     Search,
     ShieldCheck,
     Trash2,
@@ -156,9 +154,6 @@ const UserManagementDashboardIndex = ({ auth, users = [] }: Props) => {
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2">
-                        <Button variant="outline" size="icon" onClick={() => router.reload()} title="Perbarui data">
-                            <RefreshCw className="size-4" />
-                        </Button>
                         <Button onClick={() => setIsCreateOpen(true)}>
                             <Plus />
                             Tambah Pengguna

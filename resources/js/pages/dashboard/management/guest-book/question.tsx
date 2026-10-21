@@ -12,8 +12,10 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useUserRole } from "@/lib/hooks/use-user-role";
 import { resolveInertiaErrorMessage } from "@/lib/inertia-errors";
 import { toggleGuestBookQuestionActive, toggleGuestBookQuestionOptionActive } from "@/routes";
+import { User } from "@/types";
 import { GuestBookQuestion, GuestBookQuestionOption } from "@/types/guest-book";
 import { PageProps } from "@/types/page-props";
 import { VisitHelperOptions } from "@inertiajs/core";
@@ -50,7 +52,8 @@ interface OptionDeleteTarget {
     option: GuestBookQuestionOption;
 }
 
-export default function GuestBookQuestionManagement({ questions = [] }: Props) {
+export default function GuestBookQuestionManagement({ auth, questions = [] }: Props) {
+    const { hasAdminsAuthority } = useUserRole(auth.user as User);
     const [editingQuestion, setEditingQuestion] = useState<GuestBookQuestion | null>(null);
     const [deletingQuestion, setDeletingQuestion] = useState<GuestBookQuestion | null>(null);
     const [optionFormTarget, setOptionFormTarget] = useState<OptionFormTarget | null>(null);
@@ -120,17 +123,21 @@ export default function GuestBookQuestionManagement({ questions = [] }: Props) {
                         <div>
                             <h1 className="text-2xl font-bold tracking-tight text-foreground">Daftar Pertanyaan Buku Tamu</h1>
                             <p className="text-sm text-muted-foreground">
-                                Kelola pertanyaan kuisioner dan opsi jawaban untuk formulir buku tamu digital.
+                                {hasAdminsAuthority
+                                    ? "Kelola pertanyaan kuisioner dan opsi jawaban untuk formulir buku tamu digital."
+                                    : "Lihat pertanyaan kuisioner dan opsi jawaban untuk formulir buku tamu digital."}
                             </p>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <CreateGuestBookQuestion>
-                                <Button className="gap-2 shadow-sm">
-                                    <Plus className="size-4" />
-                                    <span>Tambah Pertanyaan</span>
-                                </Button>
-                            </CreateGuestBookQuestion>
-                        </div>
+                        {hasAdminsAuthority && (
+                            <div className="flex items-center gap-2">
+                                <CreateGuestBookQuestion>
+                                    <Button className="gap-2 shadow-sm">
+                                        <Plus className="size-4" />
+                                        <span>Tambah Pertanyaan</span>
+                                    </Button>
+                                </CreateGuestBookQuestion>
+                            </div>
+                        )}
                     </div>
 
                     {/* Stats Summary Cards */}
@@ -180,15 +187,19 @@ export default function GuestBookQuestionManagement({ questions = [] }: Props) {
                                 <EmptyHeader>
                                     <EmptyTitle>Belum Ada Pertanyaan</EmptyTitle>
                                     <EmptyDescription>
-                                        Belum ada pertanyaan yang dikonfigurasi untuk formulir buku tamu. Buat pertanyaan pertama Anda sekarang.
+                                        {hasAdminsAuthority
+                                            ? "Belum ada pertanyaan yang dikonfigurasi untuk formulir buku tamu. Buat pertanyaan pertama Anda sekarang."
+                                            : "Belum ada pertanyaan yang dikonfigurasi untuk formulir buku tamu."}
                                     </EmptyDescription>
                                 </EmptyHeader>
-                                <CreateGuestBookQuestion>
-                                    <Button className="mt-4 gap-2">
-                                        <Plus className="size-4" />
-                                        <span>Tambah Pertanyaan Baru</span>
-                                    </Button>
-                                </CreateGuestBookQuestion>
+                                {hasAdminsAuthority && (
+                                    <CreateGuestBookQuestion>
+                                        <Button className="mt-4 gap-2">
+                                            <Plus className="size-4" />
+                                            <span>Tambah Pertanyaan Baru</span>
+                                        </Button>
+                                    </CreateGuestBookQuestion>
+                                )}
                             </Empty>
                         </Card>
                     ) : (
@@ -226,57 +237,64 @@ export default function GuestBookQuestionManagement({ questions = [] }: Props) {
                                                 </div>
 
                                                 {/* Question Actions */}
-                                                <div className="flex items-center gap-1.5 self-end sm:self-start">
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        className="gap-1.5 text-xs"
-                                                        onClick={() => setOptionFormTarget({ question, option: null })}
-                                                    >
-                                                        <ListPlus className="size-3.5" />
-                                                        <span>Tambah Opsi</span>
-                                                    </Button>
+                                                {hasAdminsAuthority && (
+                                                    <div className="flex items-center gap-1.5 self-end sm:self-start">
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            className="gap-1.5 text-xs"
+                                                            onClick={() => setOptionFormTarget({ question, option: null })}
+                                                        >
+                                                            <ListPlus className="size-3.5" />
+                                                            <span>Tambah Opsi</span>
+                                                        </Button>
 
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon-sm"
-                                                        title="Edit Pertanyaan"
-                                                        aria-label={`Edit pertanyaan ${question.label}`}
-                                                        onClick={() => setEditingQuestion(question)}
-                                                    >
-                                                        <Pencil className="size-3.5" />
-                                                    </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon-sm"
+                                                            title="Edit Pertanyaan"
+                                                            aria-label={`Edit pertanyaan ${question.label}`}
+                                                            onClick={() => setEditingQuestion(question)}
+                                                        >
+                                                            <Pencil className="size-3.5" />
+                                                        </Button>
 
-                                                    <DropdownMenu>
-                                                        <DropdownMenuTrigger asChild>
-                                                            <Button variant="ghost" size="icon-sm" aria-label="Menu Aksi">
-                                                                <MoreVertical className="size-3.5" />
-                                                            </Button>
-                                                        </DropdownMenuTrigger>
-                                                        <DropdownMenuContent align="end" className="w-56">
-                                                            <DropdownMenuItem onSelect={() => setEditingQuestion(question)}>
-                                                                <Pencil className="size-4" />
-                                                                <span>Edit Pertanyaan</span>
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuItem onSelect={() => setOptionFormTarget({ question, option: null })}>
-                                                                <ListPlus className="size-4" />
-                                                                <span>Tambah Pilihan Opsi</span>
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuItem
-                                                                disabled={isTogglingQuestion}
-                                                                onSelect={() => toggleQuestionActive(question)}
-                                                            >
-                                                                <Power className="size-4" />
-                                                                <span>{question.is_active ? "Nonaktifkan Pertanyaan" : "Aktifkan Pertanyaan"}</span>
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuSeparator />
-                                                            <DropdownMenuItem variant="destructive" onSelect={() => setDeletingQuestion(question)}>
-                                                                <Trash2 className="size-4" />
-                                                                <span>Hapus Pertanyaan</span>
-                                                            </DropdownMenuItem>
-                                                        </DropdownMenuContent>
-                                                    </DropdownMenu>
-                                                </div>
+                                                        <DropdownMenu>
+                                                            <DropdownMenuTrigger asChild>
+                                                                <Button variant="ghost" size="icon-sm" aria-label="Menu Aksi">
+                                                                    <MoreVertical className="size-3.5" />
+                                                                </Button>
+                                                            </DropdownMenuTrigger>
+                                                            <DropdownMenuContent align="end" className="w-56">
+                                                                <DropdownMenuItem onSelect={() => setEditingQuestion(question)}>
+                                                                    <Pencil className="size-4" />
+                                                                    <span>Edit Pertanyaan</span>
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem onSelect={() => setOptionFormTarget({ question, option: null })}>
+                                                                    <ListPlus className="size-4" />
+                                                                    <span>Tambah Pilihan Opsi</span>
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem
+                                                                    disabled={isTogglingQuestion}
+                                                                    onSelect={() => toggleQuestionActive(question)}
+                                                                >
+                                                                    <Power className="size-4" />
+                                                                    <span>
+                                                                        {question.is_active ? "Nonaktifkan Pertanyaan" : "Aktifkan Pertanyaan"}
+                                                                    </span>
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuSeparator />
+                                                                <DropdownMenuItem
+                                                                    variant="destructive"
+                                                                    onSelect={() => setDeletingQuestion(question)}
+                                                                >
+                                                                    <Trash2 className="size-4" />
+                                                                    <span>Hapus Pertanyaan</span>
+                                                                </DropdownMenuItem>
+                                                            </DropdownMenuContent>
+                                                        </DropdownMenu>
+                                                    </div>
+                                                )}
                                             </div>
                                         </CardHeader>
 
@@ -294,7 +312,7 @@ export default function GuestBookQuestionManagement({ questions = [] }: Props) {
                                                         )}
                                                     </div>
 
-                                                    {hasOptions && (
+                                                    {hasAdminsAuthority && hasOptions && (
                                                         <Button
                                                             variant="ghost"
                                                             size="sm"
@@ -346,61 +364,63 @@ export default function GuestBookQuestionManagement({ questions = [] }: Props) {
                                                                     </div>
 
                                                                     {/* Option Row Action Buttons */}
-                                                                    <div className="flex items-center gap-1 self-end sm:self-auto sm:opacity-90 sm:group-hover:opacity-100">
-                                                                        <Tooltip>
-                                                                            <TooltipTrigger asChild>
-                                                                                <Button
-                                                                                    variant="ghost"
-                                                                                    size="icon-sm"
-                                                                                    aria-label={`Edit pilihan ${option.label}`}
-                                                                                    onClick={() => setOptionFormTarget({ question, option })}
-                                                                                >
-                                                                                    <Pencil className="size-3.5 text-muted-foreground" />
-                                                                                </Button>
-                                                                            </TooltipTrigger>
-                                                                            <TooltipContent side="top">Edit Pilihan</TooltipContent>
-                                                                        </Tooltip>
+                                                                    {hasAdminsAuthority && (
+                                                                        <div className="flex items-center gap-1 self-end sm:self-auto sm:opacity-90 sm:group-hover:opacity-100">
+                                                                            <Tooltip>
+                                                                                <TooltipTrigger asChild>
+                                                                                    <Button
+                                                                                        variant="ghost"
+                                                                                        size="icon-sm"
+                                                                                        aria-label={`Edit pilihan ${option.label}`}
+                                                                                        onClick={() => setOptionFormTarget({ question, option })}
+                                                                                    >
+                                                                                        <Pencil className="size-3.5 text-muted-foreground" />
+                                                                                    </Button>
+                                                                                </TooltipTrigger>
+                                                                                <TooltipContent side="top">Edit Pilihan</TooltipContent>
+                                                                            </Tooltip>
 
-                                                                        <Tooltip>
-                                                                            <TooltipTrigger asChild>
-                                                                                <Button
-                                                                                    variant="ghost"
-                                                                                    size="icon-sm"
-                                                                                    aria-label={
-                                                                                        option.is_active
-                                                                                            ? `Nonaktifkan pilihan ${option.label}`
-                                                                                            : `Aktifkan pilihan ${option.label}`
-                                                                                    }
-                                                                                    disabled={isTogglingOption}
-                                                                                    onClick={() => toggleOptionActive(option)}
-                                                                                >
-                                                                                    {option.is_active ? (
-                                                                                        <CheckCircle2 className="size-3.5 text-primary" />
-                                                                                    ) : (
-                                                                                        <XCircle className="size-3.5 text-muted-foreground" />
-                                                                                    )}
-                                                                                </Button>
-                                                                            </TooltipTrigger>
-                                                                            <TooltipContent side="top">
-                                                                                {option.is_active ? "Nonaktifkan Pilihan" : "Aktifkan Pilihan"}
-                                                                            </TooltipContent>
-                                                                        </Tooltip>
+                                                                            <Tooltip>
+                                                                                <TooltipTrigger asChild>
+                                                                                    <Button
+                                                                                        variant="ghost"
+                                                                                        size="icon-sm"
+                                                                                        aria-label={
+                                                                                            option.is_active
+                                                                                                ? `Nonaktifkan pilihan ${option.label}`
+                                                                                                : `Aktifkan pilihan ${option.label}`
+                                                                                        }
+                                                                                        disabled={isTogglingOption}
+                                                                                        onClick={() => toggleOptionActive(option)}
+                                                                                    >
+                                                                                        {option.is_active ? (
+                                                                                            <CheckCircle2 className="size-3.5 text-primary" />
+                                                                                        ) : (
+                                                                                            <XCircle className="size-3.5 text-muted-foreground" />
+                                                                                        )}
+                                                                                    </Button>
+                                                                                </TooltipTrigger>
+                                                                                <TooltipContent side="top">
+                                                                                    {option.is_active ? "Nonaktifkan Pilihan" : "Aktifkan Pilihan"}
+                                                                                </TooltipContent>
+                                                                            </Tooltip>
 
-                                                                        <Tooltip>
-                                                                            <TooltipTrigger asChild>
-                                                                                <Button
-                                                                                    variant="ghost"
-                                                                                    size="icon-sm"
-                                                                                    className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                                                                                    aria-label={`Hapus pilihan ${option.label}`}
-                                                                                    onClick={() => setDeletingOption({ question, option })}
-                                                                                >
-                                                                                    <Trash2 className="size-3.5" />
-                                                                                </Button>
-                                                                            </TooltipTrigger>
-                                                                            <TooltipContent side="top">Hapus Pilihan</TooltipContent>
-                                                                        </Tooltip>
-                                                                    </div>
+                                                                            <Tooltip>
+                                                                                <TooltipTrigger asChild>
+                                                                                    <Button
+                                                                                        variant="ghost"
+                                                                                        size="icon-sm"
+                                                                                        className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                                                                                        aria-label={`Hapus pilihan ${option.label}`}
+                                                                                        onClick={() => setDeletingOption({ question, option })}
+                                                                                    >
+                                                                                        <Trash2 className="size-3.5" />
+                                                                                    </Button>
+                                                                                </TooltipTrigger>
+                                                                                <TooltipContent side="top">Hapus Pilihan</TooltipContent>
+                                                                            </Tooltip>
+                                                                        </div>
+                                                                    )}
                                                                 </div>
                                                             );
                                                         })}
@@ -415,15 +435,17 @@ export default function GuestBookQuestionManagement({ questions = [] }: Props) {
                                                                 jawaban mereka.
                                                             </p>
                                                         </div>
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            className="mt-1 gap-1 text-xs"
-                                                            onClick={() => setOptionFormTarget({ question, option: null })}
-                                                        >
-                                                            <Plus className="size-3" />
-                                                            <span>Ubah Jadi Pilihan Ganda (Tambah Opsi)</span>
-                                                        </Button>
+                                                        {hasAdminsAuthority && (
+                                                            <Button
+                                                                variant="outline"
+                                                                size="sm"
+                                                                className="mt-1 gap-1 text-xs"
+                                                                onClick={() => setOptionFormTarget({ question, option: null })}
+                                                            >
+                                                                <Plus className="size-3" />
+                                                                <span>Ubah Jadi Pilihan Ganda (Tambah Opsi)</span>
+                                                            </Button>
+                                                        )}
                                                     </div>
                                                 )}
                                             </div>

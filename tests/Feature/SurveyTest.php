@@ -280,12 +280,20 @@ class SurveyTest extends TestCase
         $this->assertSoftDeleted('survey_question_options', ['id' => $option->id]);
     }
 
-    public function test_staff_cannot_manage_survey_questions(): void
+    public function test_staff_can_view_survey_questions_but_cannot_manage_them(): void
     {
         $staff = User::factory()->create(['role' => 'staff']);
+        $survey = Survey::factory()->create(['is_active' => true]);
 
         $this->actingAs($staff)
             ->get(route('survey-question-index'))
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->component('dashboard/management/survey/question')
+                ->where('survey.id', $survey->id)
+            );
+
+        $this->actingAs($staff)
+            ->post(route('create-survey-question'), [])
             ->assertRedirect(route('guest-book-statistics-index'));
     }
 }

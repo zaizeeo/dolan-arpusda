@@ -9,9 +9,12 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import { Separator } from "@/components/ui/separator";
+import { useUserRole } from "@/lib/hooks/use-user-role";
 import { resolveInertiaErrorMessage } from "@/lib/inertia-errors";
 import { toggleSurveyQuestionActive, toggleSurveyQuestionOptionActive } from "@/routes";
 import survey from "@/routes/survey";
+import { User } from "@/types";
+import { PageProps } from "@/types/page-props";
 import type { SurveyQuestion, SurveyQuestionOption } from "@/types/survey";
 import { router, type VisitHelperOptions } from "@inertiajs/core";
 import { Link } from "@inertiajs/react";
@@ -39,7 +42,7 @@ interface SurveySummary {
     description: string | null;
 }
 
-interface Props {
+interface Props extends PageProps {
     survey: SurveySummary | null;
     questions?: Array<SurveyQuestion>;
 }
@@ -54,7 +57,8 @@ interface OptionDeleteTarget {
     option: SurveyQuestionOption;
 }
 
-export default function SurveyQuestionManagement({ survey: activeSurvey, questions = [] }: Props) {
+export default function SurveyQuestionManagement({ auth, survey: activeSurvey, questions = [] }: Props) {
+    const { hasAdminsAuthority } = useUserRole(auth.user as User);
     const [createOpen, setCreateOpen] = useState(false);
     const [editingQuestion, setEditingQuestion] = useState<SurveyQuestion | null>(null);
     const [deletingQuestion, setDeletingQuestion] = useState<SurveyQuestion | null>(null);
@@ -122,7 +126,11 @@ export default function SurveyQuestionManagement({ survey: activeSurvey, questio
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight text-foreground">Pertanyaan Survei</h1>
-                        <p className="text-sm text-muted-foreground">Kelola pertanyaan dan pilihan jawaban untuk survei layanan Jeta Arsip.</p>
+                        <p className="text-sm text-muted-foreground">
+                            {hasAdminsAuthority
+                                ? "Kelola pertanyaan dan pilihan jawaban untuk survei layanan Jeta Arsip."
+                                : "Lihat pertanyaan dan pilihan jawaban untuk survei layanan Jeta Arsip."}
+                        </p>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2">
@@ -132,10 +140,12 @@ export default function SurveyQuestionManagement({ survey: activeSurvey, questio
                                 Lihat Survei
                             </Link>
                         </Button>
-                        <Button onClick={() => setCreateOpen(true)} className="gap-2" disabled={!activeSurvey}>
-                            <Plus className="size-4" />
-                            Tambah Pertanyaan
-                        </Button>
+                        {hasAdminsAuthority && (
+                            <Button onClick={() => setCreateOpen(true)} className="gap-2" disabled={!activeSurvey}>
+                                <Plus className="size-4" />
+                                Tambah Pertanyaan
+                            </Button>
+                        )}
                     </div>
                 </div>
 
@@ -203,13 +213,17 @@ export default function SurveyQuestionManagement({ survey: activeSurvey, questio
                             <EmptyHeader>
                                 <EmptyTitle>Belum Ada Pertanyaan</EmptyTitle>
                                 <EmptyDescription>
-                                    Belum ada pertanyaan yang dikonfigurasi untuk survei ini. Buat pertanyaan pertama Anda sekarang.
+                                    {hasAdminsAuthority
+                                        ? "Belum ada pertanyaan yang dikonfigurasi untuk survei ini. Buat pertanyaan pertama Anda sekarang."
+                                        : "Belum ada pertanyaan yang dikonfigurasi untuk survei ini."}
                                 </EmptyDescription>
                             </EmptyHeader>
-                            <Button onClick={() => setCreateOpen(true)} className="mt-4 gap-2" disabled={!activeSurvey}>
-                                <Plus className="size-4" />
-                                Tambah Pertanyaan Baru
-                            </Button>
+                            {hasAdminsAuthority && (
+                                <Button onClick={() => setCreateOpen(true)} className="mt-4 gap-2" disabled={!activeSurvey}>
+                                    <Plus className="size-4" />
+                                    Tambah Pertanyaan Baru
+                                </Button>
+                            )}
                         </Empty>
                     </Card>
                 ) : (
@@ -246,53 +260,55 @@ export default function SurveyQuestionManagement({ survey: activeSurvey, questio
                                                 </div>
                                             </div>
 
-                                            <div className="flex flex-wrap items-center gap-1.5 self-end sm:self-start">
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    className="gap-1.5 text-xs"
-                                                    onClick={() => setOptionFormTarget({ question, option: null })}
-                                                >
-                                                    <Plus className="size-3.5" />
-                                                    Tambah Opsi
-                                                </Button>
+                                            {hasAdminsAuthority && (
+                                                <div className="flex flex-wrap items-center gap-1.5 self-end sm:self-start">
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="gap-1.5 text-xs"
+                                                        onClick={() => setOptionFormTarget({ question, option: null })}
+                                                    >
+                                                        <Plus className="size-3.5" />
+                                                        Tambah Opsi
+                                                    </Button>
 
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon-sm"
-                                                    title="Edit pertanyaan"
-                                                    aria-label={`Edit pertanyaan ${question.label}`}
-                                                    onClick={() => setEditingQuestion(question)}
-                                                >
-                                                    <Pencil className="size-3.5" />
-                                                </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon-sm"
+                                                        title="Edit pertanyaan"
+                                                        aria-label={`Edit pertanyaan ${question.label}`}
+                                                        onClick={() => setEditingQuestion(question)}
+                                                    >
+                                                        <Pencil className="size-3.5" />
+                                                    </Button>
 
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon-sm"
-                                                    title={question.is_active ? "Nonaktifkan pertanyaan" : "Aktifkan pertanyaan"}
-                                                    aria-label={
-                                                        question.is_active
-                                                            ? `Nonaktifkan pertanyaan ${question.label}`
-                                                            : `Aktifkan pertanyaan ${question.label}`
-                                                    }
-                                                    disabled={isTogglingQuestion}
-                                                    onClick={() => toggleQuestionActive(question)}
-                                                >
-                                                    <Power className="size-3.5" />
-                                                </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon-sm"
+                                                        title={question.is_active ? "Nonaktifkan pertanyaan" : "Aktifkan pertanyaan"}
+                                                        aria-label={
+                                                            question.is_active
+                                                                ? `Nonaktifkan pertanyaan ${question.label}`
+                                                                : `Aktifkan pertanyaan ${question.label}`
+                                                        }
+                                                        disabled={isTogglingQuestion}
+                                                        onClick={() => toggleQuestionActive(question)}
+                                                    >
+                                                        <Power className="size-3.5" />
+                                                    </Button>
 
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon-sm"
-                                                    className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                                                    title="Hapus pertanyaan"
-                                                    aria-label={`Hapus pertanyaan ${question.label}`}
-                                                    onClick={() => setDeletingQuestion(question)}
-                                                >
-                                                    <Trash2 className="size-3.5" />
-                                                </Button>
-                                            </div>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon-sm"
+                                                        className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                                                        title="Hapus pertanyaan"
+                                                        aria-label={`Hapus pertanyaan ${question.label}`}
+                                                        onClick={() => setDeletingQuestion(question)}
+                                                    >
+                                                        <Trash2 className="size-3.5" />
+                                                    </Button>
+                                                </div>
+                                            )}
                                         </div>
                                     </CardHeader>
 
@@ -347,44 +363,46 @@ export default function SurveyQuestionManagement({ survey: activeSurvey, questio
                                                                     </div>
                                                                 </div>
 
-                                                                <div className="flex items-center gap-1 self-end sm:self-auto">
-                                                                    <Button
-                                                                        variant="ghost"
-                                                                        size="icon-sm"
-                                                                        aria-label={`Edit pilihan ${option.label}`}
-                                                                        onClick={() => setOptionFormTarget({ question, option })}
-                                                                    >
-                                                                        <Pencil className="size-3.5 text-muted-foreground" />
-                                                                    </Button>
+                                                                {hasAdminsAuthority && (
+                                                                    <div className="flex items-center gap-1 self-end sm:self-auto">
+                                                                        <Button
+                                                                            variant="ghost"
+                                                                            size="icon-sm"
+                                                                            aria-label={`Edit pilihan ${option.label}`}
+                                                                            onClick={() => setOptionFormTarget({ question, option })}
+                                                                        >
+                                                                            <Pencil className="size-3.5 text-muted-foreground" />
+                                                                        </Button>
 
-                                                                    <Button
-                                                                        variant="ghost"
-                                                                        size="icon-sm"
-                                                                        aria-label={
-                                                                            option.is_active
-                                                                                ? `Nonaktifkan pilihan ${option.label}`
-                                                                                : `Aktifkan pilihan ${option.label}`
-                                                                        }
-                                                                        disabled={isTogglingOption}
-                                                                        onClick={() => toggleOptionActive(option)}
-                                                                    >
-                                                                        {option.is_active ? (
-                                                                            <CheckCircle2 className="size-3.5 text-primary" />
-                                                                        ) : (
-                                                                            <XCircle className="size-3.5 text-muted-foreground" />
-                                                                        )}
-                                                                    </Button>
+                                                                        <Button
+                                                                            variant="ghost"
+                                                                            size="icon-sm"
+                                                                            aria-label={
+                                                                                option.is_active
+                                                                                    ? `Nonaktifkan pilihan ${option.label}`
+                                                                                    : `Aktifkan pilihan ${option.label}`
+                                                                            }
+                                                                            disabled={isTogglingOption}
+                                                                            onClick={() => toggleOptionActive(option)}
+                                                                        >
+                                                                            {option.is_active ? (
+                                                                                <CheckCircle2 className="size-3.5 text-primary" />
+                                                                            ) : (
+                                                                                <XCircle className="size-3.5 text-muted-foreground" />
+                                                                            )}
+                                                                        </Button>
 
-                                                                    <Button
-                                                                        variant="ghost"
-                                                                        size="icon-sm"
-                                                                        className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                                                                        aria-label={`Hapus pilihan ${option.label}`}
-                                                                        onClick={() => setDeletingOption({ question, option })}
-                                                                    >
-                                                                        <Trash2 className="size-3.5" />
-                                                                    </Button>
-                                                                </div>
+                                                                        <Button
+                                                                            variant="ghost"
+                                                                            size="icon-sm"
+                                                                            className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                                                                            aria-label={`Hapus pilihan ${option.label}`}
+                                                                            onClick={() => setDeletingOption({ question, option })}
+                                                                        >
+                                                                            <Trash2 className="size-3.5" />
+                                                                        </Button>
+                                                                    </div>
+                                                                )}
                                                             </div>
                                                         );
                                                     })}
@@ -399,15 +417,17 @@ export default function SurveyQuestionManagement({ survey: activeSurvey, questio
                                                             mereka.
                                                         </p>
                                                     </div>
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        className="mt-1 gap-1 text-xs"
-                                                        onClick={() => setOptionFormTarget({ question, option: null })}
-                                                    >
-                                                        <Plus className="size-3" />
-                                                        Ubah Jadi Pilihan Ganda
-                                                    </Button>
+                                                    {hasAdminsAuthority && (
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            className="mt-1 gap-1 text-xs"
+                                                            onClick={() => setOptionFormTarget({ question, option: null })}
+                                                        >
+                                                            <Plus className="size-3" />
+                                                            Ubah Jadi Pilihan Ganda
+                                                        </Button>
+                                                    )}
                                                 </div>
                                             )}
                                         </div>

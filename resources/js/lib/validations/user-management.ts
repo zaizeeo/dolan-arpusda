@@ -26,7 +26,7 @@ export const createUserSchema = z
             .min(1, "Email harus diisi")
             .refine((value) => z.email().safeParse(value).success, "Email tidak valid"),
         name: z.string("Nama harus diisi text").trim().min(3, "Nama harus diisi minimal 3 karakter").max(128, "Nama maksimal 128 karakter"),
-        role: z.enum(allowedUserRole, "Pilih role yang tersedia"),
+        role: z.enum(editableUserRole, "Pilih role yang tersedia"),
         password: z.string("Password minimal 8 karakter").min(8, "Password minimal 8 karakter").max(32, "Password maksimal 32 karakter"),
         password_confirmation: z
             .string("Konfirmasi Password minimal 8 karakter")
