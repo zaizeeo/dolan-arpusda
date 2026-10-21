@@ -1,4 +1,5 @@
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Head } from "@inertiajs/react";
 import { Library } from "lucide-react";
 import { ReactNode } from "react";
 
@@ -13,6 +14,7 @@ interface Props {
 const ErrorPageLayout = ({ icon, code, title, description, actions }: Props) => {
     return (
         <div className="flex min-h-screen flex-col items-center justify-center gap-6 p-4">
+            <Head title={title} />
             <Card className="w-full max-w-md">
                 <CardHeader className="items-center text-center">
                     <div className="mb-2 flex size-12 items-center justify-center rounded-lg bg-primary/10 text-primary">{icon}</div>
@@ -28,7 +30,7 @@ const ErrorPageLayout = ({ icon, code, title, description, actions }: Props) => 
                     <Library className="size-4" />
                 </div>
                 <div className="grid leading-tight">
-                    <span className="text-sm font-semibold text-foreground">Dolan Arpusda</span>
+                    <span className="text-sm font-semibold text-foreground">Jeta Arsip</span>
                     <span className="text-xs">Buku Tamu Digital</span>
                 </div>
             </div>

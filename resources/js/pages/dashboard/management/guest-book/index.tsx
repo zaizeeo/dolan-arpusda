@@ -183,7 +183,7 @@ const GuestBookIndex = ({
                                 Manajemen Tamu
                             </Badge>
                             <span className="text-xs text-muted-foreground">
-                                Dolan Arpusda
+                                Jeta Arsip
                             </span>
                         </div>
                         <h1 className="mt-2 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">

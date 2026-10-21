@@ -98,7 +98,7 @@ const DashboardIndexPage = ({
                         <div className="flex items-center gap-2">
                             <Badge variant="secondary" className="gap-1 font-medium">
                                 <Sparkles className="size-3.5 text-primary" />
-                                Dolan Arpusda
+                                Jeta Arsip
                             </Badge>
                             <span className="text-xs text-muted-foreground">
                                 Kabupaten Banyumas
@@ -432,7 +432,7 @@ const DashboardIndexPage = ({
                                 Pintasan Menu
                             </CardTitle>
                             <CardDescription>
-                                Akses cepat ke modul operasional Dolan Arpusda
+                                Akses cepat ke modul operasional Jeta Arsip
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-3">

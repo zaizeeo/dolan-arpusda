@@ -1,6 +1,7 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { Head } from "@inertiajs/react";
 import { ReactNode } from "react";
 import AppWrapperLayout from "./app-wrapper-layout";
 
@@ -13,6 +14,7 @@ interface Props {
 const DashboardLayout = ({ children, title = "Dashboard", className }: Props) => {
     return (
         <AppWrapperLayout className={className}>
+            <Head title={title} />
             <SidebarProvider defaultOpen={true}>
                 <AppSidebar />
                 <SidebarInset>
