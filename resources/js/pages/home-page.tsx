@@ -3,6 +3,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageProps } from "@/types/page-props";
+import { login } from "@/routes";
+import dashboard from "@/routes/dashboard";
 import { Head, Link } from "@inertiajs/react";
 import { BookOpen, CheckCircle2, HelpCircle, LayoutDashboard, LogIn, PlusCircle, Sparkles } from "lucide-react";
 import { useState } from "react";
@@ -30,12 +32,12 @@ const HomePage = ({ activeQuestions = [], auth }: Props) => {
 
                     <Button variant="outline" size="sm" asChild>
                         {auth.user !== null ? (
-                            <Link href="/dashboard">
+                            <Link href={dashboard.index.url()}>
                                 <LayoutDashboard className="mr-1.5 size-4" />
                                 Area Petugas
                             </Link>
                         ) : (
-                            <Link href="/auth">
+                            <Link href={login.url()}>
                                 <LogIn className="mr-1.5 size-4" />
                                 Area Petugas
                             </Link>

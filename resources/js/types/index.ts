@@ -8,6 +8,7 @@ export interface User extends TimeStamps {
     name: string;
     email: string;
     role: string;
+    avatar: string;
 }
 
 export enum UserRole {
@@ -17,7 +18,7 @@ export enum UserRole {
     SUPERADMIN = "superadmin",
 }
 
-const convertUserRoleTOEnum = (role: string): UserRole => {
+export const convertUserRoleTOEnum = (role: string): UserRole => {
     switch (role) {
         case "superadmin":
             return UserRole.SUPERADMIN;

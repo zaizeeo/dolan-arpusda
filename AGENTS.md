@@ -169,7 +169,13 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 
 # Laravel Wayfinder
 
-Use Wayfinder to generate TypeScript functions for Laravel routes. Import from `@/actions/` (controllers) or `@/routes/` (named routes).
+Use Wayfinder to generate TypeScript functions for Laravel routes and controller actions.
+
+- Always import named-route helpers from `@/routes` for page links and Inertia `router.*` calls.
+- Import controller action helpers from `@/actions` when calling a controller action directly.
+- Never hardcode internal route paths (e.g. `/dashboard/...`, `/_api/...`) in `<Link>`, `router.*`, or form actions.
+- External URLs and assets are exempt from this rule.
+- Run `php artisan wayfinder:generate` after changing routes so the helpers stay in sync.
 
 === phpunit/core rules ===
 
@@ -196,6 +202,7 @@ Use Wayfinder to generate TypeScript functions for Laravel routes. Import from `
 # Frontend Guidelines (Laravel Inertia + React)
 
 - **Package Manager**: Bun is the main package manager (`bun`). Use `pnpm` if `bun` is not available.
+- **Routing**: Always use the generated Wayfinder helpers. Import named routes from `@/routes` and controller actions from `@/actions`; never hardcode internal paths in `<Link>`, `router.*`, or form actions.
 - **UI Stack**: This project uses Tailwind CSS (v4) and shadcn UI components.
 - **Component Priority & Consistency**: Always prioritize using shadcn UI components over native HTML elements or raw React primitives (e.g. use shadcn `<Checkbox>`, `<FieldLabel>`, `<Select>`, `<Button>`, `<Input>` instead of native `<input type="checkbox">`, `<label>`, `<select>`, `<button>`, etc.) to maintain UI consistency. If a required shadcn component is not yet installed in the project, install it using `bunx shadcn@latest add <component-name>`. This rule can only be bypassed if shadcn does not provide the desired component.
 - **Color System**: Never use raw Tailwind palette colors (e.g. `bg-blue-500`, `text-gray-700`). Always use shadcn UI semantic theme colors instead (e.g. `bg-primary`, `text-primary-foreground`, `bg-muted`, `text-muted-foreground`, `bg-card`, `text-card-foreground`, `border-border`, `text-destructive`).

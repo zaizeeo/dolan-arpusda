@@ -36,6 +36,7 @@ class CreateUserAction
             'email' => $data['email'],
             'password' => $data['password'],
             'role' => $data['role'],
+            'avatar' => config('app.ui_avatar') . $data['name']
         ]);
     }
 

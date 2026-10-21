@@ -1,14 +1,11 @@
 import DashboardLayout from "@/components/layouts/dashboard-layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageProps } from "@/types/page-props";
+import { homePage } from "@/routes";
+import guestBook from "@/routes/dashboard/management/guest-book";
+import guestBookQuestion from "@/routes/dashboard/management/guest-book-question";
 import { Link } from "@inertiajs/react";
 import {
     ArrowRight,
@@ -100,13 +97,9 @@ const DashboardIndexPage = ({
                                 <Sparkles className="size-3.5 text-primary" />
                                 Jeta Arsip
                             </Badge>
-                            <span className="text-xs text-muted-foreground">
-                                Kabupaten Banyumas
-                            </span>
+                            <span className="text-xs text-muted-foreground">Kabupaten Banyumas</span>
                         </div>
-                        <h1 className="mt-2 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-                            Statistik Buku Tamu
-                        </h1>
+                        <h1 className="mt-2 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">Statistik Buku Tamu</h1>
                         <p className="mt-1 text-sm text-muted-foreground">
                             Pantau data arus kunjungan masyarakat dan ringkasan aktivitas buku tamu secara real-time.
                         </p>
@@ -114,13 +107,13 @@ const DashboardIndexPage = ({
 
                     <div className="flex flex-wrap items-center gap-2 pt-2 sm:pt-0">
                         <Button variant="outline" size="sm" asChild>
-                            <a href="/" target="_blank" rel="noreferrer">
+                            <a href={homePage.url()} target="_blank" rel="noreferrer">
                                 <ExternalLink className="mr-1.5 size-4" />
                                 Form Publik
                             </a>
                         </Button>
                         <Button size="sm" asChild>
-                            <Link href="/dashboard/management/guest-book">
+                            <Link href={guestBook.index.url()}>
                                 <Users className="mr-1.5 size-4" />
                                 Kelola Tamu
                             </Link>
@@ -133,22 +126,17 @@ const DashboardIndexPage = ({
                     {/* Hari Ini */}
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">
-                                Kunjungan Hari Ini
-                            </CardTitle>
+                            <CardTitle className="text-sm font-medium text-muted-foreground">Kunjungan Hari Ini</CardTitle>
                             <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
                                 <Users className="size-4" />
                             </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-3xl font-bold text-foreground">
-                                {stats.today_visits}
-                            </div>
+                            <div className="text-3xl font-bold text-foreground">{stats.today_visits}</div>
                             <div className="mt-1.5 flex items-center gap-1.5 text-xs text-muted-foreground">
                                 {stats.today_trend > 0 ? (
                                     <span className="flex items-center font-medium text-emerald-600 dark:text-emerald-400">
-                                        <TrendingUp className="mr-1 size-3.5" />
-                                        +{stats.today_trend}%
+                                        <TrendingUp className="mr-1 size-3.5" />+{stats.today_trend}%
                                     </span>
                                 ) : stats.today_trend < 0 ? (
                                     <span className="flex items-center font-medium text-destructive">
@@ -169,60 +157,42 @@ const DashboardIndexPage = ({
                     {/* Minggu Ini */}
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">
-                                Kunjungan Minggu Ini
-                            </CardTitle>
+                            <CardTitle className="text-sm font-medium text-muted-foreground">Kunjungan Minggu Ini</CardTitle>
                             <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
                                 <CalendarDays className="size-4" />
                             </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-3xl font-bold text-foreground">
-                                {stats.week_visits}
-                            </div>
-                            <p className="mt-1.5 text-xs text-muted-foreground">
-                                Sejak awal pekan ini
-                            </p>
+                            <div className="text-3xl font-bold text-foreground">{stats.week_visits}</div>
+                            <p className="mt-1.5 text-xs text-muted-foreground">Sejak awal pekan ini</p>
                         </CardContent>
                     </Card>
 
                     {/* Bulan Ini */}
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">
-                                Kunjungan Bulan Ini
-                            </CardTitle>
+                            <CardTitle className="text-sm font-medium text-muted-foreground">Kunjungan Bulan Ini</CardTitle>
                             <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
                                 <BookOpen className="size-4" />
                             </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-3xl font-bold text-foreground">
-                                {stats.month_visits}
-                            </div>
-                            <p className="mt-1.5 text-xs text-muted-foreground">
-                                Total kunjungan bulan berjalan
-                            </p>
+                            <div className="text-3xl font-bold text-foreground">{stats.month_visits}</div>
+                            <p className="mt-1.5 text-xs text-muted-foreground">Total kunjungan bulan berjalan</p>
                         </CardContent>
                     </Card>
 
                     {/* Total Kunjungan */}
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">
-                                Total Semua Tamu
-                            </CardTitle>
+                            <CardTitle className="text-sm font-medium text-muted-foreground">Total Semua Tamu</CardTitle>
                             <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
                                 <BarChart3 className="size-4" />
                             </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-3xl font-bold text-foreground">
-                                {stats.total_visits}
-                            </div>
-                            <p className="mt-1.5 text-xs text-muted-foreground">
-                                {stats.active_questions_count} pertanyaan formulir aktif
-                            </p>
+                            <div className="text-3xl font-bold text-foreground">{stats.total_visits}</div>
+                            <p className="mt-1.5 text-xs text-muted-foreground">{stats.active_questions_count} pertanyaan formulir aktif</p>
                         </CardContent>
                     </Card>
                 </div>
@@ -233,12 +203,8 @@ const DashboardIndexPage = ({
                     <Card className="lg:col-span-4">
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
                             <div>
-                                <CardTitle className="text-base font-semibold">
-                                    Tren Kunjungan 7 Hari Terakhir
-                                </CardTitle>
-                                <CardDescription>
-                                    Total {totalTrendVisits} kunjungan dalam rentang sepekan terakhir
-                                </CardDescription>
+                                <CardTitle className="text-base font-semibold">Tren Kunjungan 7 Hari Terakhir</CardTitle>
+                                <CardDescription>Total {totalTrendVisits} kunjungan dalam rentang sepekan terakhir</CardDescription>
                             </div>
                             <Badge variant="outline" className="text-xs">
                                 7 Hari
@@ -252,16 +218,10 @@ const DashboardIndexPage = ({
                             ) : (
                                 <div className="flex h-56 items-end justify-between gap-2 pt-6">
                                     {trend.map((item) => {
-                                        const heightPercent = Math.max(
-                                            Math.round((item.count / maxTrendCount) * 100),
-                                            8,
-                                        );
+                                        const heightPercent = Math.max(Math.round((item.count / maxTrendCount) * 100), 8);
 
                                         return (
-                                            <div
-                                                key={item.date}
-                                                className="group flex flex-1 flex-col items-center gap-2"
-                                            >
+                                            <div key={item.date} className="group flex flex-1 flex-col items-center gap-2">
                                                 {/* Count label above bar */}
                                                 <span className="text-xs font-semibold text-muted-foreground transition-colors group-hover:text-primary">
                                                     {item.count}
@@ -277,12 +237,8 @@ const DashboardIndexPage = ({
 
                                                 {/* Day and date label */}
                                                 <div className="flex flex-col items-center text-center">
-                                                    <span className="text-xs font-medium text-foreground">
-                                                        {item.day_name}
-                                                    </span>
-                                                    <span className="text-[10px] text-muted-foreground">
-                                                        {item.short_date}
-                                                    </span>
+                                                    <span className="text-xs font-medium text-foreground">{item.day_name}</span>
+                                                    <span className="text-[10px] text-muted-foreground">{item.short_date}</span>
                                                 </div>
                                             </div>
                                         );
@@ -295,12 +251,8 @@ const DashboardIndexPage = ({
                     {/* Popular Categories / Options */}
                     <Card className="lg:col-span-3">
                         <CardHeader>
-                            <CardTitle className="text-base font-semibold">
-                                Opsi Pilihan Terbanyak
-                            </CardTitle>
-                            <CardDescription>
-                                Distribusi jawaban opsi pengunjung yang paling sering dipilih
-                            </CardDescription>
+                            <CardTitle className="text-base font-semibold">Opsi Pilihan Terbanyak</CardTitle>
+                            <CardDescription>Distribusi jawaban opsi pengunjung yang paling sering dipilih</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4 pt-1">
                             {popularOptions.length === 0 ? (
@@ -309,25 +261,15 @@ const DashboardIndexPage = ({
                                 </div>
                             ) : (
                                 popularOptions.map((opt) => {
-                                    const percent =
-                                        stats.total_visits > 0
-                                            ? Math.min(
-                                                  Math.round((opt.count / stats.total_visits) * 100),
-                                                  100,
-                                              )
-                                            : 0;
+                                    const percent = stats.total_visits > 0 ? Math.min(Math.round((opt.count / stats.total_visits) * 100), 100) : 0;
 
                                     return (
                                         <div key={opt.id} className="space-y-1.5">
                                             <div className="flex items-center justify-between text-xs">
                                                 <div className="flex flex-col">
-                                                    <span className="font-medium text-foreground">
-                                                        {opt.label}
-                                                    </span>
+                                                    <span className="font-medium text-foreground">{opt.label}</span>
                                                     {opt.question_label && (
-                                                        <span className="text-[10px] text-muted-foreground">
-                                                            {opt.question_label}
-                                                        </span>
+                                                        <span className="text-[10px] text-muted-foreground">{opt.question_label}</span>
                                                     )}
                                                 </div>
                                                 <span className="font-semibold text-primary">
@@ -354,18 +296,11 @@ const DashboardIndexPage = ({
                     <Card className="lg:col-span-4">
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
                             <div>
-                                <CardTitle className="text-base font-semibold">
-                                    Kunjungan Terbaru
-                                </CardTitle>
-                                <CardDescription>
-                                    Pengunjung yang baru saja mengisi buku tamu digital
-                                </CardDescription>
+                                <CardTitle className="text-base font-semibold">Kunjungan Terbaru</CardTitle>
+                                <CardDescription>Pengunjung yang baru saja mengisi buku tamu digital</CardDescription>
                             </div>
                             <Button variant="ghost" size="sm" asChild>
-                                <Link
-                                    href="/dashboard/management/guest-book"
-                                    className="gap-1 text-xs text-primary"
-                                >
+                                <Link href={guestBook.index.url()} className="gap-1 text-xs text-primary">
                                     Semua
                                     <ArrowRight className="size-3.5" />
                                 </Link>
@@ -383,14 +318,8 @@ const DashboardIndexPage = ({
                                         const firstAnswer = visit.answers[0];
                                         const secondAnswer = visit.answers[1];
 
-                                        const primaryText =
-                                            firstAnswer?.custom_text ||
-                                            firstAnswer?.option_label ||
-                                            `Tamu #${index + 1}`;
-                                        const secondaryText =
-                                            secondAnswer?.option_label ||
-                                            secondAnswer?.custom_text ||
-                                            firstAnswer?.question_label;
+                                        const primaryText = firstAnswer?.custom_text || firstAnswer?.option_label || `Tamu #${index + 1}`;
+                                        const secondaryText = secondAnswer?.option_label || secondAnswer?.custom_text || firstAnswer?.question_label;
 
                                         return (
                                             <div
@@ -402,14 +331,8 @@ const DashboardIndexPage = ({
                                                         {primaryText.charAt(0).toUpperCase()}
                                                     </div>
                                                     <div className="flex flex-col">
-                                                        <span className="text-sm font-medium text-foreground">
-                                                            {primaryText}
-                                                        </span>
-                                                        {secondaryText && (
-                                                            <span className="text-xs text-muted-foreground">
-                                                                {secondaryText}
-                                                            </span>
-                                                        )}
+                                                        <span className="text-sm font-medium text-foreground">{primaryText}</span>
+                                                        {secondaryText && <span className="text-xs text-muted-foreground">{secondaryText}</span>}
                                                     </div>
                                                 </div>
 
@@ -428,16 +351,12 @@ const DashboardIndexPage = ({
                     {/* Quick Navigation Cards */}
                     <Card className="lg:col-span-3">
                         <CardHeader>
-                            <CardTitle className="text-base font-semibold">
-                                Pintasan Menu
-                            </CardTitle>
-                            <CardDescription>
-                                Akses cepat ke modul operasional Jeta Arsip
-                            </CardDescription>
+                            <CardTitle className="text-base font-semibold">Pintasan Menu</CardTitle>
+                            <CardDescription>Akses cepat ke modul operasional Jeta Arsip</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-3">
                             <Link
-                                href="/dashboard/management/guest-book"
+                                href={guestBook.index.url()}
                                 className="flex items-center justify-between rounded-lg border border-border p-3.5 transition-colors hover:border-primary/50 hover:bg-muted/50"
                             >
                                 <div className="flex items-center gap-3">
@@ -445,19 +364,15 @@ const DashboardIndexPage = ({
                                         <FileText className="size-4" />
                                     </div>
                                     <div className="flex flex-col">
-                                        <span className="text-sm font-semibold text-foreground">
-                                            Manajemen Buku Tamu
-                                        </span>
-                                        <span className="text-xs text-muted-foreground">
-                                            Lihat detail dan hapus data kunjungan
-                                        </span>
+                                        <span className="text-sm font-semibold text-foreground">Manajemen Buku Tamu</span>
+                                        <span className="text-xs text-muted-foreground">Lihat detail dan hapus data kunjungan</span>
                                     </div>
                                 </div>
                                 <ArrowRight className="size-4 text-muted-foreground" />
                             </Link>
 
                             <Link
-                                href="/dashboard/management/guest-book-question"
+                                href={guestBookQuestion.index.url()}
                                 className="flex items-center justify-between rounded-lg border border-border p-3.5 transition-colors hover:border-primary/50 hover:bg-muted/50"
                             >
                                 <div className="flex items-center gap-3">
@@ -465,19 +380,15 @@ const DashboardIndexPage = ({
                                         <Settings2 className="size-4" />
                                     </div>
                                     <div className="flex flex-col">
-                                        <span className="text-sm font-semibold text-foreground">
-                                            Kelola Pertanyaan
-                                        </span>
-                                        <span className="text-xs text-muted-foreground">
-                                            Atur pertanyaan dan opsi pilihan formulir
-                                        </span>
+                                        <span className="text-sm font-semibold text-foreground">Kelola Pertanyaan</span>
+                                        <span className="text-xs text-muted-foreground">Atur pertanyaan dan opsi pilihan formulir</span>
                                     </div>
                                 </div>
                                 <ArrowRight className="size-4 text-muted-foreground" />
                             </Link>
 
                             <a
-                                href="/"
+                                href={homePage.url()}
                                 target="_blank"
                                 rel="noreferrer"
                                 className="flex items-center justify-between rounded-lg border border-border p-3.5 transition-colors hover:border-primary/50 hover:bg-muted/50"
@@ -487,12 +398,8 @@ const DashboardIndexPage = ({
                                         <ExternalLink className="size-4" />
                                     </div>
                                     <div className="flex flex-col">
-                                        <span className="text-sm font-semibold text-foreground">
-                                            Layar Buku Tamu Publik
-                                        </span>
-                                        <span className="text-xs text-muted-foreground">
-                                            Buka form pengisian untuk pengunjung lobby
-                                        </span>
+                                        <span className="text-sm font-semibold text-foreground">Layar Buku Tamu Publik</span>
+                                        <span className="text-xs text-muted-foreground">Buka form pengisian untuk pengunjung lobby</span>
                                     </div>
                                 </div>
                                 <ArrowRight className="size-4 text-muted-foreground" />

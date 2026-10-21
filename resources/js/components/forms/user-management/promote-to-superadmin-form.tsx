@@ -6,6 +6,7 @@ import { FieldError } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
 import { getInitials } from "@/lib";
 import { resolveInertiaErrorMessage } from "@/lib/inertia-errors";
+import { userControllerPromoteToSuperadmin } from "@/routes";
 import { User } from "@/types";
 import { VisitHelperOptions } from "@inertiajs/core";
 import { router } from "@inertiajs/react";
@@ -49,7 +50,7 @@ const PromoteToSuperadminForm = ({ user, onClose }: Props) => {
             },
         } satisfies VisitHelperOptions;
 
-        router.post(`/_api/dashboard/management/users/${user.id}/promote-to-superadmin`, undefined, requestOptions);
+        router.post(userControllerPromoteToSuperadmin.url(user.id), undefined, requestOptions);
     }
 
     return (

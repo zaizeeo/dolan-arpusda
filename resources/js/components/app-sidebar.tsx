@@ -11,6 +11,7 @@ import {
     LogOut,
     Settings,
     User as UserIcon,
+    UserKey,
     Users,
 } from "lucide-react";
 import * as React from "react";
@@ -44,15 +45,18 @@ import {
     useSidebar,
 } from "@/components/ui/sidebar";
 import { PageProps } from "@/types/page-props";
+import { logout, settings, userControllerIndex } from "@/routes";
+import dashboard from "@/routes/dashboard";
+import guestBook from "@/routes/dashboard/management/guest-book";
+import guestBookQuestion from "@/routes/dashboard/management/guest-book-question";
+import Profile from "@/routes/profile";
+import { User } from "@/types";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const { isMobile } = useSidebar();
     const { url, props: pageProps } = usePage<PageProps>();
 
-    const user = pageProps.auth.user;
-    const userName = user?.name || "Staff Jeta Arsip";
-    const userEmail = user?.email || "staff@jetaarsip.go.id";
-    const userRole = user?.role ? user.role.toUpperCase() : "STAFF";
+    const { name: userName, role: userRole, email: userEmail, avatar } = pageProps.auth.user as User;
     const userInitials = userName
         .split(" ")
         .map((n) => n[0])
@@ -61,15 +65,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         .toUpperCase();
 
     const handleLogout = () => {
-        router.post("/_api/auth/logout");
+        router.post(logout.url());
     };
 
     const navMain = [
         {
             title: "Dashboard",
-            url: "/dashboard",
+            url: dashboard.index.url(),
             icon: LayoutDashboard,
-            isActive: url === "/dashboard",
+            isActive: url === dashboard.index.url(),
         },
         {
             title: "Buku Tamu",
@@ -98,9 +102,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const navManagement = [
         {
             title: "Data Pengguna",
-            url: "/dashboard/management/users",
+            url: userControllerIndex.url(),
             icon: Users,
-            isActive: url.startsWith("/dashboard/management/users"),
+            isActive: url.startsWith(userControllerIndex.url()),
         },
         {
             title: "Laporan & Rekap",
@@ -110,15 +114,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         },
         {
             title: "Buku Tamu",
-            url: "/dashboard/management/guest-book",
+            url: guestBook.index.url(),
             icon: BookOpen,
-            isActive: url.startsWith("/dashboard/management/guest-book"),
+            isActive: url.startsWith(guestBook.index.url()),
         },
         {
             title: "Pertanyaan Buku Tamu",
-            url: "/dashboard/management/guest-book-question",
+            url: guestBookQuestion.index.url(),
             icon: BadgeQuestionMark,
-            isActive: url.startsWith("/dashboard/management/guest-book-question"),
+            isActive: url.startsWith(guestBookQuestion.index.url()),
         },
     ];
 
@@ -143,7 +147,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link href="/dashboard">
+                            <Link href={dashboard.index.url()}>
                                 <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                                     <Library className="size-4.5" />
                                 </div>
@@ -253,7 +257,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                     className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                                 >
                                     <Avatar className="size-8 rounded-lg">
-                                        <AvatarImage src="" alt={userName} />
+                                        <AvatarImage src={avatar} alt={userName} />
                                         <AvatarFallback className="rounded-lg bg-primary/10 text-xs font-semibold text-primary">
                                             {userInitials}
                                         </AvatarFallback>
@@ -274,7 +278,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                 <DropdownMenuLabel className="p-0 font-normal">
                                     <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                                         <Avatar className="size-8 rounded-lg">
-                                            <AvatarImage src="" alt={userName} />
+                                            <AvatarImage src={avatar} alt={userName} />
                                             <AvatarFallback className="rounded-lg bg-primary/10 text-xs font-semibold text-primary">
                                                 {userInitials}
                                             </AvatarFallback>
@@ -293,15 +297,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                 <DropdownMenuSeparator />
                                 <DropdownMenuGroup>
                                     <DropdownMenuItem asChild>
-                                        <Link href="/dashboard/profile" className="cursor-pointer">
+                                        <Link href={Profile.show().url} className="cursor-pointer">
                                             <UserIcon className="size-4" />
                                             Profil Saya
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
-                                        <Link href="/dashboard/pengaturan" className="cursor-pointer">
+                                        <Link href={Profile.edit().url} className="cursor-pointer">
                                             <Settings className="size-4" />
-                                            Pengaturan Akun
+                                            Update Profil
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                        <Link href={settings.url()} className="cursor-pointer">
+                                            <UserKey className="size-4" />
+                                            Ganti Password
                                         </Link>
                                     </DropdownMenuItem>
                                 </DropdownMenuGroup>

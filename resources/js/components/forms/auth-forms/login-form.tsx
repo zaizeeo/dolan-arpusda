@@ -7,6 +7,7 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field
 import { Input } from "@/components/ui/input";
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@/components/ui/input-group";
 import { loginSchema, type LoginSchemaType } from "@/lib/validations/auth";
+import Login from "@/routes/login";
 
 import { router, type VisitHelperOptions } from "@inertiajs/core";
 import { useState } from "react";
@@ -43,7 +44,7 @@ export function LoginForm() {
             },
         } satisfies VisitHelperOptions;
 
-        router.post("/_api/auth/login", data, requestOptions);
+        router.post(Login.submit.url(), data, requestOptions);
     }
 
     return (
