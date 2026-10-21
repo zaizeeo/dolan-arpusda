@@ -11,6 +11,7 @@ import {
     LogOut,
     Settings,
     User as UserIcon,
+    UserKey,
     Users,
 } from "lucide-react";
 import * as React from "react";
@@ -298,14 +299,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
                                         <Link href="/dashboard/profile" className="cursor-pointer">
-                                            <UserIcon className="size-4" />
+                                            <Settings className="size-4" />
                                             Update Profil
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
                                         <Link href="/dashboard/settings" className="cursor-pointer">
-                                            <Settings className="size-4" />
-                                            Pengaturan Akun
+                                            <UserKey className="size-4" />
+                                            Ganti Password
                                         </Link>
                                     </DropdownMenuItem>
                                 </DropdownMenuGroup>
