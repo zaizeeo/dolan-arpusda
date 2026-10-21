@@ -299,7 +299,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
-                                        <Link href="/dashboard/pengaturan" className="cursor-pointer">
+                                        <Link href="/dashboard/profile" className="cursor-pointer">
+                                            <UserIcon className="size-4" />
+                                            Update Profil
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                        <Link href="/dashboard/settings" className="cursor-pointer">
                                             <Settings className="size-4" />
                                             Pengaturan Akun
                                         </Link>
