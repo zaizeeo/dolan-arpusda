@@ -11,7 +11,7 @@ use Inertia\Response;
 
 class DashboardController extends Controller
 {
-    public function index(): Response
+    public function /*  */ index(): Response
     {
         $today = Carbon::today();
         $yesterday = Carbon::yesterday();
@@ -37,8 +37,18 @@ class DashboardController extends Controller
         // 2. Tren Kunjungan 7 Hari Terakhir
         $indonesianDays = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
         $indonesianMonths = [
-            1 => 'Jan', 2 => 'Feb', 3 => 'Mar', 4 => 'Apr', 5 => 'Mei', 6 => 'Jun',
-            7 => 'Jul', 8 => 'Agu', 9 => 'Sep', 10 => 'Okt', 11 => 'Nov', 12 => 'Des',
+            1 => 'Jan',
+            2 => 'Feb',
+            3 => 'Mar',
+            4 => 'Apr',
+            5 => 'Mei',
+            6 => 'Jun',
+            7 => 'Jul',
+            8 => 'Agu',
+            9 => 'Sep',
+            10 => 'Okt',
+            11 => 'Nov',
+            12 => 'Des',
         ];
 
         $sevenDaysTrend = [];
@@ -48,7 +58,7 @@ class DashboardController extends Controller
             $sevenDaysTrend[] = [
                 'date' => $date->format('Y-m-d'),
                 'day_name' => $indonesianDays[$date->dayOfWeek],
-                'short_date' => $date->day.' '.$indonesianMonths[$date->month],
+                'short_date' => $date->day . ' ' . $indonesianMonths[$date->month],
                 'count' => $count,
             ];
         }
@@ -60,7 +70,7 @@ class DashboardController extends Controller
             ->orderByDesc('answers_count')
             ->limit(5)
             ->get()
-            ->map(fn ($option) => [
+            ->map(fn($option) => [
                 'id' => $option->id,
                 'label' => $option->label,
                 'question_label' => $option->question?->label,
@@ -80,7 +90,7 @@ class DashboardController extends Controller
                     'id' => $guestBook->id,
                     'created_at' => $guestBook->created_at?->toISOString(),
                     'created_at_human' => $guestBook->created_at?->diffForHumans(),
-                    'answers' => $guestBook->answers->map(fn ($a) => [
+                    'answers' => $guestBook->answers->map(fn($a) => [
                         'id' => $a->id,
                         'question_label' => $a->question?->label,
                         'option_label' => $a->option?->label,

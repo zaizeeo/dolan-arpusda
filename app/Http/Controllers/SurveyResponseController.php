@@ -21,11 +21,8 @@ class SurveyResponseController extends Controller
             return Inertia::render('dashboard/management/survey/index', [
                 'survey' => null,
                 'responses' => [],
-                'stats' => [
-                    'total_responses' => 0,
-                    'today_responses' => 0,
-                    'month_responses' => 0,
-                ],
+                'stats' => $this->stats(null),
+                'trend' => $this->weeklyTrend(null),
             ]);
         }
 
@@ -68,15 +65,89 @@ class SurveyResponseController extends Controller
                 'description' => $survey->description,
             ],
             'responses' => $responses,
-            'stats' => [
-                'total_responses' => SurveyResponse::where('survey_id', $survey->id)->count(),
-                'today_responses' => SurveyResponse::where('survey_id', $survey->id)->whereDate('created_at', today())->count(),
-                'month_responses' => SurveyResponse::where('survey_id', $survey->id)
-                    ->whereMonth('created_at', now()->month)
-                    ->whereYear('created_at', now()->year)
-                    ->count(),
-            ],
+            'stats' => $this->stats($survey),
+            'trend' => $this->weeklyTrend($survey),
         ]);
+    }
+
+    /**
+     * Show read-only survey response statistics.
+     */
+    public function statistics(): Response
+    {
+        $survey = Survey::where('is_active', true)->latest()->first();
+
+        return Inertia::render('dashboard/survey-statistics', [
+            'survey' => $survey ? [
+                'id' => $survey->id,
+                'title' => $survey->title,
+                'description' => $survey->description,
+            ] : null,
+            'stats' => $this->stats($survey),
+            'trend' => $this->weeklyTrend($survey),
+        ]);
+    }
+
+    /**
+     * Build response statistic totals for the active survey.
+     *
+     * @return array{total_responses: int, today_responses: int, month_responses: int}
+     */
+    private function stats(?Survey $survey): array
+    {
+        if (! $survey) {
+            return [
+                'total_responses' => 0,
+                'today_responses' => 0,
+                'month_responses' => 0,
+            ];
+        }
+
+        return [
+            'total_responses' => SurveyResponse::where('survey_id', $survey->id)->count(),
+            'today_responses' => SurveyResponse::where('survey_id', $survey->id)->whereDate('created_at', today())->count(),
+            'month_responses' => SurveyResponse::where('survey_id', $survey->id)
+                ->whereMonth('created_at', now()->month)
+                ->whereYear('created_at', now()->year)
+                ->count(),
+        ];
+    }
+
+    /**
+     * Build a seven-day response trend for the active survey.
+     *
+     * @return array<int, array{date: string, day_name: string, short_date: string, count: int}>
+     */
+    private function weeklyTrend(?Survey $survey): array
+    {
+        $dayNames = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+        $monthNames = [
+            1 => 'Jan', 2 => 'Feb', 3 => 'Mar', 4 => 'Apr', 5 => 'Mei', 6 => 'Jun',
+            7 => 'Jul', 8 => 'Agu', 9 => 'Sep', 10 => 'Okt', 11 => 'Nov', 12 => 'Des',
+        ];
+
+        $startDate = today()->subDays(6);
+
+        $counts = $survey
+            ? SurveyResponse::where('survey_id', $survey->id)
+                ->where('created_at', '>=', $startDate)
+                ->selectRaw('DATE(created_at) as response_date, COUNT(*) as total')
+                ->groupBy('response_date')
+                ->pluck('total', 'response_date')
+            : collect();
+
+        return collect(range(6, 0))
+            ->map(function (int $daysAgo) use ($counts, $dayNames, $monthNames) {
+                $date = today()->subDays($daysAgo);
+
+                return [
+                    'date' => $date->toDateString(),
+                    'day_name' => $dayNames[$date->dayOfWeek],
+                    'short_date' => $date->day.' '.$monthNames[$date->month],
+                    'count' => (int) ($counts[$date->toDateString()] ?? 0),
+                ];
+            })
+            ->all();
     }
 
     /**

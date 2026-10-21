@@ -87,7 +87,7 @@ const DashboardIndexPage = ({
     const totalTrendVisits = trend.reduce((sum, item) => sum + item.count, 0);
 
     return (
-        <DashboardLayout title="Statistik & Dashboard">
+        <DashboardLayout title="Statistik Buku Tamu">
             <div className="flex flex-col gap-6">
                 {/* Header Welcome Banner */}
                 <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-6 shadow-xs sm:flex-row sm:items-center sm:justify-between">

@@ -1,3 +1,4 @@
+import { SurveyResponseTrendChart, type SurveyTrendItem } from "@/components/charts/survey-response-trend-chart";
 import DashboardLayout from "@/components/layouts/dashboard-layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -30,12 +31,14 @@ interface Props {
     survey: SurveySummary | null;
     responses?: Array<SurveyResponseItem>;
     stats?: Stats;
+    trend?: Array<SurveyTrendItem>;
 }
 
 export default function SurveyResponseManagement({
     survey: activeSurvey,
     responses = [],
     stats = { total_responses: 0, today_responses: 0, month_responses: 0 },
+    trend = [],
 }: Props) {
     const [deletingResponse, setDeletingResponse] = useState<SurveyResponseItem | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
@@ -143,6 +146,8 @@ export default function SurveyResponseManagement({
                         </div>
                     </div>
                 </div>
+
+                <SurveyResponseTrendChart trend={trend} />
 
                 {responses.length === 0 ? (
                     <Card className="border-dashed py-12">

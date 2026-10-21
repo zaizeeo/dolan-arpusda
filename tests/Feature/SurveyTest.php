@@ -164,6 +164,8 @@ class SurveyTest extends TestCase
                 ->component('dashboard/management/survey/index')
                 ->where('survey.id', $survey->id)
                 ->has('responses', 1)
+                ->has('trend', 7)
+                ->where('trend.6.count', 1)
             );
 
         $this->actingAs($admin)
@@ -172,6 +174,22 @@ class SurveyTest extends TestCase
 
         $this->assertSoftDeleted('survey_responses', ['id' => $response->id]);
         $this->assertSoftDeleted('survey_answers', ['id' => $answer->id]);
+    }
+
+    public function test_authenticated_users_can_view_read_only_survey_statistics(): void
+    {
+        $staff = User::factory()->create(['role' => 'staff']);
+        $survey = Survey::factory()->create(['is_active' => true]);
+        SurveyResponse::factory()->create(['survey_id' => $survey->id]);
+
+        $this->actingAs($staff)
+            ->get(route('survey-statistics-index'))
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->component('dashboard/survey-statistics')
+                ->where('survey.id', $survey->id)
+                ->where('stats.total_responses', 1)
+                ->has('trend', 7)
+            );
     }
 
     public function test_admin_can_manage_survey_questions_and_options(): void

@@ -78,6 +78,7 @@ Route::prefix('/dashboard')->middleware(['auth.middleware'])->group(function () 
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::get('/settings', [ProfileController::class, 'settings'])->name('settings');
+    Route::get('/statistics/survey', [SurveyResponseController::class, 'statistics'])->name('survey-statistics-index');
     Route::prefix('/management')->group(function () {
         Route::get('/guest-book', [GuestBookController::class, 'index'])->name('dashboard.management.guest-book.index')->middleware(['admins.middleware']);
         Route::prefix('/guest-book-question')->group(function () {
