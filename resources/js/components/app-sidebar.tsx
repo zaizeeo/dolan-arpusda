@@ -50,8 +50,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const { url, props: pageProps } = usePage<PageProps>();
 
     const user = pageProps.auth.user;
-    const userName = user?.name || "Staff Arpusda";
-    const userEmail = user?.email || "staff@arpusda.go.id";
+    const userName = user?.name || "Staff Jeta Arsip";
+    const userEmail = user?.email || "staff@jetaarsip.go.id";
     const userRole = user?.role ? user.role.toUpperCase() : "STAFF";
     const userInitials = userName
         .split(" ")
@@ -148,7 +148,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                     <Library className="size-4.5" />
                                 </div>
                                 <div className="grid flex-1 text-left text-sm leading-tight">
-                                    <span className="truncate font-semibold">Dolan Arpusda</span>
+                                    <span className="truncate font-semibold">Jeta Arsip</span>
                                     <span className="truncate text-xs text-muted-foreground">Buku Tamu Digital</span>
                                 </div>
                             </Link>

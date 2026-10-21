@@ -147,7 +147,7 @@ const UserManagementDashboardIndex = ({ auth, users = [] }: Props) => {
                                 <Crown className="size-3.5 text-primary" />
                                 Manajemen Pengguna
                             </Badge>
-                            <span className="text-xs text-muted-foreground">Dolan Arpusda</span>
+                            <span className="text-xs text-muted-foreground">Jeta Arsip</span>
                         </div>
                         <h1 className="mt-2 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">Daftar Pengguna</h1>
                         <p className="mt-1 text-sm text-muted-foreground">

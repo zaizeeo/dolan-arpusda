@@ -5,10 +5,10 @@ import { createRoot } from "react-dom/client";
 import "../css/app.css";
 import AppWrapperLayout from "./components/layouts/app-wrapper-layout";
 
-const appName = import.meta.env.VITE_APP_NAME || "Laravel";
+const appName = import.meta.env.VITE_APP_NAME || "Jeta Arsip";
 
 createInertiaApp({
-    title: (title) => (title ? `${title} - ${appName}` : appName),
+    title: (title) => (title ? `${appName} | ${title}` : appName),
     resolve: (name) => resolvePageComponent<any>(`./pages/${name}.tsx`, import.meta.glob("./pages/**/*.tsx")),
     setup({ el, App, props }) {
         const root = createRoot(el);

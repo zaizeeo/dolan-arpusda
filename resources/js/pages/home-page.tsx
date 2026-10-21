@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageProps } from "@/types/page-props";
-import { Link } from "@inertiajs/react";
+import { Head, Link } from "@inertiajs/react";
 import { BookOpen, CheckCircle2, HelpCircle, LayoutDashboard, LogIn, PlusCircle, Sparkles } from "lucide-react";
 import { useState } from "react";
 
@@ -16,13 +16,14 @@ const HomePage = ({ activeQuestions = [], auth }: Props) => {
 
     return (
         <div className="min-h-screen bg-muted/20 pb-16">
+            <Head title="Buku Tamu" />
             {/* Top Navigation Bar */}
             <header className="sticky top-0 z-10 border-b border-border bg-background/95 backdrop-blur-sm">
                 <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-3 sm:px-6">
                     <div className="flex items-center gap-3">
                         <img src="/images/logo-banyumas.png" alt="Logo Kabupaten Banyumas" className="size-9 object-contain" />
                         <div className="flex flex-col">
-                            <span className="text-sm font-bold tracking-tight text-foreground">Dolan Arpusda</span>
+                            <span className="text-sm font-bold tracking-tight text-foreground">Jeta Arsip</span>
                             <span className="text-xs text-muted-foreground">Kabupaten Banyumas</span>
                         </div>
                     </div>
@@ -67,7 +68,7 @@ const HomePage = ({ activeQuestions = [], auth }: Props) => {
                             </div>
                             <CardTitle className="text-xl font-bold text-foreground sm:text-2xl">Terima Kasih Atas Kunjungan Anda!</CardTitle>
                             <CardDescription className="mx-auto mt-2 max-w-md text-sm text-muted-foreground sm:text-base">
-                                Data kunjungan Anda telah berhasil tersimpan di sistem Buku Tamu Dolan Arpusda. Selamat menikmati layanan kami.
+                                Data kunjungan Anda telah berhasil tersimpan di sistem Buku Tamu Jeta Arsip. Selamat menikmati layanan kami.
                             </CardDescription>
 
                             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
@@ -110,7 +111,7 @@ const HomePage = ({ activeQuestions = [], auth }: Props) => {
                 {/* Footer */}
                 <footer className="mt-12 text-center text-xs text-muted-foreground">
                     <p>© {new Date().getFullYear()} Dinas Arsip dan Perpustakaan Daerah Kabupaten Banyumas.</p>
-                    <p className="mt-1">Sistem Informasi Buku Tamu Digital Dolan Arpusda.</p>
+                    <p className="mt-1">Sistem Informasi Buku Tamu Digital Jeta Arsip.</p>
                 </footer>
             </main>
         </div>
