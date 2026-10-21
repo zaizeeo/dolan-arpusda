@@ -3,9 +3,15 @@
 namespace Database\Seeders;
 
 use App\Models\Survey;
+use App\Models\SurveyAnswer;
 use App\Models\SurveyQuestion;
+use App\Models\SurveyResponse;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use RuntimeException;
 
 class SurveySeeder extends Seeder
 {
@@ -14,228 +20,127 @@ class SurveySeeder extends Seeder
      */
     public function run(): void
     {
-        $surveyData = [
-            'judul_survei' => 'SURVEI KEPUASAN MASYARAKAT TENTANG PELAYANAN KEARSIPAN - TAHUN 2026',
-            'data_responden' => [
-                [
-                    'pertanyaan' => 'Nama',
-                    'tipe' => 'teks',
-                ],
-                [
-                    'pertanyaan' => 'Alamat/ Instansi',
-                    'tipe' => 'teks',
-                ],
-                [
-                    'pertanyaan' => 'Jenis Kelamin',
-                    'tipe' => 'pilihan_ganda',
-                    'opsi' => [
-                        'Laki-laki',
-                        'Perempuan',
-                    ],
-                ],
-                [
-                    'pertanyaan' => 'Pendidikan Terakhir',
-                    'tipe' => 'pilihan_ganda',
-                    'opsi' => [
-                        'SD',
-                        'SMP',
-                        'SMA/SLTA',
-                        'DIPLOMA',
-                        'SARJANA',
-                        'S2',
-                        'Lainnya',
-                    ],
-                ],
-                [
-                    'pertanyaan' => 'Pekerjaan',
-                    'tipe' => 'pilihan_ganda',
-                    'opsi' => [
-                        'PNS',
-                        'TNI/POLRI',
-                        'Dosen',
-                        'Guru',
-                        'Swasta',
-                        'BUMN/BUMD',
-                        'Mahasiswa',
-                        'Pelajar',
-                        'Lainnya',
-                    ],
-                ],
-                [
-                    'pertanyaan' => 'Keperluan Layanan',
-                    'tipe' => 'pilihan_ganda',
-                    'opsi' => [
-                        'Bimbingan/ Konsultasi',
-                        'Peminjaman Arsip',
-                        'Penelusuran Arsip',
-                        'Kunjungan/ Wisata Arsip',
-                        'Penyerahan Arsip',
-                        'Lainnya',
-                    ],
-                ],
-            ],
-            'pertanyaan_survei' => [
-                [
-                    'nomor' => 1,
-                    'pertanyaan' => 'Bagaimana pendapat Saudara tentang kesesuaian persyaratan pelayanan dengan jenis pelayanannya?',
-                    'opsi' => [
-                        'Tidak Sesuai',
-                        'Kurang Sesuai',
-                        'Sesuai',
-                        'Sangat Sesuai',
-                    ],
-                ],
-                [
-                    'nomor' => 2,
-                    'pertanyaan' => 'Bagaimana pemahaman Saudara tentang kemudahan prosedur pelayanan di unit ini?',
-                    'opsi' => [
-                        'Tidak Mudah',
-                        'Kurang Mudah',
-                        'Mudah',
-                        'Sangat Mudah',
-                    ],
-                ],
-                [
-                    'nomor' => 3,
-                    'pertanyaan' => 'Bagaimana pendapat Saudara tentang kecepatan waktu dalam memberikan pelayanan?',
-                    'opsi' => [
-                        'Tidak Cepat',
-                        'Kurang Cepat',
-                        'Cepat',
-                        'Sangat Cepat',
-                    ],
-                ],
-                [
-                    'nomor' => 4,
-                    'pertanyaan' => 'Bagaimana pendapat Saudara tentang kewajaran biaya/tarif dalam pelayanan?',
-                    'opsi' => [
-                        'Sangat Mahal',
-                        'Mahal',
-                        'Murah',
-                        'Gratis',
-                    ],
-                ],
-                [
-                    'nomor' => 5,
-                    'pertanyaan' => 'Bagaimana pendapat Saudara tentang kesesuaian produk pelayanan antara yang tercantum dalam standar pelayanan dengan hasil yang diberikan?',
-                    'opsi' => [
-                        'Tidak Sesuai',
-                        'Kurang Sesuai',
-                        'Sesuai',
-                        'Sangat Sesuai',
-                    ],
-                ],
-                [
-                    'nomor' => 6,
-                    'pertanyaan' => 'Bagaimana pendapat Saudara tentang kompetensi/kemampuan petugas dalam pelayanan?',
-                    'opsi' => [
-                        'Tidak Kompeten',
-                        'Kurang Kompeten',
-                        'Kompeten',
-                        'Sangat Kompeten',
-                    ],
-                ],
-                [
-                    'nomor' => 7,
-                    'pertanyaan' => 'Bagaimana pendapat Saudara tentang perilaku petugas selama pelayanan terkait kesopanan dan keramahan?',
-                    'opsi' => [
-                        'Tidak Sopan dan Ramah',
-                        'Kurang Sopan dan Ramah',
-                        'Sopan dan Ramah',
-                        'Sangat Sopan dan Ramah',
-                    ],
-                ],
-                [
-                    'nomor' => 8,
-                    'pertanyaan' => 'Bagaimana pendapat Saudara tentang penanganan pengaduan pengguna layanan?',
-                    'opsi' => [
-                        'Tidak Ada',
-                        'Ada Tetapi Tidak Berfungsi',
-                        'Kurang Maksimal/ Kurang Baik',
-                        'Dikelola Dengan Baik',
-                    ],
-                ],
-                [
-                    'nomor' => 9,
-                    'pertanyaan' => 'Bagaimana pendapat Saudara tentang kualitas sarana dan prasarana?',
-                    'opsi' => [
-                        'Buruk',
-                        'Sedang',
-                        'Baik',
-                        'Sangat Baik',
-                    ],
-                ],
-            ],
-        ];
+        if (app()->environment('production') || SurveyResponse::withTrashed()->exists()) {
+            return;
+        }
 
-        DB::transaction(function () use ($surveyData) {
-            Survey::where('title', 'Survei Kepuasan Layanan Jeta Arsip')
-                ->where('is_active', true)
-                ->update(['is_active' => false]);
+        if (! Survey::where('is_active', true)->exists() || ! SurveyQuestion::exists()) {
+            $this->call(SurveyQuestionSeeder::class);
+        }
 
-            $survey = Survey::updateOrCreate(
-                ['title' => $surveyData['judul_survei']],
-                [
-                    'description' => 'Survei kepuasan masyarakat terhadap pelayanan kearsipan tahun 2026.',
-                    'is_active' => true,
-                ]
+        $survey = Survey::where('is_active', true)
+            ->latest()
+            ->first();
+
+        if (! $survey) {
+            throw new RuntimeException('SurveySeeder membutuhkan survei aktif. Jalankan SurveyQuestionSeeder terlebih dahulu.');
+        }
+
+        $questions = $survey->questions()
+            ->with(['options' => fn ($query) => $query->where('is_active', true)->orderBy('sequence_number')])
+            ->where('is_active', true)
+            ->orderBy('sequence_number')
+            ->get();
+
+        if ($questions->isEmpty()) {
+            throw new RuntimeException('SurveySeeder membutuhkan pertanyaan survei yang aktif.');
+        }
+
+        DB::transaction(function () use ($survey, $questions) {
+            $this->submissionDates()->each(
+                fn (Carbon $createdAt) => $this->createResponse($survey, $questions, $createdAt)
             );
-
-            $sequenceNumber = 1;
-
-            foreach ($surveyData['data_responden'] as $respondentQuestion) {
-                $this->createQuestion(
-                    $survey,
-                    $sequenceNumber++,
-                    $respondentQuestion['pertanyaan'],
-                    $this->mapOptions($respondentQuestion['opsi'] ?? []),
-                );
-            }
-
-            foreach ($surveyData['pertanyaan_survei'] as $surveyQuestion) {
-                $this->createQuestion(
-                    $survey,
-                    $sequenceNumber++,
-                    $surveyQuestion['pertanyaan'],
-                    $this->mapOptions($surveyQuestion['opsi'] ?? []),
-                );
-            }
         });
     }
 
     /**
-     * Create a survey question together with its options.
+     * Build sample submission dates for the survey dashboard statistics.
      *
-     * @param  array<int, array{label: string}>  $options
+     * @return Collection<int, Carbon>
      */
-    private function createQuestion(Survey $survey, int $sequenceNumber, string $label, array $options = []): void
+    private function submissionDates(): Collection
     {
-        $question = SurveyQuestion::firstOrCreate(
-            ['survey_id' => $survey->id, 'sequence_number' => $sequenceNumber],
-            ['label' => $label, 'description' => null]
+        $now = now();
+        $minutesToday = $now->hour * 60 + $now->minute;
+
+        $today = collect(range(1, 4))->map(
+            fn () => $now->copy()
+                ->startOfDay()
+                ->addMinutes(random_int(0, $minutesToday))
         );
 
-        foreach ($options as $index => $option) {
-            $question->options()->firstOrCreate(
-                ['label' => $option['label']],
-                [
-                    'description' => null,
-                    'is_active' => true,
-                    'is_allow_custom_text' => false,
-                    'sequence_number' => $index + 1,
-                ]
-            );
-        }
+        $thisMonth = collect(range(1, 4))->map(
+            function () use ($now) {
+                $date = $now->copy()
+                    ->startOfMonth()
+                    ->addDays(random_int(0, max(0, $now->day - 1)))
+                    ->setTime(random_int(8, 15), random_int(0, 59));
+
+                return $date->isFuture()
+                    ? $now->copy()->subMinutes(random_int(0, min(60, $now->hour * 60 + $now->minute)))
+                    : $date;
+            }
+        );
+
+        $previousMonths = collect(range(1, 4))->map(
+            fn () => $now->copy()
+                ->subMonths(random_int(1, 4))
+                ->startOfMonth()
+                ->addDays(random_int(0, 25))
+                ->setTime(random_int(8, 15), random_int(0, 59))
+        );
+
+        return $today
+            ->merge($thisMonth)
+            ->merge($previousMonths)
+            ->sortBy(fn (Carbon $date) => $date->getTimestamp())
+            ->values();
     }
 
     /**
-     * Convert a list of option labels into option payloads.
+     * Create a single survey response with one answer per active question.
      *
-     * @param  array<int, string>  $optionLabels
-     * @return array<int, array{label: string}>
+     * @param  Collection<int, SurveyQuestion>  $questions
      */
-    private function mapOptions(array $optionLabels): array
+    private function createResponse(Survey $survey, Collection $questions, Carbon $createdAt): void
     {
-        return array_map(fn (string $label) => ['label' => $label], $optionLabels);
+        $response = new SurveyResponse;
+        $response->survey_id = $survey->id;
+        $response->created_at = $createdAt;
+        $response->updated_at = $createdAt;
+        $response->save();
+
+        $rows = [];
+
+        foreach ($questions as $index => $question) {
+            $timestamp = $createdAt->copy()->addSeconds($index);
+            $option = $question->options->isNotEmpty() ? $question->options->random() : null;
+
+            $rows[] = [
+                'id' => (string) Str::orderedUuid(),
+                'survey_response_id' => $response->id,
+                'survey_question_id' => $question->id,
+                'survey_question_option_id' => $option?->id,
+                'custom_text' => $option === null
+                    ? $this->textAnswer($question->label)
+                    : ($option->is_allow_custom_text ? fake('id_ID')->sentence() : null),
+                'created_at' => $timestamp,
+                'updated_at' => $timestamp,
+            ];
+        }
+
+        SurveyAnswer::insert($rows);
+    }
+
+    /**
+     * Build a sample text answer based on the question label.
+     */
+    private function textAnswer(string $label): string
+    {
+        return match ($label) {
+            'Nama' => fake('id_ID')->name(),
+            'Alamat/ Instansi' => fake('id_ID')->address(),
+            default => fake('id_ID')->sentence(),
+        };
     }
 }
