@@ -16,21 +16,25 @@ class UserSeeder extends Seeder
             [
                 'role' => 'superadmin',
                 'name' => 'Superadmin',
+                'avatar' => config('app.ui_avatar') . "Superadmin",
                 'email' => 'superadmin@superadmin.com',
             ],
             [
                 'role' => 'admin',
                 'name' => 'Admin',
+                'avatar' => config('app.ui_avatar') . "Admin",
                 'email' => 'admin@admin.com',
             ],
             [
                 'role' => 'staff',
                 'name' => 'Staff',
+                'avatar' => config('app.ui_avatar') . "Staff",
                 'email' => 'staff@staff.com',
             ],
             [
                 'role' => 'intern',
                 'name' => 'Intern',
+                'avatar' => config('app.ui_avatar') . "Staff",
                 'email' => 'intern@intern.com',
             ],
         )->create();
