@@ -5,6 +5,7 @@ import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { resolveInertiaErrorMessage, resolveInertiaFieldError } from "@/lib/inertia-errors";
+import { userControllerEdit } from "@/routes";
 import {
     editUserSchema,
     editableUserRole,
@@ -98,7 +99,7 @@ const EditUserForm = ({ user, onSuccess, onCancel }: Props) => {
             },
         } satisfies VisitHelperOptions;
 
-        router.patch(`/_api/dashboard/management/users/${user.id}`, payload, requestOptions);
+        router.patch(userControllerEdit.url(user.id), payload, requestOptions);
     }
 
     return (

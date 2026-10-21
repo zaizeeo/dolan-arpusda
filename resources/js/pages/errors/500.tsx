@@ -1,5 +1,6 @@
 import ErrorPageLayout from "@/components/layouts/error-page-layout";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { homePage } from "@/routes";
 import { Link } from "@inertiajs/react";
 import { ShieldAlert, TriangleAlert } from "lucide-react";
 
@@ -27,7 +28,7 @@ const ErrorPage = ({ status = 500, message }: Props) => {
                     <Button variant="outline" onClick={() => window.location.reload()}>
                         Muat Ulang
                     </Button>
-                    <Link href="/" className={buttonVariants()}>
+                    <Link href={homePage.url()} className={buttonVariants()}>
                         Kembali ke Beranda
                     </Link>
                 </>

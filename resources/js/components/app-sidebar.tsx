@@ -45,6 +45,11 @@ import {
     useSidebar,
 } from "@/components/ui/sidebar";
 import { PageProps } from "@/types/page-props";
+import { logout, settings, userControllerIndex } from "@/routes";
+import dashboard from "@/routes/dashboard";
+import guestBook from "@/routes/dashboard/management/guest-book";
+import guestBookQuestion from "@/routes/dashboard/management/guest-book-question";
+import Profile from "@/routes/profile";
 import { User } from "@/types";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -60,15 +65,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         .toUpperCase();
 
     const handleLogout = () => {
-        router.post("/_api/auth/logout");
+        router.post(logout.url());
     };
 
     const navMain = [
         {
             title: "Dashboard",
-            url: "/dashboard",
+            url: dashboard.index.url(),
             icon: LayoutDashboard,
-            isActive: url === "/dashboard",
+            isActive: url === dashboard.index.url(),
         },
         {
             title: "Buku Tamu",
@@ -97,9 +102,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const navManagement = [
         {
             title: "Data Pengguna",
-            url: "/dashboard/management/users",
+            url: userControllerIndex.url(),
             icon: Users,
-            isActive: url.startsWith("/dashboard/management/users"),
+            isActive: url.startsWith(userControllerIndex.url()),
         },
         {
             title: "Laporan & Rekap",
@@ -109,15 +114,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         },
         {
             title: "Buku Tamu",
-            url: "/dashboard/management/guest-book",
+            url: guestBook.index.url(),
             icon: BookOpen,
-            isActive: url.startsWith("/dashboard/management/guest-book"),
+            isActive: url.startsWith(guestBook.index.url()),
         },
         {
             title: "Pertanyaan Buku Tamu",
-            url: "/dashboard/management/guest-book-question",
+            url: guestBookQuestion.index.url(),
             icon: BadgeQuestionMark,
-            isActive: url.startsWith("/dashboard/management/guest-book-question"),
+            isActive: url.startsWith(guestBookQuestion.index.url()),
         },
     ];
 
@@ -142,7 +147,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link href="/dashboard">
+                            <Link href={dashboard.index.url()}>
                                 <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                                     <Library className="size-4.5" />
                                 </div>
@@ -292,19 +297,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                 <DropdownMenuSeparator />
                                 <DropdownMenuGroup>
                                     <DropdownMenuItem asChild>
-                                        <Link href="/dashboard/profile" className="cursor-pointer">
+                                        <Link href={Profile.show().url} className="cursor-pointer">
                                             <UserIcon className="size-4" />
                                             Profil Saya
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
-                                        <Link href="/dashboard/profile/edit" className="cursor-pointer">
+                                        <Link href={Profile.edit().url} className="cursor-pointer">
                                             <Settings className="size-4" />
                                             Update Profil
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
-                                        <Link href="/dashboard/settings" className="cursor-pointer">
+                                        <Link href={settings.url()} className="cursor-pointer">
                                             <UserKey className="size-4" />
                                             Ganti Password
                                         </Link>

@@ -1,5 +1,6 @@
 import ErrorPageLayout from "@/components/layouts/error-page-layout";
 import { buttonVariants } from "@/components/ui/button";
+import { homePage } from "@/routes";
 import { Link } from "@inertiajs/react";
 import { SearchX } from "lucide-react";
 
@@ -11,7 +12,7 @@ const NotFoundPage = () => {
             title="Halaman Tidak Ditemukan"
             description="Halaman yang kamu tuju tidak ditemukan atau mungkin sudah dipindahkan. Silakan kembali ke halaman utama."
             actions={
-                <Link href="/" className={buttonVariants()}>
+                <Link href={homePage.url()} className={buttonVariants()}>
                     Kembali ke Beranda
                 </Link>
             }

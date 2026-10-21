@@ -5,6 +5,7 @@ import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { resolveInertiaErrorMessage, resolveInertiaFieldError } from "@/lib/inertia-errors";
+import { userControllerCreate } from "@/routes";
 import {
     allowedUserRole,
     createUserSchema,
@@ -72,7 +73,7 @@ const CreateUserForm = ({ onSuccess, onCancel }: Props) => {
             },
         } satisfies VisitHelperOptions;
 
-        router.post("/_api/dashboard/management/users", data, requestOptions);
+        router.post(userControllerCreate.url(), data, requestOptions);
     }
 
     return (
