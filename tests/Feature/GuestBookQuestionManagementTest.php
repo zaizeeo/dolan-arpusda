@@ -224,7 +224,7 @@ class GuestBookQuestionManagementTest extends TestCase
 
         $this->actingAs($staff)
             ->patch(route('update-guest-book-question', $question), ['label' => 'Berubah'])
-            ->assertRedirect(route('dashboard.index'));
+            ->assertRedirect(route('guest-book-statistics-index'));
 
         $this->assertDatabaseHas('guest_book_questions', ['id' => $question->id, 'label' => 'Tetap']);
     }

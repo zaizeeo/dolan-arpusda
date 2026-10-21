@@ -164,6 +164,8 @@ class SurveyTest extends TestCase
                 ->component('dashboard/management/survey/index')
                 ->where('survey.id', $survey->id)
                 ->has('responses', 1)
+                ->has('trend', 7)
+                ->where('trend.6.count', 1)
             );
 
         $this->actingAs($admin)
@@ -172,6 +174,57 @@ class SurveyTest extends TestCase
 
         $this->assertSoftDeleted('survey_responses', ['id' => $response->id]);
         $this->assertSoftDeleted('survey_answers', ['id' => $answer->id]);
+    }
+
+    public function test_authenticated_users_can_view_read_only_survey_statistics(): void
+    {
+        $staff = User::factory()->create(['role' => 'staff']);
+        $survey = Survey::factory()->create(['is_active' => true]);
+        $question = SurveyQuestion::factory()->create([
+            'survey_id' => $survey->id,
+            'label' => 'Seberapa puas Anda?',
+            'sequence_number' => 1,
+        ]);
+        $option = SurveyQuestionOption::factory()->create([
+            'survey_question_id' => $question->id,
+            'label' => 'Sangat Puas',
+        ]);
+        $response = SurveyResponse::factory()->create(['survey_id' => $survey->id]);
+        SurveyAnswer::factory()->create([
+            'survey_response_id' => $response->id,
+            'survey_question_id' => $question->id,
+            'survey_question_option_id' => $option->id,
+        ]);
+
+        $this->actingAs($staff)
+            ->get(route('survey-statistics-index'))
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->component('dashboard/survey-statistics')
+                ->where('survey.id', $survey->id)
+                ->where('stats.total_responses', 1)
+                ->has('trend', 7)
+                ->has('popularOptions', 1)
+                ->where('popularOptions.0.label', 'Sangat Puas')
+                ->where('popularOptions.0.question_label', 'Seberapa puas Anda?')
+                ->where('popularOptions.0.count', 1)
+                ->has('recentResponses', 1)
+                ->where('recentResponses.0.id', $response->id)
+                ->where('recentResponses.0.answers.0.option.label', 'Sangat Puas')
+            );
+    }
+
+    public function test_survey_statistics_limits_recent_responses_to_six(): void
+    {
+        $staff = User::factory()->create(['role' => 'staff']);
+        $survey = Survey::factory()->create(['is_active' => true]);
+        SurveyResponse::factory()->count(7)->create(['survey_id' => $survey->id]);
+
+        $this->actingAs($staff)
+            ->get(route('survey-statistics-index'))
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->where('stats.total_responses', 7)
+                ->has('recentResponses', 6)
+            );
     }
 
     public function test_admin_can_manage_survey_questions_and_options(): void
@@ -233,6 +286,6 @@ class SurveyTest extends TestCase
 
         $this->actingAs($staff)
             ->get(route('survey-question-index'))
-            ->assertRedirect(route('dashboard.index'));
+            ->assertRedirect(route('guest-book-statistics-index'));
     }
 }

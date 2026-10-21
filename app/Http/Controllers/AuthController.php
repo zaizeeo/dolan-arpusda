@@ -26,7 +26,7 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->route('dashboard.index');
+        return redirect()->route('guest-book-statistics-index');
     }
 
     /**

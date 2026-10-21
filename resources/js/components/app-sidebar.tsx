@@ -1,20 +1,22 @@
 import { Link, router, usePage } from "@inertiajs/react";
 import {
-    BadgeQuestionMark,
-    BarChart3,
-    BookOpen,
+    BookMarked,
+    BookOpenCheck,
+    BookUser,
+    ChartPie,
     ChevronRight,
     ChevronsUpDown,
     ClipboardList,
-    HelpCircle,
-    LayoutDashboard,
+    FileQuestionMark,
     Library,
-    ListChecks,
     LogOut,
+    MessageCircleQuestionMark,
+    MessagesSquare,
     Settings,
     User as UserIcon,
     UserKey,
-    Users,
+    UsersRound,
+    type LucideIcon,
 } from "lucide-react";
 import * as React from "react";
 
@@ -46,13 +48,35 @@ import {
     SidebarRail,
     useSidebar,
 } from "@/components/ui/sidebar";
-import { PageProps } from "@/types/page-props";
-import { logout, settings, surveyQuestionIndex, surveyResponseIndex, userControllerIndex } from "@/routes";
-import dashboard from "@/routes/dashboard";
+import {
+    guestBookStatisticsIndex,
+    logout,
+    settings,
+    surveyQuestionIndex,
+    surveyResponseIndex,
+    surveyStatisticsIndex,
+    userControllerIndex,
+} from "@/routes";
 import guestBook from "@/routes/dashboard/management/guest-book";
 import guestBookQuestion from "@/routes/dashboard/management/guest-book-question";
 import Profile from "@/routes/profile";
 import { User } from "@/types";
+import { PageProps } from "@/types/page-props";
+
+interface NavSubItem {
+    title: string;
+    url: string;
+    isActive: boolean;
+    icon?: LucideIcon;
+}
+
+interface NavItem {
+    title: string;
+    icon: LucideIcon;
+    isActive: boolean;
+    url?: string;
+    items?: NavSubItem[];
+}
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const { isMobile } = useSidebar();
@@ -70,90 +94,114 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         router.post(logout.url());
     };
 
-    const navMain = [
+    const navMain: NavItem[] = [
         {
-            title: "Dashboard",
-            url: dashboard.index.url(),
-            icon: LayoutDashboard,
-            isActive: url === dashboard.index.url(),
+            title: "Statistik Buku Tamu",
+            url: guestBookStatisticsIndex.url(),
+            icon: BookMarked,
+            isActive: url === guestBookStatisticsIndex.url(),
+        },
+        {
+            title: "Statistik Respon Survei",
+            url: surveyStatisticsIndex.url(),
+            icon: ChartPie,
+            isActive: url === surveyStatisticsIndex.url(),
+        },
+    ];
+
+    const navManagement: NavItem[] = [
+        {
+            title: "Data Pengguna",
+            url: userControllerIndex.url(),
+            icon: UsersRound,
+            isActive: url.startsWith(userControllerIndex.url()),
         },
         {
             title: "Buku Tamu",
-            icon: BookOpen,
-            isActive: url.startsWith("/dashboard/buku-tamu"),
+            icon: BookUser,
+            isActive: url === guestBook.index.url() || url.startsWith(guestBookQuestion.index.url()),
             items: [
                 {
-                    title: "Daftar Tamu",
-                    url: "/dashboard/buku-tamu",
-                    isActive: url === "/dashboard/buku-tamu",
+                    title: "Daftar Buku Tamu",
+                    url: guestBook.index.url(),
+                    icon: BookOpenCheck,
+                    isActive: url === guestBook.index.url(),
                 },
                 {
-                    title: "Pertanyaan Form",
-                    url: "/dashboard/buku-tamu/pertanyaan",
-                    isActive: url === "/dashboard/buku-tamu/pertanyaan",
+                    title: "Pertanyaan Buku Tamu",
+                    url: guestBookQuestion.index.url(),
+                    icon: MessageCircleQuestionMark,
+                    isActive: url.startsWith(guestBookQuestion.index.url()),
+                },
+            ],
+        },
+        {
+            title: "Survei",
+            icon: ClipboardList,
+            isActive: url === surveyResponseIndex.url() || url.startsWith(surveyQuestionIndex.url()),
+            items: [
+                {
+                    title: "Respon Survei",
+                    url: surveyResponseIndex.url(),
+                    icon: MessagesSquare,
+                    isActive: url === surveyResponseIndex.url(),
                 },
                 {
-                    title: "Statistik Pengunjung",
-                    url: "/dashboard/buku-tamu/statistik",
-                    isActive: url === "/dashboard/buku-tamu/statistik",
+                    title: "Pertanyaan Survei",
+                    url: surveyQuestionIndex.url(),
+                    icon: FileQuestionMark,
+                    isActive: url.startsWith(surveyQuestionIndex.url()),
                 },
             ],
         },
     ];
 
-    const navManagement = [
-        {
-            title: "Data Pengguna",
-            url: userControllerIndex.url(),
-            icon: Users,
-            isActive: url.startsWith(userControllerIndex.url()),
-        },
-        {
-            title: "Laporan & Rekap",
-            url: "/dashboard/reports",
-            icon: BarChart3,
-            isActive: url.startsWith("/dashboard/reports"),
-        },
-        {
-            title: "Buku Tamu",
-            url: guestBook.index.url(),
-            icon: BookOpen,
-            isActive: url.startsWith(guestBook.index.url()),
-        },
-        {
-            title: "Pertanyaan Buku Tamu",
-            url: guestBookQuestion.index.url(),
-            icon: BadgeQuestionMark,
-            isActive: url.startsWith(guestBookQuestion.index.url()),
-        },
-        {
-            title: "Respon Survei",
-            url: surveyResponseIndex.url(),
-            icon: ClipboardList,
-            isActive: url === surveyResponseIndex.url(),
-        },
-        {
-            title: "Pertanyaan Survei",
-            url: surveyQuestionIndex.url(),
-            icon: ListChecks,
-            isActive: url.startsWith(surveyQuestionIndex.url()),
-        },
-    ];
+    const renderSidebarItem = (item: NavItem) => {
+        if (item.items) {
+            return (
+                <Collapsible key={item.title} asChild defaultOpen={item.isActive} className="group/collapsible">
+                    <SidebarMenuItem>
+                        <CollapsibleTrigger asChild>
+                            <SidebarMenuButton tooltip={item.title} isActive={item.isActive}>
+                                <item.icon className="size-4" />
+                                <span>{item.title}</span>
+                                <ChevronRight className="ml-auto size-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                            </SidebarMenuButton>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                            <SidebarMenuSub>
+                                {item.items.map((subItem) => (
+                                    <SidebarMenuSubItem key={subItem.title}>
+                                        <SidebarMenuSubButton asChild isActive={subItem.isActive}>
+                                            <Link href={subItem.url}>
+                                                {subItem.icon && <subItem.icon className="size-4" />}
+                                                <span>{subItem.title}</span>
+                                            </Link>
+                                        </SidebarMenuSubButton>
+                                    </SidebarMenuSubItem>
+                                ))}
+                            </SidebarMenuSub>
+                        </CollapsibleContent>
+                    </SidebarMenuItem>
+                </Collapsible>
+            );
+        }
 
-    const navSecondary = [
-        {
-            title: "Pengaturan",
-            url: "/dashboard/pengaturan",
-            icon: Settings,
-            isActive: url.startsWith("/dashboard/pengaturan"),
-        },
-        {
-            title: "Bantuan",
-            url: "/dashboard/bantuan",
-            icon: HelpCircle,
-            isActive: url.startsWith("/dashboard/bantuan"),
-        },
-    ];
+        if (!item.url) {
+            return null;
+        }
+
+        return (
+            <SidebarMenuItem key={item.title}>
+                <SidebarMenuButton asChild tooltip={item.title} isActive={item.isActive}>
+                    <Link href={item.url}>
+                        <item.icon className="size-4" />
+                        <span>{item.title}</span>
+                    </Link>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
+        );
+    };
 
     return (
         <Sidebar collapsible="icon" {...props}>
@@ -161,7 +209,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link href={dashboard.index.url()}>
+                            <Link href={guestBookStatisticsIndex.url()}>
                                 <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                                     <Library className="size-4.5" />
                                 </div>
@@ -176,87 +224,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SidebarHeader>
 
             <SidebarContent>
-                {/* Menu Utama */}
                 <SidebarGroup>
                     <SidebarGroupLabel>Menu Utama</SidebarGroupLabel>
                     <SidebarGroupContent>
-                        <SidebarMenu>
-                            {navMain.map((item) =>
-                                item.items ? (
-                                    <Collapsible key={item.title} asChild defaultOpen={item.isActive} className="group/collapsible">
-                                        <SidebarMenuItem>
-                                            <CollapsibleTrigger asChild>
-                                                <SidebarMenuButton tooltip={item.title} isActive={item.isActive}>
-                                                    <item.icon className="size-4" />
-                                                    <span>{item.title}</span>
-                                                    <ChevronRight className="ml-auto size-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                                                </SidebarMenuButton>
-                                            </CollapsibleTrigger>
-                                            <CollapsibleContent>
-                                                <SidebarMenuSub>
-                                                    {item.items.map((subItem) => (
-                                                        <SidebarMenuSubItem key={subItem.title}>
-                                                            <SidebarMenuSubButton asChild isActive={subItem.isActive}>
-                                                                <Link href={subItem.url}>
-                                                                    <span>{subItem.title}</span>
-                                                                </Link>
-                                                            </SidebarMenuSubButton>
-                                                        </SidebarMenuSubItem>
-                                                    ))}
-                                                </SidebarMenuSub>
-                                            </CollapsibleContent>
-                                        </SidebarMenuItem>
-                                    </Collapsible>
-                                ) : (
-                                    <SidebarMenuItem key={item.title}>
-                                        <SidebarMenuButton asChild tooltip={item.title} isActive={item.isActive}>
-                                            <Link href={item.url}>
-                                                <item.icon className="size-4" />
-                                                <span>{item.title}</span>
-                                            </Link>
-                                        </SidebarMenuButton>
-                                    </SidebarMenuItem>
-                                ),
-                            )}
-                        </SidebarMenu>
+                        <SidebarMenu>{navMain.map(renderSidebarItem)}</SidebarMenu>
                     </SidebarGroupContent>
                 </SidebarGroup>
 
-                {/* Manajemen */}
                 <SidebarGroup>
                     <SidebarGroupLabel>Manajemen</SidebarGroupLabel>
                     <SidebarGroupContent>
-                        <SidebarMenu>
-                            {navManagement.map((item) => (
-                                <SidebarMenuItem key={item.title}>
-                                    <SidebarMenuButton asChild tooltip={item.title} isActive={item.isActive}>
-                                        <Link href={item.url}>
-                                            <item.icon className="size-4" />
-                                            <span>{item.title}</span>
-                                        </Link>
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
-                            ))}
-                        </SidebarMenu>
-                    </SidebarGroupContent>
-                </SidebarGroup>
-
-                {/* Pengaturan & Bantuan */}
-                <SidebarGroup className="mt-auto">
-                    <SidebarGroupLabel>Sistem</SidebarGroupLabel>
-                    <SidebarGroupContent>
-                        <SidebarMenu>
-                            {navSecondary.map((item) => (
-                                <SidebarMenuItem key={item.title}>
-                                    <SidebarMenuButton asChild tooltip={item.title} isActive={item.isActive}>
-                                        <Link href={item.url}>
-                                            <item.icon className="size-4" />
-                                            <span>{item.title}</span>
-                                        </Link>
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
-                            ))}
-                        </SidebarMenu>
+                        <SidebarMenu>{navManagement.map(renderSidebarItem)}</SidebarMenu>
                     </SidebarGroupContent>
                 </SidebarGroup>
             </SidebarContent>
