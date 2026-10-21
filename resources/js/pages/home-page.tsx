@@ -10,16 +10,14 @@ import { useState } from "react";
 
 interface Props extends PageProps {
     activeQuestions: Array<GuestBookQuestionItem>;
-    surveyUnlocked?: boolean;
 }
 
-const HomePage = ({ activeQuestions = [], surveyUnlocked = false }: Props) => {
+const HomePage = ({ activeQuestions = [] }: Props) => {
     const [isSubmitted, setIsSubmitted] = useState(false);
 
     return (
         <PublicFormLayout
             activeForm="guestbook"
-            surveyUnlocked={surveyUnlocked}
             badge="Buku Tamu Digital"
             badgeIcon={Sparkles}
             title="Buku Tamu Kunjungan"

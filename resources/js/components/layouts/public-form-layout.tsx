@@ -11,10 +11,9 @@ type PublicForm = "guestbook" | "survey";
 
 interface PublicFormSwitcherProps {
     activeForm: PublicForm;
-    surveyUnlocked: boolean;
 }
 
-export function PublicFormSwitcher({ activeForm, surveyUnlocked }: PublicFormSwitcherProps) {
+export function PublicFormSwitcher({ activeForm }: PublicFormSwitcherProps) {
     return (
         <nav aria-label="Pilih formulir" className="flex items-center rounded-lg border border-border bg-muted/60 p-1">
             <Button asChild size="sm" variant={activeForm === "guestbook" ? "secondary" : "ghost"} className="gap-1.5">
@@ -24,26 +23,12 @@ export function PublicFormSwitcher({ activeForm, surveyUnlocked }: PublicFormSwi
                 </Link>
             </Button>
 
-            {surveyUnlocked ? (
-                <Button asChild size="sm" variant={activeForm === "survey" ? "secondary" : "ghost"} className="gap-1.5">
-                    <Link href={survey.show.url()} aria-current={activeForm === "survey" ? "page" : undefined}>
-                        <ClipboardList className="size-4" />
-                        Survei
-                    </Link>
-                </Button>
-            ) : (
-                <Button
-                    type="button"
-                    size="sm"
-                    variant="ghost"
-                    className="gap-1.5"
-                    disabled
-                    title="Isi buku tamu terlebih dahulu untuk membuka survei"
-                >
+            <Button asChild size="sm" variant={activeForm === "survey" ? "secondary" : "ghost"} className="gap-1.5">
+                <Link href={survey.show.url()} aria-current={activeForm === "survey" ? "page" : undefined}>
                     <ClipboardList className="size-4" />
                     Survei
-                </Button>
-            )}
+                </Link>
+            </Button>
         </nav>
     );
 }
@@ -51,7 +36,6 @@ export function PublicFormSwitcher({ activeForm, surveyUnlocked }: PublicFormSwi
 interface PublicFormLayoutProps {
     children: ReactNode;
     activeForm: PublicForm;
-    surveyUnlocked: boolean;
     badge: string;
     badgeIcon?: LucideIcon;
     title: string;
@@ -62,7 +46,6 @@ interface PublicFormLayoutProps {
 const PublicFormLayout = ({
     children,
     activeForm,
-    surveyUnlocked,
     badge,
     badgeIcon: BadgeIcon,
     title,
@@ -84,7 +67,7 @@ const PublicFormLayout = ({
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2">
-                        <PublicFormSwitcher activeForm={activeForm} surveyUnlocked={surveyUnlocked} />
+                        <PublicFormSwitcher activeForm={activeForm} />
 
                         <Button variant="outline" size="sm" asChild>
                             {auth.user !== null ? (

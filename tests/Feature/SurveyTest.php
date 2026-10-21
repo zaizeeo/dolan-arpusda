@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Models\GuestBookQuestion;
 use App\Models\Survey;
 use App\Models\SurveyAnswer;
 use App\Models\SurveyQuestion;
@@ -17,13 +16,7 @@ class SurveyTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_guests_cannot_open_the_survey_before_submitting_the_guest_book(): void
-    {
-        $this->get(route('survey.show'))
-            ->assertRedirect(route('home-page'));
-    }
-
-    public function test_guests_can_open_the_survey_after_the_guest_book_is_submitted(): void
+    public function test_guests_can_open_the_survey_without_submitting_the_guest_book(): void
     {
         $survey = Survey::factory()->create(['is_active' => true]);
         $question = SurveyQuestion::factory()->create([
@@ -36,57 +29,13 @@ class SurveyTest extends TestCase
             'label' => 'Puas',
         ]);
 
-        $this->withSession(['survey_unlocked' => true])
-            ->get(route('survey.show'))
+        $this->get(route('survey.show'))
             ->assertInertia(fn (AssertableInertia $page) => $page
                 ->component('survey/index')
                 ->where('survey.id', $survey->id)
                 ->where('survey.questions.0.label', 'Seberapa puas Anda?')
                 ->where('survey.questions.0.options.0.label', 'Puas')
             );
-    }
-
-    public function test_submitting_the_guest_book_unlocks_the_survey(): void
-    {
-        $question = GuestBookQuestion::factory()->create([
-            'label' => 'Nama',
-            'is_active' => true,
-        ]);
-
-        $this->from(route('home-page'))
-            ->post(route('create-guest-book'), [
-                'answers' => [
-                    [
-                        'guest_book_question_id' => $question->id,
-                        'guest_book_question_option_id' => null,
-                        'custom_text' => 'Budi',
-                    ],
-                ],
-            ])
-            ->assertRedirect(route('home-page'))
-            ->assertSessionHas('survey_unlocked', true);
-    }
-
-    public function test_survey_submission_is_locked_before_the_guest_book_is_submitted(): void
-    {
-        $survey = Survey::factory()->create(['is_active' => true]);
-        $question = SurveyQuestion::factory()->create([
-            'survey_id' => $survey->id,
-            'sequence_number' => 1,
-        ]);
-
-        $this->post(route('survey.submit'), [
-            'survey_id' => $survey->id,
-            'answers' => [
-                [
-                    'survey_question_id' => $question->id,
-                    'survey_question_option_id' => null,
-                    'custom_text' => 'Jawaban',
-                ],
-            ],
-        ])->assertRedirect(route('home-page'));
-
-        $this->assertDatabaseCount('survey_responses', 0);
     }
 
     public function test_guests_can_submit_a_survey_response(): void
@@ -109,22 +58,21 @@ class SurveyTest extends TestCase
             'sequence_number' => 2,
         ]);
 
-        $response = $this->withSession(['survey_unlocked' => true])
-            ->post(route('survey.submit'), [
-                'survey_id' => $survey->id,
-                'answers' => [
-                    [
-                        'survey_question_id' => $choiceQuestion->id,
-                        'survey_question_option_id' => $option->id,
-                        'custom_text' => null,
-                    ],
-                    [
-                        'survey_question_id' => $textQuestion->id,
-                        'survey_question_option_id' => null,
-                        'custom_text' => 'Tingkatkan fasilitas ruang tunggu.',
-                    ],
+        $response = $this->post(route('survey.submit'), [
+            'survey_id' => $survey->id,
+            'answers' => [
+                [
+                    'survey_question_id' => $choiceQuestion->id,
+                    'survey_question_option_id' => $option->id,
+                    'custom_text' => null,
                 ],
-            ]);
+                [
+                    'survey_question_id' => $textQuestion->id,
+                    'survey_question_option_id' => null,
+                    'custom_text' => 'Tingkatkan fasilitas ruang tunggu.',
+                ],
+            ],
+        ]);
 
         $response->assertRedirect(route('survey.show'));
 
@@ -156,8 +104,7 @@ class SurveyTest extends TestCase
             'survey_question_id' => $foreignQuestion->id,
         ]);
 
-        $this->withSession(['survey_unlocked' => true])
-            ->from(route('survey.show'))
+        $this->from(route('survey.show'))
             ->post(route('survey.submit'), [
                 'survey_id' => $survey->id,
                 'answers' => [
@@ -186,8 +133,7 @@ class SurveyTest extends TestCase
             'is_allow_custom_text' => true,
         ]);
 
-        $this->withSession(['survey_unlocked' => true])
-            ->from(route('survey.show'))
+        $this->from(route('survey.show'))
             ->post(route('survey.submit'), [
                 'survey_id' => $survey->id,
                 'answers' => [

@@ -6,7 +6,6 @@ use App\Actions\Survey\SubmitSurveyAction;
 use App\Http\Requests\Survey\SubmitSurveyRequest;
 use App\Models\Survey;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -15,15 +14,8 @@ class SurveyController extends Controller
     /**
      * Show the public survey form.
      */
-    public function show(Request $request): Response|RedirectResponse
+    public function show(): Response
     {
-        $unlocked = $request->session()->get('survey_unlocked', false)
-            || ($request->user()?->hasAdminsAuthority() ?? false);
-
-        if (! $unlocked) {
-            return redirect()->route('home-page');
-        }
-
         $survey = Survey::where('is_active', true)
             ->latest()
             ->with([
@@ -59,16 +51,7 @@ class SurveyController extends Controller
      */
     public function submit(SubmitSurveyRequest $request, SubmitSurveyAction $action): RedirectResponse
     {
-        $unlocked = $request->session()->get('survey_unlocked', false)
-            || ($request->user()?->hasAdminsAuthority() ?? false);
-
-        if (! $unlocked) {
-            return redirect()->route('home-page');
-        }
-
         $action->execute($request->validated());
-
-        $request->session()->put('survey_submitted', true);
 
         return redirect()->route('survey.show');
     }

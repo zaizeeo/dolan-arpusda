@@ -78,8 +78,6 @@ class GuestBookController extends Controller
     {
         $action->execute($request->validated());
 
-        $request->session()->put('survey_unlocked', true);
-
         return redirect()->back();
     }
 

@@ -11,16 +11,14 @@ import { useState } from "react";
 
 interface Props extends PageProps {
     survey: PublicSurvey | null;
-    surveyUnlocked?: boolean;
 }
 
-const SurveyPage = ({ survey, surveyUnlocked = true }: Props) => {
+const SurveyPage = ({ survey }: Props) => {
     const [isSubmitted, setIsSubmitted] = useState(false);
 
     return (
         <PublicFormLayout
             activeForm="survey"
-            surveyUnlocked={surveyUnlocked}
             badge="Survei Layanan"
             badgeIcon={ClipboardList}
             title={survey?.title ?? "Survei Layanan"}

@@ -42,8 +42,6 @@ class HandleInertiaRequests extends Middleware
             ],
             'name' => config('app.name'),
             'sidebar_state' => request()->cookie('sidebar_state', 'false'),
-            'surveyUnlocked' => (bool) $request->session()->get('survey_unlocked', false)
-                || ($request->user()?->hasAdminsAuthority() ?? false),
         ];
     }
 }
