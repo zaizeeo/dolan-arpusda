@@ -64,6 +64,22 @@ class UserManagementRoleTest extends TestCase
         $this->assertDatabaseHas('users', ['id' => $staff->id, 'role' => 'intern']);
     }
 
+    public function test_admin_cannot_promote_an_admin_to_superadmin(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $targetAdmin = User::factory()->create(['role' => 'admin']);
+        $superadmin = User::factory()->create(['role' => 'superadmin']);
+
+        $this->actingAs($admin)
+            ->from(route('user-controller-index'))
+            ->post(route('user-controller-promote-to-superadmin', $targetAdmin->id))
+            ->assertRedirect(route('user-controller-index'))
+            ->assertSessionHasErrors('server');
+
+        $this->assertDatabaseHas('users', ['id' => $targetAdmin->id, 'role' => 'admin']);
+        $this->assertDatabaseHas('users', ['id' => $superadmin->id, 'role' => 'superadmin']);
+    }
+
     public function test_superadmin_promotes_an_admin_and_becomes_admin(): void
     {
         $superadmin = User::factory()->create(['role' => 'superadmin']);

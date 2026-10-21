@@ -38,6 +38,19 @@ class ManagementRoleAccessTest extends TestCase
             ->assertOk();
     }
 
+    public function test_staff_can_view_statistics_pages(): void
+    {
+        $staff = User::factory()->create(['role' => 'staff']);
+
+        $this->actingAs($staff)
+            ->get(route('guest-book-statistics-index'))
+            ->assertOk();
+
+        $this->actingAs($staff)
+            ->get(route('survey-statistics-index'))
+            ->assertOk();
+    }
+
     public function test_intern_cannot_access_management_or_user_management_pages(): void
     {
         $intern = User::factory()->create(['role' => 'intern']);
