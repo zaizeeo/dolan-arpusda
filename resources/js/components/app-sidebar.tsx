@@ -5,9 +5,11 @@ import {
     BookOpen,
     ChevronRight,
     ChevronsUpDown,
+    ClipboardList,
     HelpCircle,
     LayoutDashboard,
     Library,
+    ListChecks,
     LogOut,
     Settings,
     User as UserIcon,
@@ -45,7 +47,7 @@ import {
     useSidebar,
 } from "@/components/ui/sidebar";
 import { PageProps } from "@/types/page-props";
-import { logout, settings, userControllerIndex } from "@/routes";
+import { logout, settings, surveyQuestionIndex, surveyResponseIndex, userControllerIndex } from "@/routes";
 import dashboard from "@/routes/dashboard";
 import guestBook from "@/routes/dashboard/management/guest-book";
 import guestBookQuestion from "@/routes/dashboard/management/guest-book-question";
@@ -123,6 +125,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             url: guestBookQuestion.index.url(),
             icon: BadgeQuestionMark,
             isActive: url.startsWith(guestBookQuestion.index.url()),
+        },
+        {
+            title: "Respon Survei",
+            url: surveyResponseIndex.url(),
+            icon: ClipboardList,
+            isActive: url === surveyResponseIndex.url(),
+        },
+        {
+            title: "Pertanyaan Survei",
+            url: surveyQuestionIndex.url(),
+            icon: ListChecks,
+            isActive: url.startsWith(surveyQuestionIndex.url()),
         },
     ];
 

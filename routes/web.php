@@ -5,10 +5,15 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GuestBookController;
 use App\Http\Controllers\GuestBookQuestionController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SurveyController;
+use App\Http\Controllers\SurveyQuestionController;
+use App\Http\Controllers\SurveyResponseController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [GuestBookController::class, 'showGuestBookForm'])->name('home-page');
+
+Route::get('/survey', [SurveyController::class, 'show'])->name('survey.show');
 
 Route::get('/auth', [AuthController::class, 'showAuthPage'])->middleware('guest.middleware')->name('login');
 
@@ -36,6 +41,21 @@ Route::prefix('/_api')->group(function () {
                 Route::delete('/{guestBookQuestionOption}', [GuestBookQuestionController::class, 'destroyOption'])->name('delete-guest-book-question-option');
                 Route::patch('/{guestBookQuestionOption}/toggle-active', [GuestBookQuestionController::class, 'toggleOptionActive'])->name('toggle-guest-book-question-option-active');
             });
+            Route::prefix('/survey')->middleware(['admins.middleware'])->group(function () {
+                Route::delete('/responses/{surveyResponse}', [SurveyResponseController::class, 'destroy'])->name('delete-survey-response');
+                Route::prefix('/question')->group(function () {
+                    Route::post('/', [SurveyQuestionController::class, 'create'])->name('create-survey-question');
+                    Route::patch('/{surveyQuestion}', [SurveyQuestionController::class, 'update'])->name('update-survey-question');
+                    Route::delete('/{surveyQuestion}', [SurveyQuestionController::class, 'destroy'])->name('delete-survey-question');
+                    Route::patch('/{surveyQuestion}/toggle-active', [SurveyQuestionController::class, 'toggleActive'])->name('toggle-survey-question-active');
+                    Route::post('/{surveyQuestion}/options', [SurveyQuestionController::class, 'createOption'])->name('create-survey-question-option');
+                });
+                Route::prefix('/question-option')->group(function () {
+                    Route::patch('/{surveyQuestionOption}', [SurveyQuestionController::class, 'updateOption'])->name('update-survey-question-option');
+                    Route::delete('/{surveyQuestionOption}', [SurveyQuestionController::class, 'destroyOption'])->name('delete-survey-question-option');
+                    Route::patch('/{surveyQuestionOption}/toggle-active', [SurveyQuestionController::class, 'toggleOptionActive'])->name('toggle-survey-question-option-active');
+                });
+            });
             Route::prefix('/users')->group(function () {
                 Route::post('/', [UserController::class, 'createUser'])->name('user-controller-create')->middleware(['admins.middleware']);
                 Route::patch('/{id}', [UserController::class, 'editUser'])->name('user-controller-edit')->middleware(['admins.middleware']);
@@ -49,6 +69,8 @@ Route::prefix('/_api')->group(function () {
         Route::post('/', [GuestBookController::class, 'create'])->name('create-guest-book');
         Route::delete('/{guestBook}', [GuestBookController::class, 'destroy'])->name('delete-guest-book')->middleware(['admins.middleware']);
     });
+
+    Route::post('/survey', [SurveyController::class, 'submit'])->name('survey.submit');
 });
 
 Route::prefix('/dashboard')->middleware(['auth.middleware'])->group(function () {
@@ -61,6 +83,9 @@ Route::prefix('/dashboard')->middleware(['auth.middleware'])->group(function () 
         Route::prefix('/guest-book-question')->group(function () {
             Route::get('/', [GuestBookQuestionController::class, 'index'])->name('dashboard.management.guest-book-question.index')->middleware(['admins.middleware']);
         });
+
+        Route::get('/survey', [SurveyResponseController::class, 'index'])->name('survey-response-index')->middleware(['admins.middleware']);
+        Route::get('/survey/question', [SurveyQuestionController::class, 'index'])->name('survey-question-index')->middleware(['admins.middleware']);
 
         Route::get('/users', [UserController::class, 'index'])->name('user-controller-index')->middleware(['admins.middleware']);
     });
