@@ -182,7 +182,7 @@ const GuestBookIndex = ({
                         <Button variant="outline" size="sm" asChild>
                             <Link href={guestBookQuestion.index.url()}>
                                 <Settings2 className="mr-1.5 size-4" />
-                                Kelola Pertanyaan
+                                {hasAdminsAuthority ? "Kelola Pertanyaan" : "Lihat Pertanyaan"}
                             </Link>
                         </Button>
                     </div>

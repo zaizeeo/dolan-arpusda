@@ -96,7 +96,7 @@ export default function SurveyResponseManagement({
                         <Button asChild className="gap-2">
                             <Link href={surveyQuestionIndex.url()}>
                                 <Settings2 className="size-4" />
-                                Kelola Pertanyaan
+                                {hasAdminsAuthority ? "Kelola Pertanyaan" : "Lihat Pertanyaan"}
                             </Link>
                         </Button>
                     </div>
