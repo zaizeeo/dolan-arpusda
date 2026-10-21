@@ -169,7 +169,7 @@ export default function SurveyResponseManagement({
                                                 <MessagesSquare className="size-4" />
                                             </span>
                                             <div>
-                                                <CardTitle className="text-sm font-semibold">Respon #{responses.length - index}</CardTitle>
+                                                <CardTitle className="text-sm font-semibold">Respon</CardTitle>
                                                 <CardDescription className="text-xs">
                                                     {response.created_at_human ?? "Baru saja"}
                                                     {response.created_at ? (
