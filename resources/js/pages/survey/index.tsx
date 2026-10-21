@@ -25,7 +25,7 @@ const SurveyPage = ({ survey }: Props) => {
             description={survey?.description ?? "Bantu kami meningkatkan kualitas layanan Jeta Arsip dengan mengisi survei singkat berikut."}
             footerDescription="Sistem Informasi Layanan Jeta Arsip."
         >
-            <Head title="Survei" />
+            <Head title={survey?.title ?? "Survei"} />
 
             {isSubmitted ? (
                 <Card className="border-border bg-card shadow-sm">
@@ -69,7 +69,7 @@ const SurveyPage = ({ survey }: Props) => {
                     <CardHeader className="border-b border-border pb-4">
                         <div className="flex items-center gap-2 text-primary">
                             <ClipboardList className="size-5" />
-                            <CardTitle className="text-lg font-semibold text-card-foreground">Formulir Survei</CardTitle>
+                            <CardTitle className="text-lg leading-snug font-semibold text-card-foreground">{survey.title}</CardTitle>
                         </div>
                         <CardDescription>
                             Mohon lengkapi semua pertanyaan bertanda bintang (<span className="text-destructive">*</span>) sesuai pengalaman Anda.

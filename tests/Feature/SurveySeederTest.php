@@ -19,7 +19,9 @@ class SurveySeederTest extends TestCase
         $survey = Survey::where('is_active', true)->firstOrFail();
 
         $this->assertDatabaseCount('surveys', 1);
-        $this->assertSame(5, SurveyQuestion::where('survey_id', $survey->id)->count());
-        $this->assertGreaterThan(0, $survey->questions()->withCount('options')->get()->sum('options_count'));
+        $this->assertSame('SURVEI KEPUASAN MASYARAKAT TENTANG PELAYANAN KEARSIPAN - TAHUN 2026', $survey->title);
+        $this->assertSame(15, SurveyQuestion::where('survey_id', $survey->id)->count());
+        $this->assertSame(60, $survey->questions()->withCount('options')->get()->sum('options_count'));
+        $this->assertSame(0, $survey->questions()->where('label', 'Nama')->firstOrFail()->options()->count());
     }
 }
