@@ -44,15 +44,13 @@ import {
     useSidebar,
 } from "@/components/ui/sidebar";
 import { PageProps } from "@/types/page-props";
+import { User } from "@/types";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const { isMobile } = useSidebar();
     const { url, props: pageProps } = usePage<PageProps>();
 
-    const user = pageProps.auth.user;
-    const userName = user?.name || "Staff Jeta Arsip";
-    const userEmail = user?.email || "staff@jetaarsip.go.id";
-    const userRole = user?.role ? user.role.toUpperCase() : "STAFF";
+    const { name: userName, role: userRole, email: userEmail, avatar } = pageProps.auth.user as User;
     const userInitials = userName
         .split(" ")
         .map((n) => n[0])
@@ -253,7 +251,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                     className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                                 >
                                     <Avatar className="size-8 rounded-lg">
-                                        <AvatarImage src="" alt={userName} />
+                                        <AvatarImage src={avatar} alt={userName} />
                                         <AvatarFallback className="rounded-lg bg-primary/10 text-xs font-semibold text-primary">
                                             {userInitials}
                                         </AvatarFallback>
@@ -274,7 +272,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                 <DropdownMenuLabel className="p-0 font-normal">
                                     <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                                         <Avatar className="size-8 rounded-lg">
-                                            <AvatarImage src="" alt={userName} />
+                                            <AvatarImage src={avatar} alt={userName} />
                                             <AvatarFallback className="rounded-lg bg-primary/10 text-xs font-semibold text-primary">
                                                 {userInitials}
                                             </AvatarFallback>
