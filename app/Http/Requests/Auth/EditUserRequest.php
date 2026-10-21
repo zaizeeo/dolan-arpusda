@@ -26,7 +26,7 @@ class EditUserRequest extends FormRequest
             'email' => ['email', 'nullable'],
             'name' => ['string', 'nullable'],
             'password' => ['string', 'min:8', 'max:32', 'nullable'],
-            'role' => ['string', 'in:magang,staff,admin', 'nullable']
+            'role' => ['string', 'in:intern,staff,admin', 'nullable'],
         ];
     }
 
@@ -43,7 +43,7 @@ class EditUserRequest extends FormRequest
             'password.min' => 'Password minimal 8 karakter',
             'password.max' => 'Password maksimal 32 karakter',
             'role.string' => 'Pilih Role yang sesuai',
-            'role.in' => 'Role hanya bisa diisi staff, admin, dan magang.'
+            'role.in' => 'Role hanya bisa diisi magang, staff, dan admin.',
         ];
     }
 }

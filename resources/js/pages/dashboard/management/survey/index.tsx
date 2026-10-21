@@ -5,9 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
+import { useUserRole } from "@/lib/hooks/use-user-role";
 import { resolveInertiaErrorMessage } from "@/lib/inertia-errors";
 import { deleteSurveyResponse, surveyQuestionIndex } from "@/routes";
 import survey from "@/routes/survey";
+import { User } from "@/types";
+import { PageProps } from "@/types/page-props";
 import type { SurveyResponseItem } from "@/types/survey";
 import { router, type VisitHelperOptions } from "@inertiajs/core";
 import { Link } from "@inertiajs/react";
@@ -27,7 +30,7 @@ interface Stats {
     month_responses: number;
 }
 
-interface Props {
+interface Props extends PageProps {
     survey: SurveySummary | null;
     responses?: Array<SurveyResponseItem>;
     stats?: Stats;
@@ -35,11 +38,13 @@ interface Props {
 }
 
 export default function SurveyResponseManagement({
+    auth,
     survey: activeSurvey,
     responses = [],
     stats = { total_responses: 0, today_responses: 0, month_responses: 0 },
     trend = [],
 }: Props) {
+    const { hasAdminsAuthority } = useUserRole(auth.user as User);
     const [deletingResponse, setDeletingResponse] = useState<SurveyResponseItem | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
 
@@ -74,7 +79,11 @@ export default function SurveyResponseManagement({
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight text-foreground">Respon Survei</h1>
-                        <p className="text-sm text-muted-foreground">Lihat dan kelola jawaban survei yang dikirim oleh pengunjung.</p>
+                        <p className="text-sm text-muted-foreground">
+                            {hasAdminsAuthority
+                                ? "Lihat dan kelola jawaban survei yang dikirim oleh pengunjung."
+                                : "Lihat jawaban survei yang dikirim oleh pengunjung."}
+                        </p>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2">
@@ -194,15 +203,17 @@ export default function SurveyResponseManagement({
                                             </div>
                                         </div>
 
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            className="gap-1.5 self-end text-destructive hover:bg-destructive/10 hover:text-destructive sm:self-auto"
-                                            onClick={() => setDeletingResponse(response)}
-                                        >
-                                            <Trash2 className="size-4" />
-                                            Hapus
-                                        </Button>
+                                        {hasAdminsAuthority && (
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="gap-1.5 self-end text-destructive hover:bg-destructive/10 hover:text-destructive sm:self-auto"
+                                                onClick={() => setDeletingResponse(response)}
+                                            >
+                                                <Trash2 className="size-4" />
+                                                Hapus
+                                            </Button>
+                                        )}
                                     </div>
                                 </CardHeader>
 

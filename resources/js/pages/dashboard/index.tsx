@@ -2,10 +2,12 @@ import DashboardLayout from "@/components/layouts/dashboard-layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { PageProps } from "@/types/page-props";
+import { useUserRole } from "@/lib/hooks/use-user-role";
 import { homePage } from "@/routes";
 import guestBook from "@/routes/dashboard/management/guest-book";
 import guestBookQuestion from "@/routes/dashboard/management/guest-book-question";
+import { User } from "@/types";
+import { PageProps } from "@/types/page-props";
 import { Link } from "@inertiajs/react";
 import {
     ArrowRight,
@@ -70,6 +72,7 @@ interface Props extends PageProps {
 }
 
 const DashboardIndexPage = ({
+    auth,
     stats = {
         total_visits: 0,
         today_visits: 0,
@@ -83,6 +86,7 @@ const DashboardIndexPage = ({
     popularOptions = [],
     recentVisits = [],
 }: Props) => {
+    const { hasAdminsAuthority, canReadManagement } = useUserRole(auth.user as User);
     const maxTrendCount = Math.max(...trend.map((t) => t.count), 1);
     const totalTrendVisits = trend.reduce((sum, item) => sum + item.count, 0);
 
@@ -112,12 +116,14 @@ const DashboardIndexPage = ({
                                 Form Publik
                             </a>
                         </Button>
-                        <Button size="sm" asChild>
-                            <Link href={guestBook.index.url()}>
-                                <Users className="mr-1.5 size-4" />
-                                Kelola Tamu
-                            </Link>
-                        </Button>
+                        {canReadManagement && (
+                            <Button size="sm" asChild>
+                                <Link href={guestBook.index.url()}>
+                                    <Users className="mr-1.5 size-4" />
+                                    {hasAdminsAuthority ? "Kelola Tamu" : "Lihat Tamu"}
+                                </Link>
+                            </Button>
+                        )}
                     </div>
                 </div>
 
@@ -299,12 +305,14 @@ const DashboardIndexPage = ({
                                 <CardTitle className="text-base font-semibold">Kunjungan Terbaru</CardTitle>
                                 <CardDescription>Pengunjung yang baru saja mengisi buku tamu digital</CardDescription>
                             </div>
-                            <Button variant="ghost" size="sm" asChild>
-                                <Link href={guestBook.index.url()} className="gap-1 text-xs text-primary">
-                                    Semua
-                                    <ArrowRight className="size-3.5" />
-                                </Link>
-                            </Button>
+                            {canReadManagement && (
+                                <Button variant="ghost" size="sm" asChild>
+                                    <Link href={guestBook.index.url()} className="gap-1 text-xs text-primary">
+                                        Semua
+                                        <ArrowRight className="size-3.5" />
+                                    </Link>
+                                </Button>
+                            )}
                         </CardHeader>
                         <CardContent className="pt-2">
                             {recentVisits.length === 0 ? (
@@ -355,37 +363,49 @@ const DashboardIndexPage = ({
                             <CardDescription>Akses cepat ke modul operasional Jeta Arsip</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-3">
-                            <Link
-                                href={guestBook.index.url()}
-                                className="flex items-center justify-between rounded-lg border border-border p-3.5 transition-colors hover:border-primary/50 hover:bg-muted/50"
-                            >
-                                <div className="flex items-center gap-3">
-                                    <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                                        <FileText className="size-4" />
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-sm font-semibold text-foreground">Manajemen Buku Tamu</span>
-                                        <span className="text-xs text-muted-foreground">Lihat detail dan hapus data kunjungan</span>
-                                    </div>
-                                </div>
-                                <ArrowRight className="size-4 text-muted-foreground" />
-                            </Link>
+                            {canReadManagement && (
+                                <>
+                                    <Link
+                                        href={guestBook.index.url()}
+                                        className="flex items-center justify-between rounded-lg border border-border p-3.5 transition-colors hover:border-primary/50 hover:bg-muted/50"
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                                <FileText className="size-4" />
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <span className="text-sm font-semibold text-foreground">Manajemen Buku Tamu</span>
+                                                <span className="text-xs text-muted-foreground">
+                                                    {hasAdminsAuthority ? "Lihat detail dan hapus data kunjungan" : "Lihat detail data kunjungan"}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <ArrowRight className="size-4 text-muted-foreground" />
+                                    </Link>
 
-                            <Link
-                                href={guestBookQuestion.index.url()}
-                                className="flex items-center justify-between rounded-lg border border-border p-3.5 transition-colors hover:border-primary/50 hover:bg-muted/50"
-                            >
-                                <div className="flex items-center gap-3">
-                                    <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                                        <Settings2 className="size-4" />
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-sm font-semibold text-foreground">Kelola Pertanyaan</span>
-                                        <span className="text-xs text-muted-foreground">Atur pertanyaan dan opsi pilihan formulir</span>
-                                    </div>
-                                </div>
-                                <ArrowRight className="size-4 text-muted-foreground" />
-                            </Link>
+                                    <Link
+                                        href={guestBookQuestion.index.url()}
+                                        className="flex items-center justify-between rounded-lg border border-border p-3.5 transition-colors hover:border-primary/50 hover:bg-muted/50"
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                                <Settings2 className="size-4" />
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <span className="text-sm font-semibold text-foreground">
+                                                    {hasAdminsAuthority ? "Kelola Pertanyaan" : "Pertanyaan Buku Tamu"}
+                                                </span>
+                                                <span className="text-xs text-muted-foreground">
+                                                    {hasAdminsAuthority
+                                                        ? "Atur pertanyaan dan opsi pilihan formulir"
+                                                        : "Lihat pertanyaan dan opsi pilihan formulir"}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <ArrowRight className="size-4 text-muted-foreground" />
+                                    </Link>
+                                </>
+                            )}
 
                             <a
                                 href={homePage.url()}

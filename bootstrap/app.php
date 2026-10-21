@@ -4,6 +4,7 @@ use App\Http\Middleware\AdminsMiddleware;
 use App\Http\Middleware\AuthMiddleware;
 use App\Http\Middleware\GuestMiddleware;
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\ManagementReadMiddleware;
 use App\Http\Middleware\SuperadminMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -26,6 +27,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'guest.middleware' => GuestMiddleware::class,
             'auth.middleware' => AuthMiddleware::class,
             'admins.middleware' => AdminsMiddleware::class,
+            'management.read.middleware' => ManagementReadMiddleware::class,
             'super-admin.middleware' => SuperadminMiddleware::class,
         ]);
     })

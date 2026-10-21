@@ -5,8 +5,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useUserRole } from "@/lib/hooks/use-user-role";
 import { deleteGuestBook, homePage } from "@/routes";
 import guestBookQuestion from "@/routes/dashboard/management/guest-book-question";
+import { User } from "@/types";
 import { PageProps } from "@/types/page-props";
 import { router, type VisitHelperOptions } from "@inertiajs/core";
 import { Link } from "@inertiajs/react";
@@ -87,6 +89,7 @@ const formatIndonesianDate = (isoString?: string | null) => {
 };
 
 const GuestBookIndex = ({
+    auth,
     guestBooks = [],
     stats = {
         total_visits: 0,
@@ -94,6 +97,7 @@ const GuestBookIndex = ({
         month_visits: 0,
     },
 }: Props) => {
+    const { hasAdminsAuthority } = useUserRole(auth.user as User);
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedGuestBook, setSelectedGuestBook] = useState<GuestBookItem | null>(null);
     const [deleteTarget, setDeleteTarget] = useState<GuestBookItem | null>(null);
@@ -162,7 +166,9 @@ const GuestBookIndex = ({
                         </div>
                         <h1 className="mt-2 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">Riwayat Kunjungan Tamu</h1>
                         <p className="mt-1 text-sm text-muted-foreground">
-                            Kelola data pengunjung, tinjau detail jawaban formulir, dan lakukan pemeliharaan data.
+                            {hasAdminsAuthority
+                                ? "Kelola data pengunjung, tinjau detail jawaban formulir, dan lakukan pemeliharaan data."
+                                : "Lihat data pengunjung dan tinjau detail jawaban formulir."}
                         </p>
                     </div>
 
@@ -348,15 +354,17 @@ const GuestBookIndex = ({
                                                             <Eye className="size-3.5" />
                                                         </Button>
 
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon-sm"
-                                                            className="text-destructive hover:bg-destructive/10"
-                                                            onClick={() => setDeleteTarget(item)}
-                                                            title="Hapus Data Tamu"
-                                                        >
-                                                            <Trash2 className="size-3.5" />
-                                                        </Button>
+                                                        {hasAdminsAuthority && (
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon-sm"
+                                                                className="text-destructive hover:bg-destructive/10"
+                                                                onClick={() => setDeleteTarget(item)}
+                                                                title="Hapus Data Tamu"
+                                                            >
+                                                                <Trash2 className="size-3.5" />
+                                                            </Button>
+                                                        )}
                                                     </div>
                                                 </TableCell>
                                             </TableRow>
@@ -435,18 +443,22 @@ const GuestBookIndex = ({
                         })}
                     </div>
 
-                    <DialogFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-between">
-                        <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => {
-                                setDeleteTarget(selectedGuestBook);
-                                setSelectedGuestBook(null);
-                            }}
-                        >
-                            <Trash2 className="mr-1.5 size-4" />
-                            Hapus Data Ini
-                        </Button>
+                    <DialogFooter
+                        className={`flex flex-col-reverse gap-2 sm:flex-row ${hasAdminsAuthority ? "sm:justify-between" : "sm:justify-end"}`}
+                    >
+                        {hasAdminsAuthority && (
+                            <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => {
+                                    setDeleteTarget(selectedGuestBook);
+                                    setSelectedGuestBook(null);
+                                }}
+                            >
+                                <Trash2 className="mr-1.5 size-4" />
+                                Hapus Data Ini
+                            </Button>
+                        )}
 
                         <DialogClose asChild>
                             <Button variant="outline" size="sm">

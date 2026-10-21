@@ -7,11 +7,11 @@ import { Spinner } from "@/components/ui/spinner";
 import { resolveInertiaErrorMessage, resolveInertiaFieldError } from "@/lib/inertia-errors";
 import { userControllerCreate } from "@/routes";
 import {
-    allowedUserRole,
     createUserSchema,
+    editableUserRole,
     getUserRoleLabel,
-    type AllowedUserRoleType,
     type CreateUserSchemaType,
+    type EditableUserRoleType,
 } from "@/lib/validations/user-management";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { VisitHelperOptions } from "@inertiajs/core";
@@ -39,7 +39,7 @@ const CreateUserForm = ({ onSuccess, onCancel }: Props) => {
             email: "",
             password: "",
             password_confirmation: "",
-            role: "staff" as AllowedUserRoleType,
+            role: "staff" as EditableUserRoleType,
         },
     });
 
@@ -125,7 +125,7 @@ const CreateUserForm = ({ onSuccess, onCancel }: Props) => {
                                 <SelectContent position="popper">
                                     <SelectGroup>
                                         <SelectLabel>Role Pengguna</SelectLabel>
-                                        {allowedUserRole.map((role) => (
+                                        {editableUserRole.map((role) => (
                                             <SelectItem key={role} value={role}>
                                                 {getUserRoleLabel(role)}
                                             </SelectItem>

@@ -3,8 +3,11 @@ import DashboardLayout from "@/components/layouts/dashboard-layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useUserRole } from "@/lib/hooks/use-user-role";
 import { surveyQuestionIndex, surveyResponseIndex } from "@/routes";
 import survey from "@/routes/survey";
+import { User } from "@/types";
+import { PageProps } from "@/types/page-props";
 import type { SurveyResponseItem } from "@/types/survey";
 import { Link } from "@inertiajs/react";
 import {
@@ -38,7 +41,7 @@ interface PopularOption {
     count: number;
 }
 
-interface Props {
+interface Props extends PageProps {
     survey: SurveySummary | null;
     stats?: Stats;
     trend?: Array<SurveyTrendItem>;
@@ -47,12 +50,14 @@ interface Props {
 }
 
 export default function SurveyStatisticsPage({
+    auth,
     survey: activeSurvey,
     stats = { total_responses: 0, today_responses: 0, month_responses: 0 },
     trend = [],
     popularOptions = [],
     recentResponses = [],
 }: Props) {
+    const { hasAdminsAuthority, canReadManagement } = useUserRole(auth.user as User);
     const weeklyResponses = trend.reduce((total, item) => total + item.count, 0);
 
     return (
@@ -179,12 +184,14 @@ export default function SurveyStatisticsPage({
                                 <CardTitle className="text-base font-semibold">Respon Terbaru</CardTitle>
                                 <CardDescription>6 respon survei terakhir dari responden.</CardDescription>
                             </div>
-                            <Button variant="ghost" size="sm" asChild>
-                                <Link href={surveyResponseIndex.url()} className="gap-1 text-xs text-primary">
-                                    Semua
-                                    <ArrowRight className="size-3.5" />
-                                </Link>
-                            </Button>
+                            {canReadManagement && (
+                                <Button variant="ghost" size="sm" asChild>
+                                    <Link href={surveyResponseIndex.url()} className="gap-1 text-xs text-primary">
+                                        Semua
+                                        <ArrowRight className="size-3.5" />
+                                    </Link>
+                                </Button>
+                            )}
                         </CardHeader>
                         <CardContent className="pt-2">
                             {recentResponses.length === 0 ? (
@@ -240,37 +247,49 @@ export default function SurveyStatisticsPage({
                             <CardDescription>Akses cepat ke modul survei.</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-3">
-                            <Link
-                                href={surveyResponseIndex.url()}
-                                className="flex items-center justify-between rounded-lg border border-border p-3.5 transition-colors hover:border-primary/50 hover:bg-muted/50"
-                            >
-                                <div className="flex items-center gap-3">
-                                    <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                                        <FileText className="size-4" />
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-sm font-semibold text-foreground">Manajemen Respon Survei</span>
-                                        <span className="text-xs text-muted-foreground">Lihat detail dan hapus respon survei</span>
-                                    </div>
-                                </div>
-                                <ArrowRight className="size-4 shrink-0 text-muted-foreground" />
-                            </Link>
+                            {canReadManagement && (
+                                <>
+                                    <Link
+                                        href={surveyResponseIndex.url()}
+                                        className="flex items-center justify-between rounded-lg border border-border p-3.5 transition-colors hover:border-primary/50 hover:bg-muted/50"
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                                <FileText className="size-4" />
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <span className="text-sm font-semibold text-foreground">Manajemen Respon Survei</span>
+                                                <span className="text-xs text-muted-foreground">
+                                                    {hasAdminsAuthority ? "Lihat detail dan hapus respon survei" : "Lihat detail respon survei"}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <ArrowRight className="size-4 shrink-0 text-muted-foreground" />
+                                    </Link>
 
-                            <Link
-                                href={surveyQuestionIndex.url()}
-                                className="flex items-center justify-between rounded-lg border border-border p-3.5 transition-colors hover:border-primary/50 hover:bg-muted/50"
-                            >
-                                <div className="flex items-center gap-3">
-                                    <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                                        <Settings2 className="size-4" />
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-sm font-semibold text-foreground">Kelola Pertanyaan Survei</span>
-                                        <span className="text-xs text-muted-foreground">Atur pertanyaan dan opsi pilihan survei</span>
-                                    </div>
-                                </div>
-                                <ArrowRight className="size-4 shrink-0 text-muted-foreground" />
-                            </Link>
+                                    <Link
+                                        href={surveyQuestionIndex.url()}
+                                        className="flex items-center justify-between rounded-lg border border-border p-3.5 transition-colors hover:border-primary/50 hover:bg-muted/50"
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                                <Settings2 className="size-4" />
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <span className="text-sm font-semibold text-foreground">
+                                                    {hasAdminsAuthority ? "Kelola Pertanyaan Survei" : "Pertanyaan Survei"}
+                                                </span>
+                                                <span className="text-xs text-muted-foreground">
+                                                    {hasAdminsAuthority
+                                                        ? "Atur pertanyaan dan opsi pilihan survei"
+                                                        : "Lihat pertanyaan dan opsi pilihan survei"}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <ArrowRight className="size-4 shrink-0 text-muted-foreground" />
+                                    </Link>
+                                </>
+                            )}
 
                             <a
                                 href={survey.show.url()}

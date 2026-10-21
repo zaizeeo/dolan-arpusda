@@ -40,4 +40,9 @@ class User extends Authenticatable
     {
         return in_array(strtolower($this->role), ['superadmin']);
     }
+
+    public function canReadManagement(): bool
+    {
+        return in_array(strtolower($this->role), ['staff', 'admin', 'superadmin'], true);
+    }
 }
