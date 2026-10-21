@@ -251,6 +251,6 @@ class SurveyTest extends TestCase
 
         $this->actingAs($staff)
             ->get(route('survey-question-index'))
-            ->assertRedirect(route('dashboard.index'));
+            ->assertRedirect(route('guest-book-statistics-index'));
     }
 }

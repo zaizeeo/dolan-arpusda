@@ -4,7 +4,6 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 
 class AdminsMiddleware
@@ -17,14 +16,15 @@ class AdminsMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         if ($request->user() == null) {
-            return redirect()->route("login");
+            return redirect()->route('login');
         }
-        if (!$request->user()->hasAdminsAuthority()) {
+        if (! $request->user()->hasAdminsAuthority()) {
             // if (str_starts_with($request->path, "/_api") || str_starts_with($request->path, "/api")) {
             //     return redirect()->back()->withErrors("Forbidden", "server");
             // }
-            return redirect()->route("dashboard.index");
+            return redirect()->route('guest-book-statistics-index');
         }
+
         return $next($request);
     }
 }

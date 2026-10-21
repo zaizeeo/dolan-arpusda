@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { homePage, login } from "@/routes";
-import dashboard from "@/routes/dashboard";
+import { guestBookStatisticsIndex, homePage, login } from "@/routes";
 import survey from "@/routes/survey";
 import type { PageProps } from "@/types/page-props";
 import { Link, usePage } from "@inertiajs/react";
@@ -71,7 +70,7 @@ const PublicFormLayout = ({
 
                         <Button variant="outline" size="sm" asChild>
                             {auth.user !== null ? (
-                                <Link href={dashboard.index.url()}>
+                                <Link href={guestBookStatisticsIndex.url()}>
                                     <LayoutDashboard className="mr-1.5 size-4" />
                                     Area Petugas
                                 </Link>

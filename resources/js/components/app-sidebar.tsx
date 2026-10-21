@@ -1,9 +1,9 @@
 import { Link, router, usePage } from "@inertiajs/react";
 import {
+    BookMarked,
     BookOpenCheck,
     BookUser,
-    ChartNoAxesColumn,
-    ChartNoAxesColumnIncreasing,
+    ChartPie,
     ChevronRight,
     ChevronsUpDown,
     ClipboardList,
@@ -48,8 +48,15 @@ import {
     SidebarRail,
     useSidebar,
 } from "@/components/ui/sidebar";
-import { logout, settings, surveyQuestionIndex, surveyResponseIndex, surveyStatisticsIndex, userControllerIndex } from "@/routes";
-import dashboard from "@/routes/dashboard";
+import {
+    guestBookStatisticsIndex,
+    logout,
+    settings,
+    surveyQuestionIndex,
+    surveyResponseIndex,
+    surveyStatisticsIndex,
+    userControllerIndex,
+} from "@/routes";
 import guestBook from "@/routes/dashboard/management/guest-book";
 import guestBookQuestion from "@/routes/dashboard/management/guest-book-question";
 import Profile from "@/routes/profile";
@@ -90,14 +97,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const navMain: NavItem[] = [
         {
             title: "Statistik Buku Tamu",
-            url: dashboard.index.url(),
-            icon: ChartNoAxesColumn,
-            isActive: url === dashboard.index.url(),
+            url: guestBookStatisticsIndex.url(),
+            icon: BookMarked,
+            isActive: url === guestBookStatisticsIndex.url(),
         },
         {
             title: "Statistik Respon Survei",
             url: surveyStatisticsIndex.url(),
-            icon: ChartNoAxesColumnIncreasing,
+            icon: ChartPie,
             isActive: url === surveyStatisticsIndex.url(),
         },
     ];
@@ -202,7 +209,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link href={dashboard.index.url()}>
+                            <Link href={guestBookStatisticsIndex.url()}>
                                 <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                                     <Library className="size-4.5" />
                                 </div>
