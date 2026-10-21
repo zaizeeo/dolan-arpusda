@@ -48,7 +48,9 @@ class ProfileController extends Controller
         if ($request->hasFile('avatar')) {
             $this->deleteStoredAvatar($user);
 
-            $user->avatar = Storage::disk('public')->url(
+            /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+            $disk = Storage::disk('public');
+            $user->avatar = $disk->url(
                 $request->file('avatar')->store('avatars', 'public')
             );
         }
@@ -79,7 +81,9 @@ class ProfileController extends Controller
             return;
         }
 
-        $prefix = rtrim(Storage::disk('public')->url(''), '/').'/';
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+        $disk = Storage::disk('public');
+        $prefix = rtrim($disk->url(''), '/') . '/';
 
         if (! Str::startsWith($user->avatar, $prefix)) {
             return;
