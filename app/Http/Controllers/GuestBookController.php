@@ -14,7 +14,7 @@ class GuestBookController extends Controller
     public function index(): Response
     {
         $guestBooks = GuestBook::with([
-            'answers' => fn($query) => $query->orderBy('created_at', 'asc'),
+            'answers' => fn ($query) => $query->orderBy('created_at', 'asc'),
             'answers.question:id,label,description,sequence_number',
             'answers.option:id,label,description,is_allow_custom_text',
         ])
@@ -25,7 +25,7 @@ class GuestBookController extends Controller
                     'id' => $item->id,
                     'created_at' => $item->created_at?->toISOString(),
                     'created_at_human' => $item->created_at?->diffForHumans(),
-                    'answers' => $item->answers->map(fn($answer) => [
+                    'answers' => $item->answers->map(fn ($answer) => [
                         'id' => $answer->id,
                         'guest_book_question_id' => $answer->guest_book_question_id,
                         'guest_book_question_option_id' => $answer->guest_book_question_option_id,
@@ -48,7 +48,7 @@ class GuestBookController extends Controller
 
         $activeQuestions = GuestBookQuestion::where('is_active', true)
             ->orderBy('sequence_number', 'asc')
-            ->with(['options' => fn($query) => $query->where('is_active', true)->orderBy('sequence_number', 'asc')])
+            ->with(['options' => fn ($query) => $query->where('is_active', true)->orderBy('sequence_number', 'asc')])
             ->get();
 
         $stats = [
@@ -68,7 +68,7 @@ class GuestBookController extends Controller
     {
         $activeQuestions = GuestBookQuestion::where('is_active', true)
             ->orderBy('sequence_number', 'asc')
-            ->with(['options' => fn($query) => $query->where('is_active', true)->orderBy('sequence_number', 'asc')])
+            ->with(['options' => fn ($query) => $query->where('is_active', true)->orderBy('sequence_number', 'asc')])
             ->get();
 
         return Inertia::render('home-page', compact('activeQuestions'));
