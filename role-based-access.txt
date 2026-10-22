@@ -1,0 +1,495 @@
+================================================================================
+PENJELASAN ROLE-BASED ACCESS (RBAC)
+Aplikasi Dolan Arpusda
+Tanggal: 22 Oktober 2026
+================================================================================
+
+Dokumen ini menjelaskan hak akses setiap role berdasarkan implementasi aplikasi
+saat ini, mencakup halaman, operasi data, aturan khusus manajemen pengguna, serta
+perbedaan antara tampilan UI dan pengecekan di backend.
+
+
+================================================================================
+1. DAFTAR ROLE
+================================================================================
+
+Aplikasi memiliki 4 role:
+
++------------+----------------+------------------------------------------------------+
+| Role       | Label UI       | Fungsi utama                                         |
++------------+----------------+------------------------------------------------------+
+| intern     | Magang         | Melihat statistik sebagai bahan pemantauan.          |
+| staff      | Staf           | Melihat statistik dan data operasional (read-only).  |
+| admin      | Admin          | Mengelola data operasional dan sebagian pengguna.    |
+| superadmin | Superadmin     | Pemegang otoritas tertinggi, termasuk pengguna.      |
++------------+----------------+------------------------------------------------------+
+
+Nilai role disimpan di kolom users.role berupa string. Nilai yang digunakan:
+intern, staff, admin, superadmin.
+
+
+================================================================================
+2. PRINSIP DASAR
+================================================================================
+
+1. Statistik bersifat read-only untuk semua role yang sudah login.
+2. Semua perubahan data operasional dilakukan melalui menu Management.
+3. Staff hanya boleh membaca data Management, tidak boleh mengubah data.
+4. Intern hanya boleh membaca Statistik Buku Tamu dan Statistik Respon Survei.
+5. User management adalah area khusus Admin dan Superadmin.
+6. Admin tidak boleh mengubah atau menghapus akun Superadmin.
+7. Hanya boleh ada 1 akun Superadmin dalam sistem.
+8. Superadmin tidak boleh membuat Superadmin kedua.
+9. Promosi Admin menjadi Superadmin akan menukar role:
+   Admin target menjadi Superadmin, Superadmin saat ini menjadi Admin.
+10. Penyembunyian tombol di UI bukan satu-satunya pengaman. Backend tetap
+    memeriksa role melalui middleware dan action.
+
+
+================================================================================
+3. MEKANISME OTORISASI
+================================================================================
+
+A. auth.middleware
+   - Memastikan pengguna sudah login.
+   - Jika belum login, pengguna diarahkan ke halaman login.
+
+B. management.read.middleware
+   - Mengizinkan akses baca halaman Management untuk:
+     staff, admin, superadmin.
+   - Intern yang mencoba membuka halaman Management akan diarahkan ke
+     Statistik Buku Tamu.
+
+C. admins.middleware
+   - Mengizinkan aksi Management dan User Management hanya untuk:
+     admin, superadmin.
+   - Staff dan intern yang mencoba mengirim request perubahan data akan
+     diarahkan ke Statistik Buku Tamu.
+   - Pengguna yang belum login diarahkan ke halaman login.
+
+D. Pemeriksaan di action (backend)
+   - CreateUserAction, EditUserAction, DeleteUserAction, dan
+     PromoteUserToSuperadminAction memiliki aturan tambahan untuk melindungi
+     akun Superadmin dan menjaga jumlah Superadmin tetap 1.
+
+E. Pemeriksaan di frontend
+   - Hook useUserRole menyediakan:
+     * hasAdminsAuthority      -> admin atau superadmin
+     * hasSuperAdminAuthority  -> superadmin
+     * hasStaffAuthority       -> staff
+     * canReadManagement       -> staff, admin, atau superadmin
+   - Hook ini dipakai untuk menyembunyikan menu dan tombol yang tidak boleh
+     digunakan oleh role tertentu.
+
+
+================================================================================
+4. MATRIKS AKSES HALAMAN
+================================================================================
+
+Keterangan:
+  Ya       = boleh membuka halaman.
+  Baca     = boleh membuka, tetapi hanya membaca.
+  CRUD     = boleh membaca dan melakukan create/update/delete/toggle.
+  Tidak    = tidak boleh; biasanya diarahkan ke halaman lain.
+  -        = tidak relevan.
+
++------------------------------------------+--------+--------+--------+-------------+-------------+
+| Halaman / Route                          | Guest  | Intern | Staff  | Admin       | Superadmin  |
++------------------------------------------+--------+--------+--------+-------------+-------------+
+| Form Buku Tamu publik (/)                | Ya     | Ya     | Ya     | Ya          | Ya          |
+| Form Survei publik (/survey)             | Ya     | Ya     | Ya     | Ya          | Ya          |
+| Halaman login (/auth)                    | Ya     | -      | -      | -           | -           |
+| Logout                                   | -      | Ya     | Ya     | Ya          | Ya          |
+| Profil sendiri (/dashboard/profile)      | Tidak  | Ya     | Ya     | Ya          | Ya          |
+| Edit profil sendiri                      | Tidak  | Ya     | Ya     | Ya          | Ya          |
+| Pengaturan/password sendiri              | Tidak  | Ya     | Ya     | Ya          | Ya          |
+| Statistik Buku Tamu                      | Tidak  | Ya     | Ya     | Ya          | Ya          |
+| Statistik Respon Survei                  | Tidak  | Ya     | Ya     | Ya          | Ya          |
+| Management Buku Tamu                     | Tidak  | Tidak  | Baca   | Baca+Hapus  | Baca+Hapus  |
+| Management Pertanyaan Buku Tamu          | Tidak  | Tidak  | Baca   | CRUD        | CRUD        |
+| Management Respon Survei                 | Tidak  | Tidak  | Baca   | Baca+Hapus  | Baca+Hapus  |
+| Management Pertanyaan Survei             | Tidak  | Tidak  | Baca   | CRUD        | CRUD        |
+| Management Pengguna                      | Tidak  | Tidak  | Tidak  | CRUD*       | CRUD*       |
++------------------------------------------+--------+--------+--------+-------------+-------------+
+
+Catatan:
+- CRUD* pada Management Pengguna mengikuti aturan khusus di bagian 7.
+- Baca+Hapus berarti halaman hanya menyediakan baca dan hapus; tidak ada
+  fitur edit untuk resource tersebut.
+- Staff tidak dapat membuka Management Pengguna.
+- Intern tidak dapat membuka halaman Management mana pun.
+- Semua role yang sudah login dapat membuka Statistik Buku Tamu dan
+  Statistik Respon Survei.
+- Admin dan Superadmin dapat membuka seluruh halaman Management operasional.
+
+
+================================================================================
+5. MATRIKS OPERASI DATA
+================================================================================
+
+A. BUKU TAMU
+
++------------------------------------------+--------+--------+--------+------------+
+| Operasi                                  | Intern | Staff  | Admin  | Superadmin |
++------------------------------------------+--------+--------+--------+------------+
+| Mengisi formulir buku tamu (publik)      | Ya     | Ya     | Ya     | Ya         |
+| Melihat statistik buku tamu              | Ya     | Ya     | Ya     | Ya         |
+| Melihat daftar dan detail kunjungan      | Tidak  | Ya     | Ya     | Ya         |
+| Menghapus data kunjungan                 | Tidak  | Tidak  | Ya     | Ya         |
+| Mengubah data kunjungan                  | Tidak  | Tidak  | Tidak  | Tidak      |
++------------------------------------------+--------+--------+--------+------------+
+
+Catatan:
+- Tidak ada fitur edit data buku tamu.
+- Penghapusan data buku tamu juga menghapus jawaban terkait (soft delete).
+- Tombol hapus disembunyikan untuk staff.
+
+B. PERTANYAAN DAN OPSI BUKU TAMU
+
++------------------------------------------+--------+--------+--------+------------+
+| Operasi                                  | Intern | Staff  | Admin  | Superadmin |
++------------------------------------------+--------+--------+--------+------------+
+| Melihat pertanyaan aktif di form publik  | Ya     | Ya     | Ya     | Ya         |
+| Melihat semua pertanyaan di Management   | Tidak  | Ya     | Ya     | Ya         |
+| Menambah pertanyaan                      | Tidak  | Tidak  | Ya     | Ya         |
+| Mengubah pertanyaan                      | Tidak  | Tidak  | Ya     | Ya         |
+| Menghapus pertanyaan                     | Tidak  | Tidak  | Ya     | Ya         |
+| Mengaktifkan/menonaktifkan pertanyaan    | Tidak  | Tidak  | Ya     | Ya         |
+| Menambah opsi jawaban                    | Tidak  | Tidak  | Ya     | Ya         |
+| Mengubah opsi jawaban                    | Tidak  | Tidak  | Ya     | Ya         |
+| Menghapus opsi jawaban                   | Tidak  | Tidak  | Ya     | Ya         |
+| Mengaktifkan/menonaktifkan opsi jawaban  | Tidak  | Tidak  | Ya     | Ya         |
++------------------------------------------+--------+--------+--------+------------+
+
+C. SURVEI DAN RESPON SURVEI
+
++------------------------------------------+--------+--------+--------+------------+
+| Operasi                                  | Intern | Staff  | Admin  | Superadmin |
++------------------------------------------+--------+--------+--------+------------+
+| Mengisi survei publik                    | Ya     | Ya     | Ya     | Ya         |
+| Melihat statistik respon survei          | Ya     | Ya     | Ya     | Ya         |
+| Melihat daftar respon survei             | Tidak  | Ya     | Ya     | Ya         |
+| Menghapus respon survei                  | Tidak  | Tidak  | Ya     | Ya         |
+| Mengubah respon survei                   | Tidak  | Tidak  | Tidak  | Tidak      |
+| Melihat pertanyaan survei aktif (publik) | Ya     | Ya     | Ya     | Ya         |
+| Melihat semua pertanyaan di Management   | Tidak  | Ya     | Ya     | Ya         |
+| Menambah pertanyaan survei               | Tidak  | Tidak  | Ya     | Ya         |
+| Mengubah pertanyaan survei               | Tidak  | Tidak  | Ya     | Ya         |
+| Menghapus pertanyaan survei              | Tidak  | Tidak  | Ya     | Ya         |
+| Mengaktifkan/menonaktifkan pertanyaan    | Tidak  | Tidak  | Ya     | Ya         |
+| Menambah opsi jawaban survei             | Tidak  | Tidak  | Ya     | Ya         |
+| Mengubah opsi jawaban survei             | Tidak  | Tidak  | Ya     | Ya         |
+| Menghapus opsi jawaban survei            | Tidak  | Tidak  | Ya     | Ya         |
+| Mengaktifkan/menonaktifkan opsi survei   | Tidak  | Tidak  | Ya     | Ya         |
++------------------------------------------+--------+--------+--------+------------+
+
+Catatan:
+- Tidak ada fitur edit respon survei; hanya lihat dan hapus.
+- Tidak ada fitur CRUD entitas Survei (buat/ubah/hapus survei) di aplikasi
+  saat ini. Yang dikelola adalah pertanyaan dan opsi dari survei aktif.
+- Management Respon Survei dan Management Pertanyaan Survei hanya menampilkan
+  data dari survei yang sedang aktif.
+
+D. MANAJEMEN PENGGUNA
+
++------------------------------------------+--------+--------+--------+------------+
+| Operasi                                  | Intern | Staff  | Admin  | Superadmin |
++------------------------------------------+--------+--------+--------+------------+
+| Membuka halaman daftar pengguna          | Tidak  | Tidak  | Ya     | Ya         |
+| Menambah pengguna                        | Tidak  | Tidak  | Ya*    | Ya*        |
+| Mengubah data pengguna                   | Tidak  | Tidak  | Ya**   | Ya**       |
+| Menghapus pengguna                       | Tidak  | Tidak  | Ya***  | Ya****     |
+| Mempromosikan Admin menjadi Superadmin   | Tidak  | Tidak  | Tidak  | Ya         |
+| Mengubah role menjadi Superadmin via edit| Tidak  | Tidak  | Tidak  | Tidak      |
+| Mengubah data akun sendiri via Management| Tidak  | Tidak  | Tidak  | Tidak      |
++------------------------------------------+--------+--------+--------+------------+
+
+Penjelasan tanda:
+*  Form create di UI hanya menyediakan role intern, staff, dan admin.
+   Backend tetap menolak pembuatan Superadmin kedua.
+** Admin dapat mengubah user ber-role intern, staff, dan admin lain. Admin
+   tidak dapat mengubah Superadmin. Superadmin dapat mengubah user ber-role
+   intern, staff, dan admin. Baik Admin maupun Superadmin tidak dapat mengubah
+   akun dirinya sendiri melalui Management; gunakan halaman Profil.
+*** Backend mengizinkan Admin menghapus user ber-role intern/staff. Namun UI
+    saat ini hanya menampilkan tombol hapus untuk Superadmin. Admin tidak dapat
+    menghapus Admin lain dan tidak dapat menghapus Superadmin.
+**** Superadmin dapat menghapus Admin, Staff, dan Intern. Superadmin tidak dapat
+     menghapus akun Superadmin (termasuk dirinya sendiri).
+
+E. PROFIL SENDIRI
+
++------------------------------------------+--------+--------+--------+------------+
+| Operasi                                  | Intern | Staff  | Admin  | Superadmin |
++------------------------------------------+--------+--------+--------+------------+
+| Melihat profil sendiri                   | Ya     | Ya     | Ya     | Ya         |
+| Mengubah nama/email/avatar sendiri       | Ya     | Ya     | Ya     | Ya         |
+| Mengubah password sendiri                | Ya     | Ya     | Ya     | Ya         |
+| Mengubah role sendiri lewat profil       | Tidak  | Tidak  | Tidak  | Tidak      |
++------------------------------------------+--------+--------+--------+------------+
+
+
+================================================================================
+6. DETAIL PER ROLE
+================================================================================
+
+6.1 INTERN (MAGANG)
+--------------------------------------------------------------------------------
+Tujuan:
+  Memberikan akses pemantauan statistik tanpa membuka data operasional.
+
+Yang boleh dilakukan:
+  - Login dan logout.
+  - Melihat dan mengubah profil sendiri (nama, email, avatar, password).
+  - Membuka Statistik Buku Tamu.
+  - Membuka Statistik Respon Survei.
+  - Melihat ringkasan statistik, tren, opsi populer, dan data terbaru yang
+    ditampilkan pada halaman statistik.
+  - Mengakses form publik buku tamu dan survei seperti pengunjung biasa.
+
+Yang tidak boleh dilakukan:
+  - Membuka halaman Management Buku Tamu.
+  - Membuka halaman Management Pertanyaan Buku Tamu.
+  - Membuka halaman Management Respon Survei.
+  - Membuka halaman Management Pertanyaan Survei.
+  - Membuka halaman Management Pengguna.
+  - Melakukan create/update/delete/toggle data operasional.
+  - Mengubah role atau data pengguna lain.
+
+Perilaku UI dan backend:
+  - Menu Management tidak ditampilkan di sidebar.
+  - Shortcut menuju Management pada halaman statistik disembunyikan.
+  - Jika membuka URL Management secara langsung, diarahkan ke
+    Statistik Buku Tamu oleh management.read.middleware.
+
+
+6.2 STAFF (STAF)
+--------------------------------------------------------------------------------
+Tujuan:
+  Memberikan akses baca menyeluruh ke data operasional tanpa hak perubahan.
+
+Yang boleh dilakukan:
+  - Semua akses yang dimiliki Intern.
+  - Membaca daftar dan detail data buku tamu.
+  - Membaca seluruh pertanyaan dan opsi buku tamu, termasuk yang nonaktif.
+  - Membaca daftar respon survei dari survei aktif.
+  - Membaca seluruh pertanyaan dan opsi survei dari survei aktif.
+  - Melihat halaman Management operasional dalam mode read-only.
+  - Mengakses form publik dan halaman profil sendiri.
+
+Yang tidak boleh dilakukan:
+  - Menambah, mengubah, menghapus, atau mengaktifkan/menonaktifkan data
+    buku tamu, pertanyaan, opsi, respon survei, atau pertanyaan survei.
+  - Menghapus data kunjungan atau respon survei.
+  - Membuka Management Pengguna.
+  - Mengubah role atau data pengguna lain.
+
+Perilaku UI dan backend:
+  - Menu Management tetap terlihat, tetapi hanya berisi Buku Tamu dan Survei.
+  - Menu Data Pengguna tidak ditampilkan.
+  - Tombol tambah, edit, hapus, dan toggle disembunyikan di semua halaman
+    Management operasional.
+  - Request perubahan data secara langsung tetap ditolak oleh
+    admins.middleware dan diarahkan ke Statistik Buku Tamu.
+  - Halaman Management Pengguna juga menolak akses staff dan mengarahkan ke
+    Statistik Buku Tamu.
+
+
+6.3 ADMIN
+--------------------------------------------------------------------------------
+Tujuan:
+  Mengelola seluruh data operasional dan sebagian data pengguna.
+
+Yang boleh dilakukan:
+  - Semua akses yang dimiliki Staff.
+  - Menghapus data buku tamu.
+  - Menambah, mengubah, menghapus, dan mengaktifkan/menonaktifkan pertanyaan
+    serta opsi buku tamu.
+  - Menghapus respon survei.
+  - Menambah, mengubah, menghapus, dan mengaktifkan/menonaktifkan pertanyaan
+    serta opsi survei.
+  - Membuka halaman Management Pengguna.
+  - Menambah pengguna dengan role intern, staff, atau admin.
+  - Mengubah data pengguna ber-role intern, staff, atau admin lain.
+  - Menghapus pengguna ber-role intern/staff melalui backend.
+
+Yang tidak boleh dilakukan:
+  - Mengubah atau menghapus akun Superadmin.
+  - Mempromosikan pengguna menjadi Superadmin.
+  - Mengubah role pengguna menjadi Superadmin.
+  - Menghapus Admin lain.
+  - Menghapus akun sendiri.
+  - Mengubah data akun sendiri melalui Management Pengguna.
+  - Membuat Superadmin kedua.
+
+Perilaku UI dan backend:
+  - Seluruh tombol CRUD operasional ditampilkan.
+  - Menu Data Pengguna ditampilkan.
+  - Aksi terhadap Superadmin tidak ditampilkan di menu aksi.
+  - Backend EditUserAction dan DeleteUserAction tetap menolak perubahan atau
+    penghapusan Superadmin.
+  - Backend PromoteUserToSuperadminAction menolak Admin karena hanya
+    Superadmin yang boleh mempromosikan.
+  - Pada UI, tombol hapus pengguna hanya muncul untuk Superadmin. Backend
+    masih mengizinkan Admin menghapus user intern/staff jika request dikirim
+    langsung. Ini adalah catatan konsistensi UI dan backend, bukan izin untuk
+    menyentuh Superadmin.
+
+
+6.4 SUPERADMIN
+--------------------------------------------------------------------------------
+Tujuan:
+  Menjadi pemegang otoritas tertinggi dan penjaga keberlangsungan sistem.
+
+Yang boleh dilakukan:
+  - Semua akses dan CRUD operasional yang dimiliki Admin.
+  - Membuka halaman Management Pengguna.
+  - Menambah pengguna dengan role intern, staff, atau admin.
+  - Mengubah seluruh pengguna lain (intern, staff, admin), kecuali akun sendiri
+    melalui Management Pengguna.
+  - Menghapus pengguna ber-role admin, staff, atau intern.
+  - Mempromosikan pengguna ber-role admin menjadi Superadmin.
+  - Mengubah data akun sendiri melalui halaman Profil.
+
+Yang tidak boleh dilakukan:
+  - Membuat Superadmin kedua.
+  - Mengubah role pengguna menjadi Superadmin melalui form edit biasa.
+  - Menghapus akun Superadmin, termasuk akun sendiri.
+  - Menghapus atau mengubah akun sendiri melalui Management Pengguna.
+  - Menurunkan role Superadmin melalui form edit biasa.
+  - Mempromosikan pengguna yang bukan Admin melalui aksi promosi.
+
+Aturan promosi Superadmin:
+  - Hanya Superadmin yang dapat mempromosikan.
+  - Target harus ber-role Admin.
+  - Sistem harus memiliki tepat satu Superadmin sebelum promosi.
+  - Dalam satu transaksi:
+      1) target Admin diubah menjadi Superadmin;
+      2) Superadmin saat ini diubah menjadi Admin.
+  - Setelah promosi, pembuat aksi menjadi Admin dan target menjadi Superadmin.
+  - Jumlah Superadmin tetap 1.
+
+Catatan akun sendiri:
+  - Management Pengguna memblokir edit dan hapus akun sendiri.
+  - Perubahan nama, email, avatar, dan password akun sendiri dilakukan melalui
+    halaman Profil/Pengaturan.
+
+
+6.5 GUEST / BELUM LOGIN
+--------------------------------------------------------------------------------
+Yang boleh dilakukan:
+  - Membuka form buku tamu publik.
+  - Mengirim data buku tamu.
+  - Membuka form survei publik.
+  - Mengirim respon survei.
+  - Membuka halaman login.
+
+Yang tidak boleh dilakukan:
+  - Membuka dashboard.
+  - Membuka statistik.
+  - Membuka Management.
+  - Mengubah data apa pun melalui endpoint admin.
+
+Catatan:
+  - Login hanya untuk guest.
+  - Pengguna yang sudah login dapat logout.
+  - Semua role yang sudah login tetap dapat mengakses form publik seperti
+    pengunjung biasa.
+
+
+================================================================================
+7. ATURAN KHUSUS MANAJEMEN PENGGUNA
+================================================================================
+
+1. Hanya ada 1 Superadmin.
+   - CreateUserAction menolak pembuatan Superadmin jika sudah ada Superadmin.
+   - PromoteUserToSuperadminAction mensyaratkan jumlah Superadmin tepat 1.
+
+2. Admin tidak boleh menyentuh Superadmin.
+   - Admin tidak dapat mengedit data Superadmin.
+   - Admin tidak dapat menghapus Superadmin.
+   - Admin tidak dapat mempromosikan siapa pun menjadi Superadmin.
+   - Menu aksi pada baris Superadmin tidak ditampilkan untuk Admin.
+
+3. Superadmin tidak boleh membuat Superadmin kedua.
+   - Form create di UI hanya menampilkan role intern, staff, dan admin.
+   - Backend tetap menolak role superadmin jika sudah ada Superadmin.
+
+4. Promosi Admin menukar role.
+   - Target Admin menjadi Superadmin.
+   - Superadmin saat ini menjadi Admin.
+   - Proses dilakukan dalam transaksi database.
+
+5. Superadmin tidak dapat diturunkan lewat edit biasa.
+   - EditUserAction menolak perubahan role Superadmin menjadi role lain.
+   - Perubahan role Superadmin hanya terjadi melalui aksi promosi yang
+     menukar posisi Superadmin.
+
+6. Tidak ada penghapusan Superadmin.
+   - DeleteUserAction menolak penghapusan akun ber-role Superadmin.
+   - Superadmin juga tidak dapat menghapus akun sendiri.
+
+7. Tidak ada edit/hapus akun sendiri melalui Management Pengguna.
+   - EditUserAction dan DeleteUserAction memblokir aksi terhadap akun sendiri.
+   - Gunakan halaman Profil untuk memperbarui data akun sendiri.
+
+8. Role yang dapat dibuat melalui UI:
+   - intern
+   - staff
+   - admin
+   Superadmin tidak disediakan di form create.
+
+9. Role yang dapat diubah melalui form edit:
+   - intern
+   - staff
+   - admin
+   Superadmin tidak disediakan di form edit.
+
+
+================================================================================
+8. RINGKASAN CEPAT
+================================================================================
+
++----------------------+--------+--------+--------+------------+
+| Kemampuan            | Intern | Staff  | Admin  | Superadmin |
++----------------------+--------+--------+--------+------------+
+| Statistik            | Ya     | Ya     | Ya     | Ya         |
+| Management           | Tidak  | Baca   | CRUD*  | CRUD*      |
+| User Management      | Tidak  | Tidak  | Ya**   | Ya**       |
+| CRUD operasional     | Tidak  | Tidak  | Ya     | Ya         |
+| Promosi Superadmin   | Tidak  | Tidak  | Tidak  | Ya         |
++----------------------+--------+--------+--------+------------+
+
+*  CRUD sesuai resource: Buku Tamu dan Respon Survei hanya baca + hapus;
+   pertanyaan dan opsi memiliki create/update/delete/toggle.
+** Dengan aturan khusus pada bagian 7.
+
+Inti pembagian akses:
+  - Intern  : statistik saja.
+  - Staff   : statistik + baca Management operasional.
+  - Admin   : statistik + CRUD operasional + user management terbatas.
+  - Superadmin: seluruh akses, dengan aturan tunggal Superadmin.
+
+
+================================================================================
+9. CATATAN IMPLEMENTASI
+================================================================================
+
+- Role disimpan sebagai string, bukan enum database. Nilai yang sah saat ini
+  adalah intern, staff, admin, dan superadmin.
+- Frontend menormalkan role menjadi huruf kecil sebelum memeriksa hak akses.
+- Penyembunyian menu dan tombol dilakukan di frontend, tetapi keputusan akhir
+  tetap berada di backend melalui middleware dan action.
+- Halaman statistik tidak memiliki tombol CRUD. Semua CRUD berada di menu
+  Management.
+- Management Pengguna adalah pengecualian dari pola read-only staff: halaman
+  ini hanya untuk Admin dan Superadmin.
+- Middleware super-admin khusus belum digunakan pada route; aturan Superadmin
+  saat ini ditegakkan melalui action dan pengecekan role di controller/action.
+- Jika aturan role berubah, perbarui minimal:
+    1) routes/web.php
+    2) middleware dan alias di bootstrap/app.php
+    3) method role di app/Models/User.php
+    4) hook useUserRole di frontend
+    5) test akses role di tests/Feature
+================================================================================

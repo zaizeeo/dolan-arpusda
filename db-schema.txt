@@ -1,0 +1,223 @@
+// ============================================================================
+// DBML SCHEMA - DOLAN ARPUSDA
+// Sumber: database/migrations/*.php
+// Database: MySQL
+// Tanggal: 22 Oktober 2026
+// ============================================================================
+//
+// Catatan tipe dan relasi:
+// - Kolom id pada tabel domain memakai string/varchar karena UUID dibuat
+//   aplikasi melalui trait HasUuids.
+// - foreignUuid di MySQL menjadi char(36). Beberapa kolom foreignUuid mengarah
+//   ke id varchar; migration tidak membuat foreign key constraint untuk kolom
+//   tersebut. Relasi tetap digambarkan sebagai Ref logis.
+// - Tabel infrastruktur Laravel yang dikecualikan dari diagram: cache,
+//   cache_locks, jobs, job_batches, failed_jobs, sessions, dan
+//   password_reset_tokens.
+// - deleted_at menandakan soft delete.
+// - Semua timestamp dari timestamps() bersifat nullable.
+// - Tabel migrations dibuat otomatis oleh Laravel dan tidak didefinisikan di
+//   file migration, sehingga tidak disertakan dalam diagram ini.
+// ============================================================================
+
+Project dolan_arpusda {
+  database_type: 'MySQL'
+  Note: 'Skema database aplikasi Dolan Arpusda berdasarkan migration Laravel.'
+}
+
+// ============================================================================
+// DOMAIN APLIKASI
+// ============================================================================
+
+Table users {
+  id varchar [pk, note: 'UUID aplikasi (HasUuids), disimpan sebagai varchar(255)']
+  name varchar [not null]
+  email varchar [not null, unique]
+  email_verified_at timestamp
+  password varchar [not null]
+  avatar varchar [not null, note: 'URL atau path avatar pengguna']
+  role varchar [not null, note: 'Nilai: intern, staff, admin, superadmin']
+  remember_token varchar
+  deleted_at timestamp
+  created_at timestamp
+  updated_at timestamp
+
+  Note: 'Soft delete. Role disimpan sebagai string, bukan enum database.'
+}
+
+Table guest_books {
+  id varchar [pk, note: 'UUID aplikasi']
+  deleted_at timestamp
+  created_at timestamp
+  updated_at timestamp
+
+  Note: 'Data kunjungan buku tamu. Soft delete.'
+}
+
+Table guest_book_questions {
+  id varchar [pk, note: 'UUID aplikasi']
+  label varchar [not null]
+  description varchar
+  is_active boolean [not null, default: true]
+  sequence_number integer
+  deleted_at timestamp
+  created_at timestamp
+  updated_at timestamp
+
+  indexes {
+    label
+  }
+
+  Note: 'Pertanyaan formulir buku tamu. Soft delete.'
+}
+
+Table guest_book_question_options {
+  id varchar [pk, note: 'UUID aplikasi']
+  guest_book_question_id uuid [not null, note: 'Relasi logis ke guest_book_questions.id; tipe berbeda dan tanpa FK constraint']
+  label varchar [not null]
+  description varchar
+  is_active boolean [not null, default: true]
+  is_allow_custom_text boolean [not null, default: false]
+  sequence_number integer
+  deleted_at timestamp
+  created_at timestamp
+  updated_at timestamp
+
+  indexes {
+    label
+  }
+
+  Note: 'Opsi jawaban pertanyaan buku tamu. Soft delete.'
+}
+
+Table guest_book_answers {
+  id varchar [pk, note: 'UUID aplikasi']
+  guest_book_id uuid [not null, note: 'Relasi logis ke guest_books.id; tipe berbeda dan tanpa FK constraint']
+  guest_book_question_id uuid [not null, note: 'Relasi logis ke guest_book_questions.id; tipe berbeda dan tanpa FK constraint']
+  guest_book_question_option_id uuid [note: 'Ditambahkan lewat migration 2026_10_16_024750; nullable; tanpa FK constraint']
+  custom_text text
+  deleted_at timestamp
+  created_at timestamp
+  updated_at timestamp
+
+  indexes {
+    (guest_book_id, guest_book_question_id) [unique]
+  }
+
+  Note: 'Jawaban buku tamu. Unik per kombinasi guest_book dan question. Berfungsi seperti pivot dengan atribut.'
+}
+
+Table surveys {
+  id varchar [pk, note: 'UUID aplikasi']
+  title varchar [not null]
+  description text
+  is_active boolean [not null, default: true]
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+
+  Note: 'Survei. Soft delete. Tidak ada fitur CRUD entitas survei di aplikasi saat ini.'
+}
+
+Table survey_questions {
+  id varchar [pk, note: 'UUID aplikasi']
+  survey_id varchar [not null, note: 'FK ke surveys.id; cascade delete']
+  label varchar [not null]
+  description varchar
+  is_active boolean [not null, default: true]
+  sequence_number integer
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+
+  indexes {
+    label
+  }
+
+  Note: 'Pertanyaan survei. Soft delete.'
+}
+
+Table survey_question_options {
+  id varchar [pk, note: 'UUID aplikasi']
+  survey_question_id varchar [not null, note: 'FK ke survey_questions.id; cascade delete']
+  label varchar [not null]
+  description varchar
+  is_active boolean [not null, default: true]
+  is_allow_custom_text boolean [not null, default: false]
+  sequence_number integer
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+
+  indexes {
+    label
+  }
+
+  Note: 'Opsi jawaban pertanyaan survei. Soft delete.'
+}
+
+Table survey_responses {
+  id varchar [pk, note: 'UUID aplikasi']
+  survey_id varchar [not null, note: 'FK ke surveys.id; cascade delete']
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+
+  indexes {
+    (survey_id, created_at)
+  }
+
+  Note: 'Respon survei. Soft delete.'
+}
+
+Table survey_answers {
+  id varchar [pk, note: 'UUID aplikasi']
+  survey_response_id varchar [not null, note: 'FK ke survey_responses.id; cascade delete']
+  survey_question_id varchar [not null, note: 'FK ke survey_questions.id']
+  survey_question_option_id varchar [note: 'FK ke survey_question_options.id; nullable']
+  custom_text text
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+
+  indexes {
+    (survey_response_id, survey_question_id) [unique]
+    survey_question_id
+    survey_question_option_id
+  }
+
+  Note: 'Jawaban survei. Unik per kombinasi survey_response dan survey_question.'
+}
+
+// ============================================================================
+// RELASI DOMAIN APLIKASI
+// ============================================================================
+
+// Relasi buku tamu.
+// guest_book_answers dan guest_book_question_options menggunakan foreignUuid,
+// sedangkan id tujuan berupa varchar. Migration tidak membuat FK constraint.
+Ref: guest_book_answers.guest_book_id > guest_books.id
+Ref: guest_book_answers.guest_book_question_id > guest_book_questions.id
+Ref: guest_book_answers.guest_book_question_option_id > guest_book_question_options.id
+Ref: guest_book_question_options.guest_book_question_id > guest_book_questions.id
+
+// Relasi survei dengan foreign key constraint.
+Ref: survey_questions.survey_id > surveys.id [delete: cascade]
+Ref: survey_question_options.survey_question_id > survey_questions.id [delete: cascade]
+Ref: survey_responses.survey_id > surveys.id [delete: cascade]
+Ref: survey_answers.survey_response_id > survey_responses.id [delete: cascade]
+Ref: survey_answers.survey_question_id > survey_questions.id
+Ref: survey_answers.survey_question_option_id > survey_question_options.id
+
+// ============================================================================
+// CONTOH DATA ROLE (BUKAN BAGIAN DARI MIGRATION)
+// ============================================================================
+// Records ini hanya untuk membantu visualisasi role di dbdiagram.io.
+// Hapus bagian ini jika hanya ingin menampilkan skema kosong.
+
+Records users(id, name, email, role) {
+  'contoh-superadmin', 'Superadmin', 'superadmin@superadmin.com', 'superadmin'
+  'contoh-admin', 'Admin', 'admin@admin.com', 'admin'
+  'contoh-staff', 'Staff', 'staff@staff.com', 'staff'
+  'contoh-intern', 'Intern', 'intern@intern.com', 'intern'
+}
