@@ -14,13 +14,20 @@ import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useUserRole } from "@/lib/hooks/use-user-role";
 import { resolveInertiaErrorMessage } from "@/lib/inertia-errors";
-import { toggleGuestBookQuestionActive, toggleGuestBookQuestionOptionActive } from "@/routes";
+import {
+    moveGuestBookQuestionOptionSequence,
+    moveGuestBookQuestionSequence,
+    toggleGuestBookQuestionActive,
+    toggleGuestBookQuestionOptionActive,
+} from "@/routes";
 import { User } from "@/types";
 import { GuestBookQuestion, GuestBookQuestionOption } from "@/types/guest-book";
 import { PageProps } from "@/types/page-props";
 import { VisitHelperOptions } from "@inertiajs/core";
 import { router } from "@inertiajs/react";
 import {
+    ArrowDown,
+    ArrowUp,
     CheckCircle2,
     CircleDot,
     FileQuestion,
@@ -59,6 +66,7 @@ export default function GuestBookQuestionManagement({ auth, questions = [] }: Pr
     const [optionFormTarget, setOptionFormTarget] = useState<OptionFormTarget | null>(null);
     const [deletingOption, setDeletingOption] = useState<OptionDeleteTarget | null>(null);
     const [pendingToggleKey, setPendingToggleKey] = useState<string | null>(null);
+    const [pendingMoveKey, setPendingMoveKey] = useState<string | null>(null);
 
     const totalQuestions = questions.length;
     const activeQuestions = questions.filter((question) => question.is_active).length;
@@ -112,6 +120,56 @@ export default function GuestBookQuestionManagement({ auth, questions = [] }: Pr
         } satisfies VisitHelperOptions;
 
         router.patch(toggleGuestBookQuestionOptionActive.url(option.id), {}, requestOptions);
+    };
+
+    const moveQuestion = (question: GuestBookQuestion, direction: "up" | "down") => {
+        if (pendingMoveKey !== null) {
+            return;
+        }
+
+        setPendingMoveKey(`question-${question.id}`);
+
+        const requestOptions = {
+            preserveScroll: true,
+            onSuccess: () => {
+                toast.success("Berhasil", {
+                    description: "Urutan pertanyaan berhasil diperbarui.",
+                });
+            },
+            onError: (error) => {
+                toast.error("Terjadi Kesalahan!", {
+                    description: resolveInertiaErrorMessage(error as Record<string, unknown>),
+                });
+            },
+            onFinish: () => setPendingMoveKey(null),
+        } satisfies VisitHelperOptions;
+
+        router.patch(moveGuestBookQuestionSequence.url(question.id), { direction }, requestOptions);
+    };
+
+    const moveOption = (option: GuestBookQuestionOption, direction: "up" | "down") => {
+        if (pendingMoveKey !== null) {
+            return;
+        }
+
+        setPendingMoveKey(`option-${option.id}`);
+
+        const requestOptions = {
+            preserveScroll: true,
+            onSuccess: () => {
+                toast.success("Berhasil", {
+                    description: "Urutan pilihan jawaban berhasil diperbarui.",
+                });
+            },
+            onError: (error) => {
+                toast.error("Terjadi Kesalahan!", {
+                    description: resolveInertiaErrorMessage(error as Record<string, unknown>),
+                });
+            },
+            onFinish: () => setPendingMoveKey(null),
+        } satisfies VisitHelperOptions;
+
+        router.patch(moveGuestBookQuestionOptionSequence.url(option.id), { direction }, requestOptions);
     };
 
     return (
@@ -238,7 +296,7 @@ export default function GuestBookQuestionManagement({ auth, questions = [] }: Pr
 
                                                 {/* Question Actions */}
                                                 {hasAdminsAuthority && (
-                                                    <div className="flex items-center gap-1.5 self-end sm:self-start">
+                                                    <div className="flex flex-wrap items-center gap-1.5 self-end sm:self-start">
                                                         <Button
                                                             variant="outline"
                                                             size="sm"
@@ -247,6 +305,28 @@ export default function GuestBookQuestionManagement({ auth, questions = [] }: Pr
                                                         >
                                                             <ListPlus className="size-3.5" />
                                                             <span>Tambah Opsi</span>
+                                                        </Button>
+
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon-sm"
+                                                            title="Pindahkan ke atas"
+                                                            aria-label={`Pindahkan pertanyaan ${question.label} ke atas`}
+                                                            disabled={questionIndex === 0 || pendingMoveKey !== null}
+                                                            onClick={() => moveQuestion(question, "up")}
+                                                        >
+                                                            <ArrowUp className="size-3.5" />
+                                                        </Button>
+
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon-sm"
+                                                            title="Pindahkan ke bawah"
+                                                            aria-label={`Pindahkan pertanyaan ${question.label} ke bawah`}
+                                                            disabled={questionIndex === questions.length - 1 || pendingMoveKey !== null}
+                                                            onClick={() => moveQuestion(question, "down")}
+                                                        >
+                                                            <ArrowDown className="size-3.5" />
                                                         </Button>
 
                                                         <Button
@@ -327,7 +407,7 @@ export default function GuestBookQuestionManagement({ auth, questions = [] }: Pr
 
                                                 {hasOptions ? (
                                                     <div className="flex flex-col gap-2">
-                                                        {options.map((option) => {
+                                                        {options.map((option, optionIndex) => {
                                                             const isTogglingOption = pendingToggleKey === `option-${option.id}`;
 
                                                             return (
@@ -366,6 +446,39 @@ export default function GuestBookQuestionManagement({ auth, questions = [] }: Pr
                                                                     {/* Option Row Action Buttons */}
                                                                     {hasAdminsAuthority && (
                                                                         <div className="flex items-center gap-1 self-end sm:self-auto sm:opacity-90 sm:group-hover:opacity-100">
+                                                                            <Tooltip>
+                                                                                <TooltipTrigger asChild>
+                                                                                    <Button
+                                                                                        variant="ghost"
+                                                                                        size="icon-sm"
+                                                                                        aria-label={`Pindahkan pilihan ${option.label} ke atas`}
+                                                                                        disabled={optionIndex === 0 || pendingMoveKey !== null}
+                                                                                        onClick={() => moveOption(option, "up")}
+                                                                                    >
+                                                                                        <ArrowUp className="size-3.5 text-muted-foreground" />
+                                                                                    </Button>
+                                                                                </TooltipTrigger>
+                                                                                <TooltipContent side="top">Pindahkan ke Atas</TooltipContent>
+                                                                            </Tooltip>
+
+                                                                            <Tooltip>
+                                                                                <TooltipTrigger asChild>
+                                                                                    <Button
+                                                                                        variant="ghost"
+                                                                                        size="icon-sm"
+                                                                                        aria-label={`Pindahkan pilihan ${option.label} ke bawah`}
+                                                                                        disabled={
+                                                                                            optionIndex === options.length - 1 ||
+                                                                                            pendingMoveKey !== null
+                                                                                        }
+                                                                                        onClick={() => moveOption(option, "down")}
+                                                                                    >
+                                                                                        <ArrowDown className="size-3.5 text-muted-foreground" />
+                                                                                    </Button>
+                                                                                </TooltipTrigger>
+                                                                                <TooltipContent side="top">Pindahkan ke Bawah</TooltipContent>
+                                                                            </Tooltip>
+
                                                                             <Tooltip>
                                                                                 <TooltipTrigger asChild>
                                                                                     <Button

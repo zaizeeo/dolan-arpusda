@@ -10,20 +10,30 @@ use App\Actions\GuestBook\Questions\ToggleQuestionActiveAction;
 use App\Actions\GuestBook\Questions\ToggleQuestionOptionActiveAction;
 use App\Actions\GuestBook\Questions\UpdateQuestionAction;
 use App\Actions\GuestBook\Questions\UpdateQuestionOptionAction;
+use App\Actions\SwapSequenceAction;
 use App\Http\Requests\GuestBook\Questions\CreateQuestionOptionRequest;
 use App\Http\Requests\GuestBook\Questions\CreateQuestionRequest;
 use App\Http\Requests\GuestBook\Questions\UpdateQuestionOptionRequest;
 use App\Http\Requests\GuestBook\Questions\UpdateQuestionRequest;
+use App\Http\Requests\MoveSequenceRequest;
 use App\Models\GuestBookQuestion;
 use App\Models\GuestBookQuestionOption;
+use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 
 class GuestBookQuestionController extends Controller
 {
     public function index()
     {
-        $questions = GuestBookQuestion::with(['options' => fn ($query) => $query->orderBy('sequence_number', 'asc')])
-            ->orderBy('sequence_number', 'asc')
+        $questions = GuestBookQuestion::with([
+            'options' => fn ($query) => $query
+                ->orderBy('sequence_number')
+                ->orderBy('created_at')
+                ->orderBy('id'),
+        ])
+            ->orderBy('sequence_number')
+            ->orderBy('created_at')
+            ->orderBy('id')
             ->get();
 
         return Inertia::render('dashboard/management/guest-book/question', ['questions' => $questions]);
@@ -57,6 +67,13 @@ class GuestBookQuestionController extends Controller
         return redirect()->back();
     }
 
+    public function moveSequence(MoveSequenceRequest $request, GuestBookQuestion $guestBookQuestion, SwapSequenceAction $action): RedirectResponse
+    {
+        $action->execute($guestBookQuestion, (string) $request->validated('direction'));
+
+        return redirect()->back();
+    }
+
     public function createOption(CreateQuestionOptionRequest $request, GuestBookQuestion $guestBookQuestion, CreateQuestionOptionAction $action)
     {
         $action->execute($guestBookQuestion, $request->validated());
@@ -81,6 +98,17 @@ class GuestBookQuestionController extends Controller
     public function toggleOptionActive(GuestBookQuestionOption $guestBookQuestionOption, ToggleQuestionOptionActiveAction $action)
     {
         $action->execute($guestBookQuestionOption);
+
+        return redirect()->back();
+    }
+
+    public function moveOptionSequence(MoveSequenceRequest $request, GuestBookQuestionOption $guestBookQuestionOption, SwapSequenceAction $action): RedirectResponse
+    {
+        $action->execute(
+            $guestBookQuestionOption,
+            (string) $request->validated('direction'),
+            'guest_book_question_id'
+        );
 
         return redirect()->back();
     }
