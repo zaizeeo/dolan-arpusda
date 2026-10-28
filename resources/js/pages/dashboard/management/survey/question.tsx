@@ -11,7 +11,7 @@ import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/
 import { Separator } from "@/components/ui/separator";
 import { useUserRole } from "@/lib/hooks/use-user-role";
 import { resolveInertiaErrorMessage } from "@/lib/inertia-errors";
-import { toggleSurveyQuestionActive, toggleSurveyQuestionOptionActive } from "@/routes";
+import { moveSurveyQuestionOptionSequence, moveSurveyQuestionSequence, toggleSurveyQuestionActive, toggleSurveyQuestionOptionActive } from "@/routes";
 import survey from "@/routes/survey";
 import { User } from "@/types";
 import { PageProps } from "@/types/page-props";
@@ -19,6 +19,8 @@ import type { SurveyQuestion, SurveyQuestionOption } from "@/types/survey";
 import { router, type VisitHelperOptions } from "@inertiajs/core";
 import { Link } from "@inertiajs/react";
 import {
+    ArrowDown,
+    ArrowUp,
     CheckCircle2,
     CircleDot,
     ClipboardList,
@@ -65,6 +67,7 @@ export default function SurveyQuestionManagement({ auth, survey: activeSurvey, q
     const [optionFormTarget, setOptionFormTarget] = useState<OptionFormTarget | null>(null);
     const [deletingOption, setDeletingOption] = useState<OptionDeleteTarget | null>(null);
     const [pendingToggleKey, setPendingToggleKey] = useState<string | null>(null);
+    const [pendingMoveKey, setPendingMoveKey] = useState<string | null>(null);
 
     const totalQuestions = questions.length;
     const activeQuestions = questions.filter((question) => question.is_active).length;
@@ -118,6 +121,56 @@ export default function SurveyQuestionManagement({ auth, survey: activeSurvey, q
         } satisfies VisitHelperOptions;
 
         router.patch(toggleSurveyQuestionOptionActive.url(option.id), {}, requestOptions);
+    };
+
+    const moveQuestion = (question: SurveyQuestion, direction: "up" | "down") => {
+        if (pendingMoveKey !== null) {
+            return;
+        }
+
+        setPendingMoveKey(`question-${question.id}`);
+
+        const requestOptions = {
+            preserveScroll: true,
+            onSuccess: () => {
+                toast.success("Berhasil", {
+                    description: "Urutan pertanyaan berhasil diperbarui.",
+                });
+            },
+            onError: (error) => {
+                toast.error("Terjadi Kesalahan!", {
+                    description: resolveInertiaErrorMessage(error as Record<string, unknown>),
+                });
+            },
+            onFinish: () => setPendingMoveKey(null),
+        } satisfies VisitHelperOptions;
+
+        router.patch(moveSurveyQuestionSequence.url(question.id), { direction }, requestOptions);
+    };
+
+    const moveOption = (option: SurveyQuestionOption, direction: "up" | "down") => {
+        if (pendingMoveKey !== null) {
+            return;
+        }
+
+        setPendingMoveKey(`option-${option.id}`);
+
+        const requestOptions = {
+            preserveScroll: true,
+            onSuccess: () => {
+                toast.success("Berhasil", {
+                    description: "Urutan pilihan jawaban berhasil diperbarui.",
+                });
+            },
+            onError: (error) => {
+                toast.error("Terjadi Kesalahan!", {
+                    description: resolveInertiaErrorMessage(error as Record<string, unknown>),
+                });
+            },
+            onFinish: () => setPendingMoveKey(null),
+        } satisfies VisitHelperOptions;
+
+        router.patch(moveSurveyQuestionOptionSequence.url(option.id), { direction }, requestOptions);
     };
 
     return (
@@ -275,6 +328,28 @@ export default function SurveyQuestionManagement({ auth, survey: activeSurvey, q
                                                     <Button
                                                         variant="ghost"
                                                         size="icon-sm"
+                                                        title="Pindahkan ke atas"
+                                                        aria-label={`Pindahkan pertanyaan ${question.label} ke atas`}
+                                                        disabled={questionIndex === 0 || pendingMoveKey !== null}
+                                                        onClick={() => moveQuestion(question, "up")}
+                                                    >
+                                                        <ArrowUp className="size-3.5" />
+                                                    </Button>
+
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon-sm"
+                                                        title="Pindahkan ke bawah"
+                                                        aria-label={`Pindahkan pertanyaan ${question.label} ke bawah`}
+                                                        disabled={questionIndex === questions.length - 1 || pendingMoveKey !== null}
+                                                        onClick={() => moveQuestion(question, "down")}
+                                                    >
+                                                        <ArrowDown className="size-3.5" />
+                                                    </Button>
+
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon-sm"
                                                         title="Edit pertanyaan"
                                                         aria-label={`Edit pertanyaan ${question.label}`}
                                                         onClick={() => setEditingQuestion(question)}
@@ -329,7 +404,7 @@ export default function SurveyQuestionManagement({ auth, survey: activeSurvey, q
 
                                             {hasOptions ? (
                                                 <div className="flex flex-col gap-2">
-                                                    {options.map((option) => {
+                                                    {options.map((option, optionIndex) => {
                                                         const isTogglingOption = pendingToggleKey === `option-${option.id}`;
 
                                                         return (
@@ -365,6 +440,28 @@ export default function SurveyQuestionManagement({ auth, survey: activeSurvey, q
 
                                                                 {hasAdminsAuthority && (
                                                                     <div className="flex items-center gap-1 self-end sm:self-auto">
+                                                                        <Button
+                                                                            variant="ghost"
+                                                                            size="icon-sm"
+                                                                            title="Pindahkan ke atas"
+                                                                            aria-label={`Pindahkan pilihan ${option.label} ke atas`}
+                                                                            disabled={optionIndex === 0 || pendingMoveKey !== null}
+                                                                            onClick={() => moveOption(option, "up")}
+                                                                        >
+                                                                            <ArrowUp className="size-3.5 text-muted-foreground" />
+                                                                        </Button>
+
+                                                                        <Button
+                                                                            variant="ghost"
+                                                                            size="icon-sm"
+                                                                            title="Pindahkan ke bawah"
+                                                                            aria-label={`Pindahkan pilihan ${option.label} ke bawah`}
+                                                                            disabled={optionIndex === options.length - 1 || pendingMoveKey !== null}
+                                                                            onClick={() => moveOption(option, "down")}
+                                                                        >
+                                                                            <ArrowDown className="size-3.5 text-muted-foreground" />
+                                                                        </Button>
+
                                                                         <Button
                                                                             variant="ghost"
                                                                             size="icon-sm"

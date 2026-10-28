@@ -10,6 +10,8 @@ use App\Actions\Survey\Questions\ToggleSurveyQuestionActiveAction;
 use App\Actions\Survey\Questions\ToggleSurveyQuestionOptionActiveAction;
 use App\Actions\Survey\Questions\UpdateSurveyQuestionAction;
 use App\Actions\Survey\Questions\UpdateSurveyQuestionOptionAction;
+use App\Actions\SwapSequenceAction;
+use App\Http\Requests\MoveSequenceRequest;
 use App\Http\Requests\Survey\Questions\CreateSurveyQuestionOptionRequest;
 use App\Http\Requests\Survey\Questions\CreateSurveyQuestionRequest;
 use App\Http\Requests\Survey\Questions\UpdateSurveyQuestionOptionRequest;
@@ -38,8 +40,15 @@ class SurveyQuestionController extends Controller
         }
 
         $questions = $survey->questions()
-            ->with(['options' => fn ($query) => $query->orderBy('sequence_number', 'asc')])
-            ->orderBy('sequence_number', 'asc')
+            ->with([
+                'options' => fn ($query) => $query
+                    ->orderBy('sequence_number')
+                    ->orderBy('created_at')
+                    ->orderBy('id'),
+            ])
+            ->orderBy('sequence_number')
+            ->orderBy('created_at')
+            ->orderBy('id')
             ->get();
 
         return Inertia::render('dashboard/management/survey/question', [
@@ -82,6 +91,17 @@ class SurveyQuestionController extends Controller
         return redirect()->back();
     }
 
+    public function moveSequence(MoveSequenceRequest $request, SurveyQuestion $surveyQuestion, SwapSequenceAction $action): RedirectResponse
+    {
+        $action->execute(
+            $surveyQuestion,
+            (string) $request->validated('direction'),
+            'survey_id'
+        );
+
+        return redirect()->back();
+    }
+
     public function createOption(CreateSurveyQuestionOptionRequest $request, SurveyQuestion $surveyQuestion, CreateSurveyQuestionOptionAction $action): RedirectResponse
     {
         $action->execute($surveyQuestion, $request->validated());
@@ -106,6 +126,17 @@ class SurveyQuestionController extends Controller
     public function toggleOptionActive(SurveyQuestionOption $surveyQuestionOption, ToggleSurveyQuestionOptionActiveAction $action): RedirectResponse
     {
         $action->execute($surveyQuestionOption);
+
+        return redirect()->back();
+    }
+
+    public function moveOptionSequence(MoveSequenceRequest $request, SurveyQuestionOption $surveyQuestionOption, SwapSequenceAction $action): RedirectResponse
+    {
+        $action->execute(
+            $surveyQuestionOption,
+            (string) $request->validated('direction'),
+            'survey_question_id'
+        );
 
         return redirect()->back();
     }
