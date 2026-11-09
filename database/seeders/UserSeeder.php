@@ -25,18 +25,18 @@ class UserSeeder extends Seeder
                 'avatar' => config('app.ui_avatar') . "Admin",
                 'email' => 'admin@admin.com',
             ],
-            [
-                'role' => 'staff',
-                'name' => 'Staff',
-                'avatar' => config('app.ui_avatar') . "Staff",
-                'email' => 'staff@staff.com',
-            ],
-            [
-                'role' => 'intern',
-                'name' => 'Intern',
-                'avatar' => config('app.ui_avatar') . "Staff",
-                'email' => 'intern@intern.com',
-            ],
+            // [
+            //     'role' => 'staff',
+            //     'name' => 'Staff',
+            //     'avatar' => config('app.ui_avatar') . "Staff",
+            //     'email' => 'staff@staff.com',
+            // ],
+            // [
+            //     'role' => 'intern',
+            //     'name' => 'Intern',
+            //     'avatar' => config('app.ui_avatar') . "Staff",
+            //     'email' => 'intern@intern.com',
+            // ],
         )->create();
     }
 }

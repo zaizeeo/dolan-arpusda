@@ -14,7 +14,7 @@ Route::get('/', [GuestBookController::class, 'showGuestBookForm'])->name('home-p
 
 Route::get('/survey', [SurveyController::class, 'show'])->name('survey.show');
 
-Route::get('/auth', [AuthController::class, 'showAuthPage'])->middleware('guest.middleware')->name('login');
+Route::get('/login', [AuthController::class, 'showAuthPage'])->middleware('guest.middleware')->name('login');
 
 Route::prefix('/_api')->group(function () {
     Route::prefix('/auth')->group(function () {
