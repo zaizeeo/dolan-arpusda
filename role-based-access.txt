@@ -98,7 +98,7 @@ Keterangan:
 +------------------------------------------+--------+--------+--------+-------------+-------------+
 | Form Buku Tamu publik (/)                | Ya     | Ya     | Ya     | Ya          | Ya          |
 | Form Survei publik (/survey)             | Ya     | Ya     | Ya     | Ya          | Ya          |
-| Halaman login (/auth)                    | Ya     | -      | -      | -           | -           |
+| Halaman login (/login)                    | Ya     | -      | -      | -           | -           |
 | Logout                                   | -      | Ya     | Ya     | Ya          | Ya          |
 | Profil sendiri (/dashboard/profile)      | Tidak  | Ya     | Ya     | Ya          | Ya          |
 | Edit profil sendiri                      | Tidak  | Ya     | Ya     | Ya          | Ya          |
