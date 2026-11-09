@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\GuestBook\CreateGuestBookAction;
+use App\Actions\Survey\GetPublicSurveyAction;
 use App\Http\Requests\GuestBook\CreateGuestBookRequest;
 use App\Models\GuestBook;
 use App\Models\GuestBookQuestion;
@@ -66,14 +67,17 @@ class GuestBookController extends Controller
         ]);
     }
 
-    public function showGuestBookForm(): Response
+    public function showGuestBookForm(GetPublicSurveyAction $getPublicSurvey): Response
     {
         $activeQuestions = GuestBookQuestion::where('is_active', true)
             ->orderBy('sequence_number', 'asc')
             ->with(['options' => fn ($query) => $query->where('is_active', true)->orderBy('sequence_number', 'asc')])
             ->get();
 
-        return Inertia::render('home-page', compact('activeQuestions'));
+        return Inertia::render('home-page', [
+            'activeQuestions' => $activeQuestions,
+            'survey' => $getPublicSurvey->execute(),
+        ]);
     }
 
     /**
