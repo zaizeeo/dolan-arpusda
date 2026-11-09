@@ -44,21 +44,19 @@ interface PublicFormLayoutProps {
 
 const PublicFormLayout = ({
     children,
-    activeForm,
     badge,
     badgeIcon: BadgeIcon,
-    title,
     description,
     footerDescription = "Sistem Informasi Buku Tamu Digital Jeta Arsip.",
 }: PublicFormLayoutProps) => {
     const { auth } = usePage<PageProps>().props;
 
     return (
-        <div className="min-h-screen bg-muted/20 pb-16">
-            <header className="sticky top-0 z-10 border-b border-border bg-background/95 backdrop-blur-sm">
-                <div className="mx-auto flex max-w-4xl flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-                    <div className="flex items-center gap-3">
-                        <img src="/images/logo-banyumas.png" alt="Logo Kabupaten Banyumas" className="size-9 object-contain" />
+        <div className="min-h-screen bg-muted/20 pb-16 lg:flex lg:h-dvh lg:flex-col lg:overflow-hidden lg:pb-0">
+            <header className="sticky top-0 z-10 shrink-0 border-b border-border bg-background/95 backdrop-blur-sm">
+                <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:py-1">
+                    <div className="flex items-center gap-2">
+                        <img src="/images/logo-banyumas.png" alt="Logo Kabupaten Banyumas" className="size-9 object-contain lg:size-8" />
                         <div className="flex flex-col">
                             <span className="text-sm font-bold tracking-tight text-foreground">Jeta Arsip</span>
                             <span className="text-xs text-muted-foreground">Kabupaten Banyumas</span>
@@ -85,21 +83,21 @@ const PublicFormLayout = ({
                 </div>
             </header>
 
-            <main className="mx-auto max-w-3xl px-4 pt-8 sm:px-6">
-                <div className="mb-6 text-center">
-                    <span className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground">
+            <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 pt-8 pb-16 sm:px-6 lg:min-h-0 lg:pt-2 lg:pb-0">
+                <div className="mb-6 shrink-0 text-center lg:mb-1">
+                    <span className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground lg:hidden">
                         {BadgeIcon ? <BadgeIcon className="size-3.5 text-primary" /> : null}
                         {badge}
                     </span>
-                    <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">{title}</h1>
-                    <p className="mt-2 text-sm text-muted-foreground sm:text-base">{description}</p>
+                    {/* <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl lg:text-base">{title}</h1> */}
+                    <p className="mt-2 text-sm text-muted-foreground sm:text-base lg:hidden">{description}</p>
                 </div>
 
-                {children}
+                <div className="min-w-0 lg:flex lg:min-h-0 lg:flex-1 lg:flex-col">{children}</div>
 
-                <footer className="mt-12 text-center text-xs text-muted-foreground">
+                <footer className="mt-12 text-center text-xs text-muted-foreground lg:mt-auto lg:flex lg:items-center lg:justify-center lg:gap-1.5 lg:pt-1">
                     <p>© {new Date().getFullYear()} Dinas Arsip dan Perpustakaan Daerah Kabupaten Banyumas.</p>
-                    <p className="mt-1">{footerDescription}</p>
+                    <p className="mt-1 lg:mt-0">{footerDescription}</p>
                 </footer>
             </main>
         </div>
