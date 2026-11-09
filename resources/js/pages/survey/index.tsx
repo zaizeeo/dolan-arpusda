@@ -65,17 +65,17 @@ const SurveyPage = ({ survey }: Props) => {
                     </CardHeader>
                 </Card>
             ) : (
-                <Card className="border-border bg-card shadow-sm">
-                    <CardHeader className="border-b border-border pb-4">
-                        <div className="flex items-center gap-2 text-primary">
-                            <ClipboardList className="size-5" />
-                            <CardTitle className="text-lg leading-snug font-semibold text-card-foreground">{survey.title}</CardTitle>
+                <Card className="border-border bg-card shadow-sm lg:my-auto lg:flex lg:flex-col lg:gap-1 lg:py-1.5">
+                    <CardHeader className="border-b border-border pb-4 lg:hidden lg:pb-2">
+                        <div className="flex items-start gap-2 text-primary">
+                            <ClipboardList className="mt-0.5 size-5 shrink-0" />
+                            <CardTitle className="text-lg leading-snug font-semibold text-card-foreground lg:text-base">{survey.title}</CardTitle>
                         </div>
-                        <CardDescription>
+                        <CardDescription className="lg:text-xs">
                             Mohon lengkapi semua pertanyaan bertanda bintang (<span className="text-destructive">*</span>) sesuai pengalaman Anda.
                         </CardDescription>
                     </CardHeader>
-                    <CardContent className="pt-6">
+                    <CardContent className="pt-6 lg:pt-1">
                         <SubmitSurveyForm surveyId={survey.id} questions={survey.questions} onSuccessSubmit={() => setIsSubmitted(true)} />
                     </CardContent>
                 </Card>
