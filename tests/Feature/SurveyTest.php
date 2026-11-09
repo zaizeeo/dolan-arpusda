@@ -38,6 +38,44 @@ class SurveyTest extends TestCase
             );
     }
 
+    public function test_home_page_includes_the_active_survey_for_the_post_visit_offer(): void
+    {
+        $survey = Survey::factory()->create([
+            'title' => 'Survei Layanan',
+            'description' => 'Bantu kami meningkatkan layanan.',
+            'is_active' => true,
+        ]);
+        $question = SurveyQuestion::factory()->create([
+            'survey_id' => $survey->id,
+            'label' => 'Seberapa puas Anda?',
+            'sequence_number' => 1,
+        ]);
+        SurveyQuestionOption::factory()->create([
+            'survey_question_id' => $question->id,
+            'label' => 'Puas',
+        ]);
+
+        $this->get(route('home-page'))
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->component('home-page')
+                ->where('survey.id', $survey->id)
+                ->where('survey.title', 'Survei Layanan')
+                ->where('survey.questions.0.label', 'Seberapa puas Anda?')
+                ->where('survey.questions.0.options.0.label', 'Puas')
+            );
+    }
+
+    public function test_home_page_does_not_offer_an_inactive_survey(): void
+    {
+        Survey::factory()->inactive()->create();
+
+        $this->get(route('home-page'))
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->component('home-page')
+                ->where('survey', null)
+            );
+    }
+
     public function test_guests_can_submit_a_survey_response(): void
     {
         $survey = Survey::factory()->create(['is_active' => true]);
@@ -87,6 +125,32 @@ class SurveyTest extends TestCase
             'survey_question_id' => $textQuestion->id,
             'custom_text' => 'Tingkatkan fasilitas ruang tunggu.',
         ]);
+    }
+
+    public function test_survey_submission_can_redirect_back_to_the_guest_book_page(): void
+    {
+        $survey = Survey::factory()->create(['is_active' => true]);
+        $question = SurveyQuestion::factory()->create([
+            'survey_id' => $survey->id,
+            'sequence_number' => 1,
+        ]);
+        $option = SurveyQuestionOption::factory()->create([
+            'survey_question_id' => $question->id,
+        ]);
+
+        $this->post(route('survey.submit'), [
+            'survey_id' => $survey->id,
+            'redirect' => 'home',
+            'answers' => [
+                [
+                    'survey_question_id' => $question->id,
+                    'survey_question_option_id' => $option->id,
+                    'custom_text' => null,
+                ],
+            ],
+        ])->assertRedirect(route('home-page'));
+
+        $this->assertDatabaseCount('survey_responses', 1);
     }
 
     public function test_survey_submission_requires_all_questions_and_valid_options(): void

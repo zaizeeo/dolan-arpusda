@@ -19,9 +19,10 @@ interface Props {
     surveyId: string;
     questions: Array<PublicSurveyQuestion>;
     onSuccessSubmit?: () => void;
+    redirectAfterSubmit?: "home";
 }
 
-export function SubmitSurveyForm({ surveyId, questions, onSuccessSubmit }: Props) {
+export function SubmitSurveyForm({ surveyId, questions, onSuccessSubmit, redirectAfterSubmit }: Props) {
     const [isLoading, setIsLoading] = useState(false);
     const [formErrorMessage, setFormErrorMessage] = useState("");
 
@@ -45,6 +46,7 @@ export function SubmitSurveyForm({ surveyId, questions, onSuccessSubmit }: Props
 
         const payload = {
             survey_id: surveyId,
+            ...(redirectAfterSubmit ? { redirect: redirectAfterSubmit } : {}),
             answers: data.answers.map((answer) => ({
                 survey_question_id: answer.survey_question_id,
                 survey_question_option_id: answer.survey_question_option_id?.trim() !== "" ? answer.survey_question_option_id : null,

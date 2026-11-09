@@ -40,6 +40,7 @@ class SubmitSurveyRequest extends FormRequest
                 'string',
                 Rule::exists('surveys', 'id')->where('is_active', true)->whereNull('deleted_at'),
             ],
+            'redirect' => ['nullable', 'string', Rule::in(['home', 'survey'])],
             'answers' => ['required', 'array', "size:$activeQuestionCount"],
             'answers.*.survey_question_id' => [
                 'required',

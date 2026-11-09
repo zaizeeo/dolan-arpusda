@@ -1,19 +1,61 @@
 import CreateGuestBookForm, { GuestBookQuestionItem } from "@/components/forms/guest-book/create-guest-book-form";
+import SubmitSurveyForm from "@/components/forms/survey/submit-survey-form";
 import PublicFormLayout from "@/components/layouts/public-form-layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { PageProps } from "@/types/page-props";
-import survey from "@/routes/survey";
-import { Head, Link } from "@inertiajs/react";
-import { BookOpen, CheckCircle2, ClipboardList, HelpCircle, PlusCircle, Sparkles } from "lucide-react";
-import { useState } from "react";
+import { PublicSurvey } from "@/types/survey";
+import { Head } from "@inertiajs/react";
+import { BookOpen, ClipboardList, HelpCircle, Sparkles, Timer } from "lucide-react";
+import { useEffect, useState } from "react";
+
+const SURVEY_OFFER_DURATION_SECONDS = 30;
 
 interface Props extends PageProps {
     activeQuestions: Array<GuestBookQuestionItem>;
+    survey: PublicSurvey | null;
 }
 
-const HomePage = ({ activeQuestions = [] }: Props) => {
-    const [isSubmitted, setIsSubmitted] = useState(false);
+const HomePage = ({ activeQuestions = [], survey = null }: Props) => {
+    const [isSurveyDialogOpen, setIsSurveyDialogOpen] = useState(false);
+    const [isSurveyFormVisible, setIsSurveyFormVisible] = useState(false);
+    const [countdown, setCountdown] = useState(SURVEY_OFFER_DURATION_SECONDS);
+
+    const hasActiveSurvey = Boolean(survey && survey.questions.length > 0);
+
+    useEffect(() => {
+        if (!isSurveyDialogOpen || isSurveyFormVisible) {
+            return;
+        }
+
+        if (countdown <= 0) {
+            setIsSurveyDialogOpen(false);
+            setIsSurveyFormVisible(false);
+
+            return;
+        }
+
+        const timer = window.setTimeout(() => setCountdown((current) => current - 1), 1000);
+
+        return () => window.clearTimeout(timer);
+    }, [countdown, isSurveyDialogOpen, isSurveyFormVisible]);
+
+    const closeSurveyDialog = () => {
+        setIsSurveyDialogOpen(false);
+        setIsSurveyFormVisible(false);
+        setCountdown(SURVEY_OFFER_DURATION_SECONDS);
+    };
+
+    const openSurveyDialog = () => {
+        if (!hasActiveSurvey) {
+            return;
+        }
+
+        setCountdown(SURVEY_OFFER_DURATION_SECONDS);
+        setIsSurveyFormVisible(false);
+        setIsSurveyDialogOpen(true);
+    };
 
     return (
         <PublicFormLayout
@@ -25,34 +67,7 @@ const HomePage = ({ activeQuestions = [] }: Props) => {
         >
             <Head title="Buku Tamu" />
 
-            {isSubmitted ? (
-                <Card className="border-border bg-card shadow-sm">
-                    <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-                        <div className="mb-4 flex size-16 items-center justify-center rounded-full bg-primary/10 text-primary">
-                            <CheckCircle2 className="size-10" />
-                        </div>
-                        <CardTitle className="text-xl font-bold text-foreground sm:text-2xl">Terima Kasih Atas Kunjungan Anda!</CardTitle>
-                        <CardDescription className="mx-auto mt-2 max-w-md text-sm text-muted-foreground sm:text-base">
-                            Data kunjungan Anda telah berhasil tersimpan di sistem Buku Tamu Jeta Arsip. Bantu kami meningkatkan layanan dengan
-                            mengisi survei singkat berikut.
-                        </CardDescription>
-
-                        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-                            <Button asChild size="lg" className="font-medium">
-                                <Link href={survey.show.url()}>
-                                    <ClipboardList className="mr-2 size-4" />
-                                    Isi Survei
-                                </Link>
-                            </Button>
-
-                            <Button onClick={() => setIsSubmitted(false)} size="lg" variant="outline" className="font-medium">
-                                <PlusCircle className="mr-2 size-4" />
-                                Isi Buku Tamu Baru
-                            </Button>
-                        </div>
-                    </CardContent>
-                </Card>
-            ) : activeQuestions.length === 0 ? (
+            {activeQuestions.length === 0 ? (
                 <Card className="border-dashed border-border bg-card">
                     <CardHeader className="text-center">
                         <div className="mx-auto mb-2 flex size-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
@@ -76,10 +91,77 @@ const HomePage = ({ activeQuestions = [] }: Props) => {
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="pt-6">
-                        <CreateGuestBookForm questions={activeQuestions} onSuccessSubmit={() => setIsSubmitted(true)} />
+                        <CreateGuestBookForm questions={activeQuestions} onSuccessSubmit={openSurveyDialog} />
                     </CardContent>
                 </Card>
             )}
+
+            <Dialog
+                open={isSurveyDialogOpen}
+                onOpenChange={(open) => {
+                    if (!open) {
+                        closeSurveyDialog();
+                    }
+                }}
+            >
+                <DialogContent className={isSurveyFormVisible ? "max-h-dvh overflow-y-auto sm:max-w-2xl" : "sm:max-w-md"}>
+                    {isSurveyFormVisible && survey ? (
+                        <>
+                            <DialogHeader>
+                                <div className="flex items-center gap-2 text-primary">
+                                    <ClipboardList className="size-5" />
+                                    <DialogTitle className="text-lg">{survey.title}</DialogTitle>
+                                </div>
+                                <DialogDescription>
+                                    {survey.description ??
+                                        "Mohon lengkapi semua pertanyaan bertanda bintang sesuai pengalaman Anda untuk membantu kami meningkatkan kualitas layanan."}
+                                </DialogDescription>
+                            </DialogHeader>
+
+                            <SubmitSurveyForm surveyId={survey.id} questions={survey.questions} redirectAfterSubmit="home" />
+                        </>
+                    ) : (
+                        <>
+                            <DialogHeader>
+                                <div className="flex items-center gap-2 text-primary">
+                                    <Sparkles className="size-5" />
+                                    <DialogTitle className="text-lg">Bantu Kami dengan Survei Singkat</DialogTitle>
+                                </div>
+                                <DialogDescription>
+                                    Terima kasih, data kunjungan Anda berhasil disimpan. Bantu kami meningkatkan kualitas layanan dengan mengisi
+                                    survei singkat berikut.
+                                </DialogDescription>
+                            </DialogHeader>
+
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                    <span className="inline-flex items-center gap-1.5">
+                                        <Timer className="size-3.5" />
+                                        Penawaran berakhir dalam
+                                    </span>
+                                    <span className="font-semibold text-foreground">{countdown} detik</span>
+                                </div>
+                                <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                                    <div
+                                        className="h-full rounded-full bg-primary transition-all duration-1000 ease-linear"
+                                        style={{ width: `${(countdown / SURVEY_OFFER_DURATION_SECONDS) * 100}%` }}
+                                    />
+                                </div>
+                            </div>
+
+                            <DialogFooter className="gap-2">
+                                <Button type="button" variant="outline" onClick={closeSurveyDialog}>
+                                    Nanti Saja
+                                </Button>
+                                <Button type="button" onClick={() => setIsSurveyFormVisible(true)}>
+                                    <ClipboardList className="size-4" />
+                                    Isi Survei Sekarang
+                                </Button>
+                            </DialogFooter>
+                        </>
+                    )}
+                </DialogContent>
+            </Dialog>
         </PublicFormLayout>
     );
 };
