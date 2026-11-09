@@ -138,88 +138,99 @@ export function CreateGuestBookForm({ questions, onSuccessSubmit }: Props) {
                                         <Controller
                                             name={`answers.${index}.guest_book_question_option_id`}
                                             control={form.control}
-                                            render={({ field, fieldState }) => (
-                                                <Field data-invalid={Boolean(fieldState.invalid)}>
-                                                    <RadioGroup
-                                                        value={field.value}
-                                                        onValueChange={(val) => {
-                                                            field.onChange(val);
-                                                            const opt = question.options.find((o) => o.id === val);
-                                                            if (!opt?.is_allow_custom_text) {
-                                                                form.setValue(`answers.${index}.custom_text`, "");
-                                                            }
-                                                        }}
-                                                        className="grid grid-cols-1 gap-2 sm:grid-cols-2"
-                                                        aria-labelledby={`label-question-${question.id}`}
-                                                    >
-                                                        {question.options.map((option) => {
-                                                            const isSelected = field.value === option.id;
+                                            render={({ field, fieldState }) => {
+                                                const selectOption = (value: string) => {
+                                                    field.onChange(value);
+                                                    const opt = question.options.find((o) => o.id === value);
+                                                    if (!opt?.is_allow_custom_text) {
+                                                        form.setValue(`answers.${index}.custom_text`, "");
+                                                    }
+                                                };
 
-                                                            return (
-                                                                <div
-                                                                    key={option.id}
-                                                                    className={cn(
-                                                                        "rounded-lg border transition-colors",
-                                                                        isSelected
-                                                                            ? "border-primary/50 bg-primary/5 dark:bg-primary/10"
-                                                                            : "border-border hover:bg-muted/40",
-                                                                    )}
-                                                                >
-                                                                    <div className="flex items-center gap-2 p-3 lg:p-2">
-                                                                        <RadioGroupItem value={option.id} id={`option-${option.id}`} />
-                                                                        <div className="flex flex-1 flex-col">
-                                                                            <FieldLabel
-                                                                                htmlFor={`option-${option.id}`}
-                                                                                className="cursor-pointer text-sm font-medium text-card-foreground lg:text-xs"
-                                                                            >
-                                                                                {option.label}
-                                                                            </FieldLabel>
-                                                                            {option.description && (
-                                                                                <span className="mt-0.5 text-xs text-muted-foreground">
-                                                                                    {option.description}
-                                                                                </span>
-                                                                            )}
-                                                                        </div>
-                                                                    </div>
+                                                return (
+                                                    <Field data-invalid={Boolean(fieldState.invalid)}>
+                                                        <RadioGroup
+                                                            value={field.value}
+                                                            onValueChange={selectOption}
+                                                            className="grid grid-cols-1 gap-2 sm:grid-cols-2"
+                                                            aria-labelledby={`label-question-${question.id}`}
+                                                        >
+                                                            {question.options.map((option) => {
+                                                                const isSelected = field.value === option.id;
 
-                                                                    {option.is_allow_custom_text && isSelected && (
-                                                                        <div className="mt-2 px-3 pb-3 pl-7 lg:mt-1.5 lg:px-2 lg:pb-2 lg:pl-6">
-                                                                            <Controller
-                                                                                name={`answers.${index}.custom_text`}
-                                                                                control={form.control}
-                                                                                render={({ field: customField, fieldState: customFieldState }) => (
-                                                                                    <Field
-                                                                                        data-invalid={Boolean(customFieldState.invalid)}
-                                                                                        className="gap-1.5"
-                                                                                    >
-                                                                                        <FieldLabel
-                                                                                            htmlFor={`custom-text-${option.id}`}
-                                                                                            className="text-xs font-medium text-muted-foreground"
-                                                                                        >
-                                                                                            Keterangan Tambahan{" "}
-                                                                                            <span className="text-destructive">*</span>
-                                                                                        </FieldLabel>
-                                                                                        <Input
-                                                                                            id={`custom-text-${option.id}`}
-                                                                                            placeholder="Tuliskan keterangan detail..."
-                                                                                            aria-invalid={Boolean(customFieldState.invalid)}
-                                                                                            {...customField}
-                                                                                        />
-                                                                                        {customFieldState.invalid && (
-                                                                                            <FieldError errors={[customFieldState.error]} />
-                                                                                        )}
-                                                                                    </Field>
+                                                                return (
+                                                                    <div
+                                                                        key={option.id}
+                                                                        className={cn(
+                                                                            "rounded-lg border transition-colors",
+                                                                            isSelected
+                                                                                ? "border-primary/50 bg-primary/5 dark:bg-primary/10"
+                                                                                : "border-border hover:bg-muted/40",
+                                                                        )}
+                                                                    >
+                                                                        <div
+                                                                            className="flex cursor-pointer items-center gap-2 p-3 lg:p-2"
+                                                                            onClick={() => selectOption(option.id)}
+                                                                        >
+                                                                            <RadioGroupItem value={option.id} id={`option-${option.id}`} />
+                                                                            <div className="flex flex-1 flex-col">
+                                                                                <FieldLabel
+                                                                                    htmlFor={`option-${option.id}`}
+                                                                                    className="cursor-pointer text-sm font-medium text-card-foreground lg:text-xs"
+                                                                                    onClick={() => selectOption(option.id)}
+                                                                                >
+                                                                                    {option.label}
+                                                                                </FieldLabel>
+                                                                                {option.description && (
+                                                                                    <span className="mt-0.5 text-xs text-muted-foreground">
+                                                                                        {option.description}
+                                                                                    </span>
                                                                                 )}
-                                                                            />
+                                                                            </div>
                                                                         </div>
-                                                                    )}
-                                                                </div>
-                                                            );
-                                                        })}
-                                                    </RadioGroup>
-                                                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                                                </Field>
-                                            )}
+
+                                                                        {option.is_allow_custom_text && isSelected && (
+                                                                            <div className="mt-2 px-3 pb-3 pl-7 lg:mt-1.5 lg:px-2 lg:pb-2 lg:pl-6">
+                                                                                <Controller
+                                                                                    name={`answers.${index}.custom_text`}
+                                                                                    control={form.control}
+                                                                                    render={({
+                                                                                        field: customField,
+                                                                                        fieldState: customFieldState,
+                                                                                    }) => (
+                                                                                        <Field
+                                                                                            data-invalid={Boolean(customFieldState.invalid)}
+                                                                                            className="gap-1.5"
+                                                                                        >
+                                                                                            <FieldLabel
+                                                                                                htmlFor={`custom-text-${option.id}`}
+                                                                                                className="text-xs font-medium text-muted-foreground"
+                                                                                            >
+                                                                                                Keterangan Tambahan{" "}
+                                                                                                <span className="text-destructive">*</span>
+                                                                                            </FieldLabel>
+                                                                                            <Input
+                                                                                                id={`custom-text-${option.id}`}
+                                                                                                placeholder="Tuliskan keterangan detail..."
+                                                                                                aria-invalid={Boolean(customFieldState.invalid)}
+                                                                                                {...customField}
+                                                                                            />
+                                                                                            {customFieldState.invalid && (
+                                                                                                <FieldError errors={[customFieldState.error]} />
+                                                                                            )}
+                                                                                        </Field>
+                                                                                    )}
+                                                                                />
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </RadioGroup>
+                                                        {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                                                    </Field>
+                                                );
+                                            }}
                                         />
                                     ) : (
                                         <Controller
