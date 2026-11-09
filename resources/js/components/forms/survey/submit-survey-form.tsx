@@ -60,16 +60,20 @@ export function SubmitSurveyForm({ surveyId, questions, onSuccessSubmit, redirec
             onStart: () => setIsLoading(true),
             onFinish: () => setIsLoading(false),
             onSuccess: () => {
-                form.reset({
-                    answers: questions.map((question) => ({
-                        survey_question_id: question.id,
-                        survey_question_option_id: "",
-                        custom_text: "",
-                    })),
-                });
                 toast.success("Berhasil Terkirim", {
-                    description: "Terima kasih, jawaban survei Anda berhasil disimpan!",
+                    description: "Terima kasih, jawaban survei Anda berhasil disimpan dan Anda telah diarahkan ke buku tamu.",
                 });
+
+                if (!redirectAfterSubmit) {
+                    form.reset({
+                        answers: questions.map((question) => ({
+                            survey_question_id: question.id,
+                            survey_question_option_id: "",
+                            custom_text: "",
+                        })),
+                    });
+                }
+
                 onSuccessSubmit?.();
             },
             onError: (error) => {
