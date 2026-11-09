@@ -230,4 +230,12 @@ Use Wayfinder to generate TypeScript functions for Laravel routes and controller
   - Never style descriptions with `primary-foreground` (which is meant for text on `primary` backgrounds and creates illegible white-on-white text on popover/card surfaces).
 - **Localization**: Always use Bahasa Indonesia for all user-facing rendered HTML and UI text (labels, titles, descriptions, placeholders, button actions, validation errors, and toast messages).
 
+=== generated files rules ===
+
+# Auto-Generated Files
+
+- Do not modify auto-generated files, including shadcn UI primitives in `resources/js/components/ui/**`.
+- The only allowed changes to these files are changes produced by the project formatter (Prettier) or by the generator/CLI itself.
+- If a generated component needs different behavior, wrap or compose it in a non-generated component instead of editing the generated file.
+
 </laravel-boost-guidelines>
