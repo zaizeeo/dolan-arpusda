@@ -65,7 +65,7 @@ const PublicFormLayout = ({
                         </div>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-2">
+                    {/* <div className="flex flex-wrap items-center gap-2">
                         <PublicFormSwitcher activeForm={activeForm} />
 
                         <Button variant="outline" size="sm" asChild>
@@ -81,7 +81,7 @@ const PublicFormLayout = ({
                                 </Link>
                             )}
                         </Button>
-                    </div>
+                    </div> */}
                 </div>
             </header>
 
