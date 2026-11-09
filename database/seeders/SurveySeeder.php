@@ -139,7 +139,6 @@ class SurveySeeder extends Seeder
     {
         return match ($label) {
             'Nama' => fake('id_ID')->name(),
-            'Alamat/ Instansi' => fake('id_ID')->address(),
             default => fake('id_ID')->sentence(),
         };
     }

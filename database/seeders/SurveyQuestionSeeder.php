@@ -21,58 +21,6 @@ class SurveyQuestionSeeder extends Seeder
                     'pertanyaan' => 'Nama',
                     'tipe' => 'teks',
                 ],
-                [
-                    'pertanyaan' => 'Alamat/ Instansi',
-                    'tipe' => 'teks',
-                ],
-                [
-                    'pertanyaan' => 'Jenis Kelamin',
-                    'tipe' => 'pilihan_ganda',
-                    'opsi' => [
-                        'Laki-laki',
-                        'Perempuan',
-                    ],
-                ],
-                [
-                    'pertanyaan' => 'Pendidikan Terakhir',
-                    'tipe' => 'pilihan_ganda',
-                    'opsi' => [
-                        'SD',
-                        'SMP',
-                        'SMA/SLTA',
-                        'DIPLOMA',
-                        'SARJANA',
-                        'S2',
-                        'Lainnya',
-                    ],
-                ],
-                [
-                    'pertanyaan' => 'Pekerjaan',
-                    'tipe' => 'pilihan_ganda',
-                    'opsi' => [
-                        'PNS',
-                        'TNI/POLRI',
-                        'Dosen',
-                        'Guru',
-                        'Swasta',
-                        'BUMN/BUMD',
-                        'Mahasiswa',
-                        'Pelajar',
-                        'Lainnya',
-                    ],
-                ],
-                [
-                    'pertanyaan' => 'Keperluan Layanan',
-                    'tipe' => 'pilihan_ganda',
-                    'opsi' => [
-                        'Bimbingan/ Konsultasi',
-                        'Peminjaman Arsip',
-                        'Penelusuran Arsip',
-                        'Kunjungan/ Wisata Arsip',
-                        'Penyerahan Arsip',
-                        'Lainnya',
-                    ],
-                ],
             ],
             'pertanyaan_survei' => [
                 [
