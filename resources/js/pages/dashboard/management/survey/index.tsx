@@ -1,4 +1,5 @@
 import { SurveyResponseTrendChart, type SurveyTrendItem } from "@/components/charts/survey-response-trend-chart";
+import ExportExcelDialog from "@/components/export-excel-dialog";
 import DashboardLayout from "@/components/layouts/dashboard-layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import { useUserRole } from "@/lib/hooks/use-user-role";
 import { resolveInertiaErrorMessage } from "@/lib/inertia-errors";
-import { deleteSurveyResponse, surveyQuestionIndex } from "@/routes";
+import { deleteSurveyResponse, surveyQuestionIndex, surveyResponseExport } from "@/routes";
 import survey from "@/routes/survey";
 import { User } from "@/types";
 import { PageProps } from "@/types/page-props";
@@ -87,6 +88,14 @@ export default function SurveyResponseManagement({
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2">
+                        <ExportExcelDialog
+                            title="Export Respon Survei"
+                            description="Unduh jawaban survei aktif dalam format Excel. Default 7 hari terakhir; kosongkan kedua tanggal untuk mengexport semua data."
+                            url={surveyResponseExport.url()}
+                            fallbackFileName="respon-survei.xlsx"
+                            size="default"
+                            disabled={!activeSurvey}
+                        />
                         <Button variant="outline" asChild className="gap-2">
                             <Link href={survey.show.url()}>
                                 <ExternalLink className="size-4" />

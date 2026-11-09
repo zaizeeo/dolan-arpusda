@@ -84,11 +84,13 @@ Route::prefix('/dashboard')->middleware(['auth.middleware'])->group(function () 
     Route::get('/statistics/survey', [SurveyResponseController::class, 'statistics'])->name('survey-statistics-index');
     Route::prefix('/management')->group(function () {
         Route::get('/guest-book', [GuestBookController::class, 'index'])->name('dashboard.management.guest-book.index')->middleware(['management.read.middleware']);
+        Route::get('/guest-book/export', [GuestBookController::class, 'export'])->name('guest-book-export')->middleware(['management.read.middleware']);
         Route::prefix('/guest-book-question')->group(function () {
             Route::get('/', [GuestBookQuestionController::class, 'index'])->name('dashboard.management.guest-book-question.index')->middleware(['management.read.middleware']);
         });
 
         Route::get('/survey', [SurveyResponseController::class, 'index'])->name('survey-response-index')->middleware(['management.read.middleware']);
+        Route::get('/survey/export', [SurveyResponseController::class, 'export'])->name('survey-response-export')->middleware(['management.read.middleware']);
         Route::get('/survey/question', [SurveyQuestionController::class, 'index'])->name('survey-question-index')->middleware(['management.read.middleware']);
 
         Route::get('/users', [UserController::class, 'index'])->name('user-controller-index')->middleware(['admins.middleware']);

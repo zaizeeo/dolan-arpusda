@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\SurveyResponseExport;
+use App\Http\Requests\ExportResponsesRequest;
 use App\Models\Survey;
 use App\Models\SurveyQuestionOption;
 use App\Models\SurveyResponse;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class SurveyResponseController extends Controller
 {
@@ -47,6 +51,17 @@ class SurveyResponseController extends Controller
             'stats' => $this->stats($survey),
             'trend' => $this->weeklyTrend($survey),
         ]);
+    }
+
+    /**
+     * Download active survey responses as an Excel spreadsheet.
+     */
+    public function export(ExportResponsesRequest $request): BinaryFileResponse
+    {
+        return Excel::download(
+            new SurveyResponseExport($request->startDate(), $request->endDate()),
+            'respon-survei.xlsx'
+        );
     }
 
     /**
