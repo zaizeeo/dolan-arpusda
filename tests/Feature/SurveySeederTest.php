@@ -23,8 +23,8 @@ class SurveySeederTest extends TestCase
 
         $this->assertDatabaseCount('surveys', 1);
         $this->assertSame('SURVEI KEPUASAN MASYARAKAT TENTANG PELAYANAN KEARSIPAN - TAHUN 2026', $survey->title);
-        $this->assertSame(15, SurveyQuestion::where('survey_id', $survey->id)->count());
-        $this->assertSame(60, $survey->questions()->withCount('options')->get()->sum('options_count'));
+        $this->assertSame(10, SurveyQuestion::where('survey_id', $survey->id)->count());
+        $this->assertSame(36, $survey->questions()->withCount('options')->get()->sum('options_count'));
         $this->assertSame(0, $survey->questions()->where('label', 'Nama')->firstOrFail()->options()->count());
     }
 
@@ -50,18 +50,21 @@ class SurveySeederTest extends TestCase
         $this->assertSame($questions->count(), $response->answers()->count());
 
         $nameQuestion = $questions->firstWhere('label', 'Nama');
-        $genderQuestion = $questions->firstWhere('label', 'Jenis Kelamin');
+        $choiceQuestion = $questions->firstWhere(
+            'label',
+            'Bagaimana pendapat Saudara tentang kesesuaian persyaratan pelayanan dengan jenis pelayanannya?'
+        );
 
         $this->assertNotNull($nameQuestion);
-        $this->assertNotNull($genderQuestion);
+        $this->assertNotNull($choiceQuestion);
 
         $nameAnswer = $response->answers()->where('survey_question_id', $nameQuestion->id)->firstOrFail();
-        $genderAnswer = $response->answers()->where('survey_question_id', $genderQuestion->id)->firstOrFail();
+        $choiceAnswer = $response->answers()->where('survey_question_id', $choiceQuestion->id)->firstOrFail();
 
         $this->assertNull($nameAnswer->survey_question_option_id);
         $this->assertNotNull($nameAnswer->custom_text);
-        $this->assertNotNull($genderAnswer->survey_question_option_id);
-        $this->assertNull($genderAnswer->custom_text);
+        $this->assertNotNull($choiceAnswer->survey_question_option_id);
+        $this->assertNull($choiceAnswer->custom_text);
     }
 
     public function test_survey_seeder_does_not_create_duplicate_responses(): void
@@ -70,6 +73,6 @@ class SurveySeederTest extends TestCase
         $this->seed(SurveySeeder::class);
 
         $this->assertDatabaseCount('survey_responses', 12);
-        $this->assertDatabaseCount('survey_answers', 180);
+        $this->assertDatabaseCount('survey_answers', 120);
     }
 }
