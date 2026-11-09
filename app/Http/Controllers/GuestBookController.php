@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Actions\GuestBook\CreateGuestBookAction;
 use App\Actions\Survey\GetPublicSurveyAction;
+use App\Exports\GuestBookExport;
+use App\Http\Requests\ExportResponsesRequest;
 use App\Http\Requests\GuestBook\CreateGuestBookRequest;
 use App\Models\GuestBook;
 use App\Models\GuestBookQuestion;
@@ -11,6 +13,8 @@ use App\Models\GuestBookQuestionOption;
 use Carbon\Carbon;
 use Inertia\Inertia;
 use Inertia\Response;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class GuestBookController extends Controller
 {
@@ -65,6 +69,17 @@ class GuestBookController extends Controller
             'activeQuestions' => $activeQuestions,
             'stats' => $stats,
         ]);
+    }
+
+    /**
+     * Download guest book answers as an Excel spreadsheet.
+     */
+    public function export(ExportResponsesRequest $request): BinaryFileResponse
+    {
+        return Excel::download(
+            new GuestBookExport($request->startDate(), $request->endDate()),
+            'buku-tamu.xlsx'
+        );
     }
 
     public function showGuestBookForm(GetPublicSurveyAction $getPublicSurvey): Response

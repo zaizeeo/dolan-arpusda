@@ -1,3 +1,4 @@
+import ExportExcelDialog from "@/components/export-excel-dialog";
 import DashboardLayout from "@/components/layouts/dashboard-layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -6,7 +7,7 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, Di
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useUserRole } from "@/lib/hooks/use-user-role";
-import { deleteGuestBook, homePage } from "@/routes";
+import { deleteGuestBook, guestBookExport, homePage } from "@/routes";
 import guestBookQuestion from "@/routes/dashboard/management/guest-book-question";
 import { User } from "@/types";
 import { PageProps } from "@/types/page-props";
@@ -173,6 +174,12 @@ const GuestBookIndex = ({
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2">
+                        <ExportExcelDialog
+                            title="Export Data Buku Tamu"
+                            description="Unduh data kunjungan dalam format Excel. Kosongkan kedua tanggal untuk mengexport semua data."
+                            url={guestBookExport.url()}
+                            fallbackFileName="buku-tamu.xlsx"
+                        />
                         <Button variant="outline" size="sm" asChild>
                             <a href={homePage.url()} target="_blank" rel="noreferrer">
                                 <ExternalLink className="mr-1.5 size-4" />
