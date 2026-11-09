@@ -47,6 +47,26 @@ const resolveFileName = (contentDisposition: string | null, fallbackFileName: st
     return match?.[1] ?? fallbackFileName;
 };
 
+const toDateInputValue = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = `${date.getMonth() + 1}`.padStart(2, "0");
+    const day = `${date.getDate()}`.padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+};
+
+const getDefaultDateRange = (): ExportFormSchema => {
+    const endDate = new Date();
+    const startDate = new Date(endDate);
+
+    startDate.setDate(endDate.getDate() - 7);
+
+    return {
+        start_date: toDateInputValue(startDate),
+        end_date: toDateInputValue(endDate),
+    };
+};
+
 export default function ExportExcelDialog({
     title,
     description,
@@ -64,10 +84,7 @@ export default function ExportExcelDialog({
 
     const form = useForm<ExportFormSchema>({
         resolver: zodResolver(exportFormSchema),
-        defaultValues: {
-            start_date: "",
-            end_date: "",
-        },
+        defaultValues: getDefaultDateRange(),
     });
 
     const onSubmit = async (data: ExportFormSchema) => {
@@ -114,7 +131,7 @@ export default function ExportExcelDialog({
             link.remove();
             window.setTimeout(() => window.URL.revokeObjectURL(objectUrl), 1000);
 
-            form.reset();
+            form.reset(getDefaultDateRange());
             setIsOpen(false);
             toast.success("Export berhasil", { description: "File Excel sedang diunduh." });
         } catch (error) {
@@ -129,9 +146,9 @@ export default function ExportExcelDialog({
 
     const handleOpenChange = (nextOpen: boolean) => {
         setIsOpen(nextOpen);
+        form.reset(getDefaultDateRange());
 
         if (!nextOpen) {
-            form.reset();
             setFormErrorMessage("");
         }
     };

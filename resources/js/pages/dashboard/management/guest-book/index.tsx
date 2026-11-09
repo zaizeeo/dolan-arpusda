@@ -176,7 +176,7 @@ const GuestBookIndex = ({
                     <div className="flex flex-wrap items-center gap-2">
                         <ExportExcelDialog
                             title="Export Data Buku Tamu"
-                            description="Unduh data kunjungan dalam format Excel. Kosongkan kedua tanggal untuk mengexport semua data."
+                            description="Unduh data kunjungan dalam format Excel. Default 7 hari terakhir; kosongkan kedua tanggal untuk mengexport semua data."
                             url={guestBookExport.url()}
                             fallbackFileName="buku-tamu.xlsx"
                         />

@@ -90,7 +90,7 @@ export default function SurveyResponseManagement({
                     <div className="flex flex-wrap items-center gap-2">
                         <ExportExcelDialog
                             title="Export Respon Survei"
-                            description="Unduh jawaban survei aktif dalam format Excel. Kosongkan kedua tanggal untuk mengexport semua data."
+                            description="Unduh jawaban survei aktif dalam format Excel. Default 7 hari terakhir; kosongkan kedua tanggal untuk mengexport semua data."
                             url={surveyResponseExport.url()}
                             fallbackFileName="respon-survei.xlsx"
                             size="default"
