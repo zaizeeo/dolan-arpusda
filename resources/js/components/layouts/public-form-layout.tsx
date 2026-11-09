@@ -46,6 +46,7 @@ const PublicFormLayout = ({
     children,
     badge,
     badgeIcon: BadgeIcon,
+    title,
     description,
     footerDescription = "Sistem Informasi Buku Tamu Digital Jeta Arsip.",
 }: PublicFormLayoutProps) => {
@@ -62,6 +63,8 @@ const PublicFormLayout = ({
                             <span className="text-xs text-muted-foreground">Kabupaten Banyumas</span>
                         </div>
                     </div>
+
+                    <h1 className="hidden min-w-0 truncate text-sm font-semibold tracking-tight text-foreground lg:block">{title}</h1>
 
                     {/* <div className="flex flex-wrap items-center gap-2">
                         <PublicFormSwitcher activeForm={activeForm} />
@@ -84,13 +87,12 @@ const PublicFormLayout = ({
             </header>
 
             <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 pt-8 pb-16 sm:px-6 lg:min-h-0 lg:pt-2 lg:pb-0">
-                <div className="mb-6 shrink-0 text-center lg:mb-1">
-                    <span className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground lg:hidden">
+                <div className="mb-6 shrink-0 text-center lg:hidden">
+                    <span className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground">
                         {BadgeIcon ? <BadgeIcon className="size-3.5 text-primary" /> : null}
                         {badge}
                     </span>
-                    {/* <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl lg:text-base">{title}</h1> */}
-                    <p className="mt-2 text-sm text-muted-foreground sm:text-base lg:hidden">{description}</p>
+                    <p className="mt-2 text-sm text-muted-foreground sm:text-base">{description}</p>
                 </div>
 
                 <div className="min-w-0 lg:flex lg:min-h-0 lg:flex-1 lg:flex-col">{children}</div>
