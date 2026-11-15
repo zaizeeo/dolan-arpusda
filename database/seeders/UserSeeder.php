@@ -12,7 +12,7 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory()->count(4)->sequence(
+        User::factory()->count(2)->sequence(
             [
                 'role' => 'superadmin',
                 'name' => 'Superadmin',
