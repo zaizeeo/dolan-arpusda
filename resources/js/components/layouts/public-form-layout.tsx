@@ -56,7 +56,7 @@ const PublicFormLayout = ({
     return (
         <div className="min-h-screen bg-muted/20 pb-16">
             <header className="sticky top-0 z-10 border-b border-border bg-background/95 backdrop-blur-sm">
-                <div className="mx-auto flex max-w-4xl flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+                <div className="mx-auto flex max-w-4xl flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6 xl:max-w-5xl">
                     <div className="flex items-center gap-3">
                         <img src="/images/logo-banyumas.png" alt="Logo Kabupaten Banyumas" className="size-9 object-contain" />
                         <div className="flex flex-col">
@@ -85,8 +85,8 @@ const PublicFormLayout = ({
                 </div>
             </header>
 
-            <main className="mx-auto max-w-3xl px-4 pt-8 sm:px-6">
-                <div className="mb-6 text-center">
+            <main className="mx-auto max-w-3xl px-4 pt-6 sm:px-6 xl:max-w-5xl">
+                <div className="mb-4 text-center">
                     <span className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground">
                         {BadgeIcon ? <BadgeIcon className="size-3.5 text-primary" /> : null}
                         {badge}

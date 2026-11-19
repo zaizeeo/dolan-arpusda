@@ -36,16 +36,16 @@ const SurveyPage = ({ survey }: Props) => {
                 </Card>
             ) : (
                 <Card className="border-border bg-card shadow-sm">
-                    <CardHeader className="border-b border-border pb-4">
+                    <CardHeader className="border-b border-border pb-3">
                         <div className="flex items-center gap-2 text-primary">
                             <ClipboardList className="size-5" />
-                            <CardTitle className="text-lg leading-snug font-semibold text-card-foreground">{survey.title}</CardTitle>
+                            <CardTitle className="text-lg leading-snug font-semibold text-card-foreground">Formulir Survei</CardTitle>
                         </div>
                         <CardDescription>
                             Mohon lengkapi semua pertanyaan bertanda bintang (<span className="text-destructive">*</span>) sesuai pengalaman Anda.
                         </CardDescription>
                     </CardHeader>
-                    <CardContent className="pt-6">
+                    <CardContent className="pt-4">
                         <SubmitSurveyForm surveyId={survey.id} questions={survey.questions} redirectAfterSubmit="home" />
                     </CardContent>
                 </Card>

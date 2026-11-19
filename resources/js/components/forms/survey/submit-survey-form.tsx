@@ -90,36 +90,42 @@ export function SubmitSurveyForm({ surveyId, questions, onSuccessSubmit, redirec
     };
 
     return (
-        <form id="form-submit-survey" onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <form id="form-submit-survey" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             {formErrorMessage && <FieldError errors={[{ message: formErrorMessage }]} />}
 
-            <FieldGroup className="space-y-6">
+            <FieldGroup className="gap-6">
                 {questions.map((question, index) => {
-                    const hasOptions = Array.isArray(question.options) && question.options.length > 0;
+                    const hasOptions = question.options.length > 0;
+                    const useThreeColumns = question.options.length >= 6;
+                    const isLongTextAnswer = /alamat|keterangan|catatan|saran|pesan/i.test(question.label);
 
                     return (
-                        <div key={question.id} className="rounded-xl border border-border bg-card p-5 shadow-xs transition-shadow hover:shadow-sm">
-                            <div className="mb-4">
-                                <div className="flex items-start gap-3">
-                                    <span className="inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
-                                        {index + 1}
-                                    </span>
-                                    <div className="flex flex-col gap-1">
-                                        <FieldLabel
-                                            htmlFor={hasOptions ? `label-survey-question-${question.id}` : `survey-question-input-${question.id}`}
-                                            className="text-base leading-normal font-semibold text-card-foreground"
-                                        >
+                        <div
+                            key={question.id}
+                            className="grid gap-2.5 md:grid-cols-[14rem_minmax(0,1fr)] md:gap-6 xl:grid-cols-[16rem_minmax(0,1fr)]"
+                        >
+                            <div className="flex items-start gap-2.5 md:pt-0.5">
+                                <span className="inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+                                    {index + 1}
+                                </span>
+                                <div className="flex flex-col gap-0.5">
+                                    <FieldLabel
+                                        id={hasOptions ? `label-survey-question-${question.id}` : undefined}
+                                        htmlFor={hasOptions ? undefined : `survey-question-input-${question.id}`}
+                                        className="w-full text-sm leading-snug font-semibold text-card-foreground"
+                                    >
+                                        <span>
                                             {question.label}
                                             <span className="ml-1 text-destructive">*</span>
-                                        </FieldLabel>
-                                        {question.description && (
-                                            <FieldDescription className="text-sm text-muted-foreground">{question.description}</FieldDescription>
-                                        )}
-                                    </div>
+                                        </span>
+                                    </FieldLabel>
+                                    {question.description && (
+                                        <FieldDescription className="text-xs text-muted-foreground">{question.description}</FieldDescription>
+                                    )}
                                 </div>
                             </div>
 
-                            <div className="pl-10">
+                            <div className="min-w-0">
                                 {hasOptions ? (
                                     <Controller
                                         name={`answers.${index}.survey_question_option_id`}
@@ -138,7 +144,7 @@ export function SubmitSurveyForm({ surveyId, questions, onSuccessSubmit, redirec
                                                     <RadioGroup
                                                         value={field.value}
                                                         onValueChange={selectOption}
-                                                        className="gap-2.5"
+                                                        className={cn("gap-2", useThreeColumns ? "sm:grid-cols-2 xl:grid-cols-3" : "sm:grid-cols-2")}
                                                         aria-labelledby={`label-survey-question-${question.id}`}
                                                     >
                                                         {question.options.map((option) => {
@@ -148,14 +154,15 @@ export function SubmitSurveyForm({ surveyId, questions, onSuccessSubmit, redirec
                                                                 <div
                                                                     key={option.id}
                                                                     className={cn(
-                                                                        "rounded-lg border p-3.5 transition-colors",
+                                                                        "rounded-lg border px-3 py-2 transition-colors",
                                                                         isSelected
                                                                             ? "border-primary/50 bg-primary/5 dark:bg-primary/10"
                                                                             : "border-border hover:bg-muted/40",
+                                                                        option.is_allow_custom_text && isSelected && "col-span-full",
                                                                     )}
                                                                 >
                                                                     <div
-                                                                        className="flex cursor-pointer items-center gap-3"
+                                                                        className="flex cursor-pointer items-center gap-2.5"
                                                                         onClick={() => selectOption(option.id)}
                                                                     >
                                                                         <RadioGroupItem value={option.id} id={`survey-option-${option.id}`} />
@@ -176,14 +183,14 @@ export function SubmitSurveyForm({ surveyId, questions, onSuccessSubmit, redirec
                                                                     </div>
 
                                                                     {option.is_allow_custom_text && isSelected && (
-                                                                        <div className="mt-3 pl-7">
+                                                                        <div className="mt-2 pl-6">
                                                                             <Controller
                                                                                 name={`answers.${index}.custom_text`}
                                                                                 control={form.control}
                                                                                 render={({ field: customField, fieldState: customFieldState }) => (
                                                                                     <Field
                                                                                         data-invalid={Boolean(customFieldState.invalid)}
-                                                                                        className="gap-1.5"
+                                                                                        className="gap-1"
                                                                                     >
                                                                                         <FieldLabel
                                                                                             htmlFor={`survey-custom-text-${option.id}`}
@@ -221,13 +228,22 @@ export function SubmitSurveyForm({ surveyId, questions, onSuccessSubmit, redirec
                                         control={form.control}
                                         render={({ field, fieldState }) => (
                                             <Field data-invalid={Boolean(fieldState.invalid)}>
-                                                <Textarea
-                                                    id={`survey-question-input-${question.id}`}
-                                                    placeholder={`Masukkan ${question.label.toLowerCase()}...`}
-                                                    aria-invalid={Boolean(fieldState.invalid)}
-                                                    rows={3}
-                                                    {...field}
-                                                />
+                                                {isLongTextAnswer ? (
+                                                    <Textarea
+                                                        id={`survey-question-input-${question.id}`}
+                                                        placeholder={`Masukkan ${question.label.toLowerCase()}...`}
+                                                        aria-invalid={Boolean(fieldState.invalid)}
+                                                        rows={3}
+                                                        {...field}
+                                                    />
+                                                ) : (
+                                                    <Input
+                                                        id={`survey-question-input-${question.id}`}
+                                                        placeholder={`Masukkan ${question.label.toLowerCase()}...`}
+                                                        aria-invalid={Boolean(fieldState.invalid)}
+                                                        {...field}
+                                                    />
+                                                )}
                                                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                                             </Field>
                                         )}
@@ -238,7 +254,8 @@ export function SubmitSurveyForm({ surveyId, questions, onSuccessSubmit, redirec
                     );
                 })}
 
-                <div className="pt-2">
+                <div className="grid gap-2 pt-2 md:grid-cols-[14rem_minmax(0,1fr)] md:gap-6 xl:grid-cols-[16rem_minmax(0,1fr)]">
+                    <div className="hidden md:block" />
                     <Button disabled={isLoading} type="submit" size="lg" className="w-full font-semibold">
                         {isLoading ? (
                             <>
