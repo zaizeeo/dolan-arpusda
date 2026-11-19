@@ -77,7 +77,7 @@ const HomePage = ({ activeQuestions = [], survey = null }: Props) => {
                 </Card>
             ) : (
                 <Card className="border-border bg-card shadow-sm">
-                    <CardHeader className="border-b border-border pb-4">
+                    <CardHeader className="border-b border-border pb-3">
                         <div className="flex items-center gap-2 text-primary">
                             <BookOpen className="size-5" />
                             <CardTitle className="text-lg font-semibold text-card-foreground">Formulir Kunjungan</CardTitle>
@@ -86,7 +86,7 @@ const HomePage = ({ activeQuestions = [], survey = null }: Props) => {
                             Mohon lengkapi semua pertanyaan bertanda bintang (<span className="text-destructive">*</span>) dengan benar.
                         </CardDescription>
                     </CardHeader>
-                    <CardContent className="pt-6">
+                    <CardContent className="pt-4">
                         <CreateGuestBookForm questions={activeQuestions} onSuccessSubmit={openSurveyDialog} />
                     </CardContent>
                 </Card>

@@ -98,36 +98,37 @@ export function CreateGuestBookForm({ questions, onSuccessSubmit }: Props) {
     };
 
     return (
-        <form id="form-create-guest-book" onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <form id="form-create-guest-book" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             {formErrorMessage && <FieldError errors={[{ message: formErrorMessage }]} />}
 
-            <FieldGroup className="space-y-6">
+            <FieldGroup className="gap-3">
                 {questions.map((question, index) => {
                     const hasOptions = Array.isArray(question.options) && question.options.length > 0;
+                    const useOptionGrid = question.options.length >= 4;
 
                     return (
-                        <div key={question.id} className="rounded-xl border border-border bg-card p-5 shadow-xs transition-shadow hover:shadow-sm">
-                            <div className="mb-4">
-                                <div className="flex items-start gap-3">
-                                    <span className="inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+                        <div key={question.id} className="rounded-xl border border-border bg-card p-4 shadow-xs transition-shadow hover:shadow-sm">
+                            <div className="mb-3">
+                                <div className="flex items-start gap-2.5">
+                                    <span className="inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
                                         {index + 1}
                                     </span>
                                     <div className="flex flex-col gap-1">
                                         <FieldLabel
                                             htmlFor={hasOptions ? `label-question-${question.id}` : `question-input-${question.id}`}
-                                            className="text-base leading-normal font-semibold text-card-foreground"
+                                            className="text-sm leading-snug font-semibold text-card-foreground"
                                         >
                                             {question.label}
                                             <span className="ml-1 text-destructive">*</span>
                                         </FieldLabel>
                                         {question.description && (
-                                            <FieldDescription className="text-sm text-muted-foreground">{question.description}</FieldDescription>
+                                            <FieldDescription className="text-xs text-muted-foreground">{question.description}</FieldDescription>
                                         )}
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="pl-10">
+                            <div className="pl-9">
                                 {hasOptions ? (
                                     <Controller
                                         name={`answers.${index}.guest_book_question_option_id`}
@@ -146,7 +147,7 @@ export function CreateGuestBookForm({ questions, onSuccessSubmit }: Props) {
                                                     <RadioGroup
                                                         value={field.value}
                                                         onValueChange={selectOption}
-                                                        className="gap-2.5"
+                                                        className={cn("gap-2", useOptionGrid && "sm:grid-cols-2")}
                                                         aria-labelledby={`label-question-${question.id}`}
                                                     >
                                                         {question.options.map((option) => {
@@ -156,14 +157,15 @@ export function CreateGuestBookForm({ questions, onSuccessSubmit }: Props) {
                                                                 <div
                                                                     key={option.id}
                                                                     className={cn(
-                                                                        "rounded-lg border p-3.5 transition-colors",
+                                                                        "rounded-lg border px-3 py-2 transition-colors",
                                                                         isSelected
                                                                             ? "border-primary/50 bg-primary/5 dark:bg-primary/10"
                                                                             : "border-border hover:bg-muted/40",
+                                                                        option.is_allow_custom_text && isSelected && "sm:col-span-2",
                                                                     )}
                                                                 >
                                                                     <div
-                                                                        className="flex cursor-pointer items-center gap-3"
+                                                                        className="flex cursor-pointer items-center gap-2.5"
                                                                         onClick={() => selectOption(option.id)}
                                                                     >
                                                                         <RadioGroupItem value={option.id} id={`option-${option.id}`} />
@@ -184,14 +186,14 @@ export function CreateGuestBookForm({ questions, onSuccessSubmit }: Props) {
                                                                     </div>
 
                                                                     {option.is_allow_custom_text && isSelected && (
-                                                                        <div className="mt-3 pl-7">
+                                                                        <div className="mt-2 pl-6">
                                                                             <Controller
                                                                                 name={`answers.${index}.custom_text`}
                                                                                 control={form.control}
                                                                                 render={({ field: customField, fieldState: customFieldState }) => (
                                                                                     <Field
                                                                                         data-invalid={Boolean(customFieldState.invalid)}
-                                                                                        className="gap-1.5"
+                                                                                        className="gap-1"
                                                                                     >
                                                                                         <FieldLabel
                                                                                             htmlFor={`custom-text-${option.id}`}
