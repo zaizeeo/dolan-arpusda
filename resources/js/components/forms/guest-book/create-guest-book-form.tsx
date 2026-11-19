@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Textarea } from "@/components/ui/textarea";
 import { getCreateGuestBookSchema } from "@/lib/validations/guest-book";
 import { z } from "zod";
 import { createGuestBook } from "@/routes";
@@ -101,34 +102,39 @@ export function CreateGuestBookForm({ questions, onSuccessSubmit }: Props) {
         <form id="form-create-guest-book" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             {formErrorMessage && <FieldError errors={[{ message: formErrorMessage }]} />}
 
-            <FieldGroup className="gap-3">
+            <FieldGroup className="gap-6">
                 {questions.map((question, index) => {
-                    const hasOptions = Array.isArray(question.options) && question.options.length > 0;
-                    const useOptionGrid = question.options.length >= 4;
+                    const hasOptions = question.options.length > 0;
+                    const useThreeColumns = question.options.length >= 6;
+                    const isLongTextAnswer = /alamat|keterangan|catatan|saran|pesan/i.test(question.label);
 
                     return (
-                        <div key={question.id} className="rounded-xl border border-border bg-card p-4 shadow-xs transition-shadow hover:shadow-sm">
-                            <div className="mb-3">
-                                <div className="flex items-start gap-2.5">
-                                    <span className="inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
-                                        {index + 1}
-                                    </span>
-                                    <div className="flex flex-col gap-1">
-                                        <FieldLabel
-                                            htmlFor={hasOptions ? `label-question-${question.id}` : `question-input-${question.id}`}
-                                            className="text-sm leading-snug font-semibold text-card-foreground"
-                                        >
+                        <div
+                            key={question.id}
+                            className="grid gap-2.5 md:grid-cols-[12rem_minmax(0,1fr)] md:gap-6 xl:grid-cols-[14rem_minmax(0,1fr)]"
+                        >
+                            <div className="flex items-start gap-2.5 md:pt-0.5">
+                                <span className="inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+                                    {index + 1}
+                                </span>
+                                <div className="flex flex-col gap-0.5">
+                                    <FieldLabel
+                                        id={hasOptions ? `label-question-${question.id}` : undefined}
+                                        htmlFor={hasOptions ? undefined : `question-input-${question.id}`}
+                                        className="w-full text-sm leading-snug font-semibold text-card-foreground"
+                                    >
+                                        <span>
                                             {question.label}
                                             <span className="ml-1 text-destructive">*</span>
-                                        </FieldLabel>
-                                        {question.description && (
-                                            <FieldDescription className="text-xs text-muted-foreground">{question.description}</FieldDescription>
-                                        )}
-                                    </div>
+                                        </span>
+                                    </FieldLabel>
+                                    {question.description && (
+                                        <FieldDescription className="text-xs text-muted-foreground">{question.description}</FieldDescription>
+                                    )}
                                 </div>
                             </div>
 
-                            <div className="pl-9">
+                            <div className="min-w-0">
                                 {hasOptions ? (
                                     <Controller
                                         name={`answers.${index}.guest_book_question_option_id`}
@@ -147,7 +153,7 @@ export function CreateGuestBookForm({ questions, onSuccessSubmit }: Props) {
                                                     <RadioGroup
                                                         value={field.value}
                                                         onValueChange={selectOption}
-                                                        className={cn("gap-2", useOptionGrid && "sm:grid-cols-2")}
+                                                        className={cn("gap-2", useThreeColumns ? "sm:grid-cols-2 xl:grid-cols-3" : "sm:grid-cols-2")}
                                                         aria-labelledby={`label-question-${question.id}`}
                                                     >
                                                         {question.options.map((option) => {
@@ -161,7 +167,7 @@ export function CreateGuestBookForm({ questions, onSuccessSubmit }: Props) {
                                                                         isSelected
                                                                             ? "border-primary/50 bg-primary/5 dark:bg-primary/10"
                                                                             : "border-border hover:bg-muted/40",
-                                                                        option.is_allow_custom_text && isSelected && "sm:col-span-2",
+                                                                        option.is_allow_custom_text && isSelected && "col-span-full",
                                                                     )}
                                                                 >
                                                                     <div
@@ -231,12 +237,22 @@ export function CreateGuestBookForm({ questions, onSuccessSubmit }: Props) {
                                         control={form.control}
                                         render={({ field, fieldState }) => (
                                             <Field data-invalid={Boolean(fieldState.invalid)}>
-                                                <Input
-                                                    id={`question-input-${question.id}`}
-                                                    placeholder={`Masukkan ${question.label.toLowerCase()}...`}
-                                                    aria-invalid={Boolean(fieldState.invalid)}
-                                                    {...field}
-                                                />
+                                                {isLongTextAnswer ? (
+                                                    <Textarea
+                                                        id={`question-input-${question.id}`}
+                                                        placeholder={`Masukkan ${question.label.toLowerCase()}...`}
+                                                        aria-invalid={Boolean(fieldState.invalid)}
+                                                        rows={3}
+                                                        {...field}
+                                                    />
+                                                ) : (
+                                                    <Input
+                                                        id={`question-input-${question.id}`}
+                                                        placeholder={`Masukkan ${question.label.toLowerCase()}...`}
+                                                        aria-invalid={Boolean(fieldState.invalid)}
+                                                        {...field}
+                                                    />
+                                                )}
                                                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                                             </Field>
                                         )}
@@ -247,7 +263,8 @@ export function CreateGuestBookForm({ questions, onSuccessSubmit }: Props) {
                     );
                 })}
 
-                <div className="pt-2">
+                <div className="grid gap-2 pt-2 md:grid-cols-[12rem_minmax(0,1fr)] md:gap-6 xl:grid-cols-[14rem_minmax(0,1fr)]">
+                    <div className="hidden md:block" />
                     <Button disabled={isLoading} type="submit" size="lg" className="w-full font-semibold">
                         {isLoading ? (
                             <>
