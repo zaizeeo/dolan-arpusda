@@ -58,7 +58,7 @@ const HomePage = ({ activeQuestions = [], survey = null }: Props) => {
             activeForm="guestbook"
             badge="Buku Tamu Digital"
             badgeIcon={Sparkles}
-            title=""
+            title="Buku Tamu Kunjungan"
             description="Selamat datang di Dinas Arsip dan Perpustakaan Daerah Kabupaten Banyumas. Silakan lengkapi formulir di bawah ini untuk mencatat kunjungan Anda."
         >
             <Head title="Buku Tamu" />
@@ -76,17 +76,17 @@ const HomePage = ({ activeQuestions = [], survey = null }: Props) => {
                     </CardHeader>
                 </Card>
             ) : (
-                <Card className="border-border bg-card shadow-sm lg:my-auto lg:flex lg:flex-col lg:gap-1 lg:py-1.5">
-                    <CardHeader className="border-b border-border pb-4 lg:pb-1.5">
+                <Card className="border-border bg-card shadow-sm">
+                    <CardHeader className="border-b border-border pb-4">
                         <div className="flex items-center gap-2 text-primary">
-                            <BookOpen className="size-5 shrink-0" />
-                            <CardTitle className="text-lg font-semibold text-card-foreground lg:text-base">Formulir Kunjungan</CardTitle>
+                            <BookOpen className="size-5" />
+                            <CardTitle className="text-lg font-semibold text-card-foreground">Formulir Kunjungan</CardTitle>
                         </div>
-                        <CardDescription className="lg:text-xs">
+                        <CardDescription>
                             Mohon lengkapi semua pertanyaan bertanda bintang (<span className="text-destructive">*</span>) dengan benar.
                         </CardDescription>
                     </CardHeader>
-                    <CardContent className="pt-6 lg:pt-1">
+                    <CardContent className="pt-6">
                         <CreateGuestBookForm questions={activeQuestions} onSuccessSubmit={openSurveyDialog} />
                     </CardContent>
                 </Card>
